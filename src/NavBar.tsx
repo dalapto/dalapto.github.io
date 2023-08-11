@@ -17,8 +17,9 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import { blue } from '@mui/material/colors';
 
-const pages = ['About', 'Projects', 'Blog'];
 const projects = ['WebDev - ArcGIS JS', 'Modding: Rise of Nations - WW2', 'Modding: M2TW - Early to Late'];
+const routes = ["about", "projects", "blog", "arcgis", "ron", "m2tw"];
+const pages = ['About', 'Projects' , 'Blog'];
 
 function NavBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
@@ -94,7 +95,7 @@ function NavBar() {
               {pages.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">{page}</Typography>
-                  <Menu
+                  {page == "Projects" && <Menu
                     sx={{ mt: '45px' }}
                     id="menu-appbar"
                     anchorEl={anchorElUser}
@@ -115,7 +116,7 @@ function NavBar() {
                         <Typography textAlign="center">{project}</Typography>
                         </MenuItem>
                     ))}
-            </Menu>
+            </Menu>}
                 </MenuItem>
               ))}
             </Menu>
@@ -139,13 +140,12 @@ function NavBar() {
           >
             LOGO
           </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+          <Box sx={{ justifyContent: 'flexEnd' }}>
             {pages.map((page) => (
               <Button
                 key={page}
                 onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
+                sx={{ my: 2, color: 'white', display: 'block' }}>
                 {page}
               </Button>
             ))}
