@@ -44,7 +44,8 @@ function NavBar() {
     <AppBar id="NavBar" position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <SickSharpIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+        <Box sx={{ flexGrow: 100, display: { xs: 'none', md: 'flex' } }}>
+          <SickSharpIcon/>
           <Typography
             variant="h6"
             noWrap
@@ -52,7 +53,7 @@ function NavBar() {
             href="/"
             sx={{
               mr: 2,
-              display: { xs: 'none', md: 'flex' },
+              ml: 4,
               fontFamily: 'monospace',
               fontWeight: 700,
               letterSpacing: '.3rem',
@@ -62,114 +63,65 @@ function NavBar() {
           >
             LOGO
           </Typography>
+        </Box>
 
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{
-                display: { xs: 'block', md: 'none' },
-              }}
-            >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
-                  {page == "Projects" && <Menu
-                    sx={{ mt: '45px' }}
-                    id="menu-appbar"
-                    anchorEl={anchorElUser}
-                    anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                    }}
-                    keepMounted
-                    transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                    }}
-                    open={Boolean(anchorElUser)}
-                    onClose={handleCloseUserMenu}
-                    >
-                    {projects.map((project) => (
-                        <MenuItem key={project} onClick={handleCloseUserMenu}>
-                        <Typography textAlign="center">{project}</Typography>
-                        </MenuItem>
-                    ))}
-            </Menu>}
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-          <SickSharpIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href="/"
-            sx={{
-              mr: 2,
-              display: { xs: 'flex', md: 'none' },
-              flexGrow: 1,
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            LOGO
-          </Typography>
-          <Box sx={{ justifyContent: 'flexEnd' }}>
+          <Box sx={{ flexGrow: 0, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Button
                 key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}>
+                onClick={handleOpenUserMenu}
+                sx={{ my: 2, color: 'white' }}>
                 {page}
               </Button>
             ))}
+            {pages.map((page) => (
+            <MenuItem key={page} onClick={handleCloseNavMenu}>
+            <Menu
+                sx={{ mt: '45px' }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+                >
+                {projects.map((project) => (
+                    <MenuItem key={project} onClick={handleCloseUserMenu}>
+                    <Typography textAlign="center">{project}</Typography>
+                    </MenuItem>
+                ))}
+            </Menu>
+            </MenuItem>
+            ))}
           </Box>
-
-          <Box sx={{ flexGrow: 0 }}>
+          
+          
+          <Box sx={{ flexGrow: 0, display: { xs: 'none', md: 'flex' }, mr: 2}}>
             <Tooltip title="Link to LinkedIn">
               <a href="https://www.linkedin.com/in/david-mcalister/" target="_blank" rel="noopener noreferrer">
                 <IconButton sx={{ p: 0 }}>
-                    <LinkedInIcon sx={{ color: blue[500], display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+                    <LinkedInIcon sx={{ color: blue[500] }} />
                 </IconButton>
               </a>
             </Tooltip>
           </Box>
-        </Toolbar>
-        <Box sx={{ flexGrow: 0 }}>
+        <Box sx={{ flexGrow: 0, display: { xs: 'none', md: 'flex' }, mr:1 }}>
             <Tooltip title="Link to GitHub">
             <a href="https://github.com/dalapto/react-arcgis" target="_blank" rel="noopener noreferrer">
                 <IconButton sx={{ p: 0 }}>
-                    <GitHubIcon sx={{ color: blue[50], display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+                    <GitHubIcon sx={{ color: blue[50] }} />
                 </IconButton>
             </a>
             </Tooltip>
           </Box>
+        </Toolbar>
       </Container>
     </AppBar>
   );
