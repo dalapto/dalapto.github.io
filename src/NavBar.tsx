@@ -12,11 +12,12 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
+import SickSharp from '@mui/icons-material/SickSharp';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import { blue } from '@mui/material/colors';
 
 const pages = ['About', 'Projects', 'Blog'];
-const projects = ['WebDeb - ArcGIS JS', 'Modding Rise of Nations - WW2', 'Modding M2TW - Early to Late', 'Logout'];
+const projects = ['WebDev - ArcGIS JS', 'Modding: Rise of Nations - WW2', 'Modding: M2TW - Early to Late'];
 
 function NavBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
@@ -41,7 +42,7 @@ function NavBar() {
     <AppBar id="NavBar" position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+          <SickSharp sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
           <Typography
             variant="h6"
             noWrap
@@ -92,11 +93,33 @@ function NavBar() {
               {pages.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">{page}</Typography>
+                  <Menu
+                    sx={{ mt: '45px' }}
+                    id="menu-appbar"
+                    anchorEl={anchorElUser}
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    open={Boolean(anchorElUser)}
+                    onClose={handleCloseUserMenu}
+                    >
+                    {projects.map((project) => (
+                        <MenuItem key={project} onClick={handleCloseUserMenu}>
+                        <Typography textAlign="center">{project}</Typography>
+                        </MenuItem>
+                    ))}
+            </Menu>
                 </MenuItem>
               ))}
             </Menu>
           </Box>
-          <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
+          <SickSharp sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
           <Typography
             variant="h5"
             noWrap
@@ -130,31 +153,9 @@ function NavBar() {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <LinkedInIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+                <LinkedInIcon sx={{ color: blue[500], display: { xs: 'none', md: 'flex' }, mr: 1 }} />
               </IconButton>
             </Tooltip>
-            <Menu
-              sx={{ mt: '45px' }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {projects.map((project) => (
-                <MenuItem key={project} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{project}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
           </Box>
         </Toolbar>
       </Container>
