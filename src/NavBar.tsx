@@ -12,8 +12,9 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import SickSharp from '@mui/icons-material/SickSharp';
+import SickSharpIcon from '@mui/icons-material/SickSharp';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import { blue } from '@mui/material/colors';
 
 const pages = ['About', 'Projects', 'Blog'];
@@ -42,7 +43,7 @@ function NavBar() {
     <AppBar id="NavBar" position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <SickSharp sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+          <SickSharpIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
           <Typography
             variant="h6"
             noWrap
@@ -119,7 +120,7 @@ function NavBar() {
               ))}
             </Menu>
           </Box>
-          <SickSharp sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
+          <SickSharpIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
           <Typography
             variant="h5"
             noWrap
@@ -151,13 +152,24 @@ function NavBar() {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <LinkedInIcon sx={{ color: blue[500], display: { xs: 'none', md: 'flex' }, mr: 1 }} />
-              </IconButton>
+            <Tooltip title="Link to LinkedIn">
+              <a href="https://www.linkedin.com/in/david-mcalister/" target="_blank" rel="noopener noreferrer">
+                <IconButton sx={{ p: 0 }}>
+                    <LinkedInIcon sx={{ color: blue[500], display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+                </IconButton>
+              </a>
             </Tooltip>
           </Box>
         </Toolbar>
+        <Box sx={{ flexGrow: 0 }}>
+            <Tooltip title="Link to GitHub">
+            <a href="https://github.com/dalapto/react-arcgis" target="_blank" rel="noopener noreferrer">
+                <IconButton sx={{ p: 0 }}>
+                    <GitHubIcon sx={{ color: blue[50], display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+                </IconButton>
+            </a>
+            </Tooltip>
+          </Box>
       </Container>
     </AppBar>
   );
