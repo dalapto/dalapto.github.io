@@ -13,9 +13,10 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
 
-const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const pages = ['About', 'Projects', 'Blog'];
+const projects = ['WebDeb - ArcGIS JS', 'Modding Rise of Nations - WW2', 'Modding M2TW - Early to Late', 'Logout'];
 
 function NavBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
@@ -129,7 +130,7 @@ function NavBar() {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <LinkedInIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
               </IconButton>
             </Tooltip>
             <Menu
@@ -148,9 +149,9 @@ function NavBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
+              {projects.map((project) => (
+                <MenuItem key={project} onClick={handleCloseUserMenu}>
+                  <Typography textAlign="center">{project}</Typography>
                 </MenuItem>
               ))}
             </Menu>
