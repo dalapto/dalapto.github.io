@@ -1,7 +1,7 @@
 {
   "name": "react-arcgis",
   "version": "0.1.0",
-  "homepage": "https://dalapto.github.io/react-arcgis/",
+  "homepage": "https://dalapto.github.io/react/",
   "private": true,
   "dependencies": {
     "@arcgis/core": "^4.27.6",
