@@ -18,18 +18,18 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import { blue } from '@mui/material/colors';
 import {Link} from "react-router-dom";
 
-const projects = ['WebDev - ArcGIS JS', 'Modding: Rise of Nations - WW2', 'Modding: M2TW - Early to Late'];
-const routes = ["about", "projects", "blog", "arcgis", "ron", "m2tw"];
+const projects = [{ name: 'WebDev - ArcGIS JS', route: "arcgis"  }, 
+{name: 'Modding: Rise of Nations - WW2', route: "ron"}, {name: 'Modding: M2TW - Early to Late', route: "m2tw"}];
 const pages = ['About', 'Projects' , 'Blog'];
 
 function NavBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+  const [anchorElProjects, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+  const handleOpenProjectsMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
 
@@ -37,7 +37,7 @@ function NavBar() {
     setAnchorElNav(null);
   };
 
-  const handleCloseUserMenu = () => {
+  const handleCloseProjectsMenu = () => {
     setAnchorElUser(null);
   };
 
@@ -45,7 +45,7 @@ function NavBar() {
 <AppBar id="NavBar" position="static">
 <Container maxWidth={false}>
   <Toolbar disableGutters>
-    <SickSharpIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+    <SickSharpIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 2 }} />
     <Typography
       variant="h6"
       noWrap
@@ -64,7 +64,7 @@ function NavBar() {
       LOGO
     </Typography>
 
-    <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+    <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none'} }}>
       <IconButton
         size="large"
         aria-label="account of current user"
@@ -75,7 +75,7 @@ function NavBar() {
       >
         <MenuIcon />
       </IconButton>
-      <Menu
+      <Menu //burger menu for mobile
         id="menu-appbar"
         anchorEl={anchorElNav}
         anchorOrigin={{
@@ -96,7 +96,7 @@ function NavBar() {
         {pages.map((page) => (
           <MenuItem key={page} onClick={handleCloseNavMenu}>
             <Typography textAlign="center">
-            <Link style={{textDecoration:"none", color: "white"}}to={`/${page}`}>{page}</Link>
+            { (page == "Projects") ? page : <Link style={{textDecoration:"none", color: "black"}}to={`/${page}`}>{page}</Link> } 
             </Typography>
           </MenuItem>
         ))}
@@ -121,13 +121,13 @@ function NavBar() {
     >
       LOGO
     </Typography>
-    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+    <Box sx={{ flexGrow: 1, display: { justifyContent: "flex-end", xs: 'none', md: 'flex' } }}>
       {pages.map((page) => (
         <Button
           key={page}
           onClick={handleCloseNavMenu}
           sx={{ my: 2, color: 'white', display: 'block' }}>
-                        <Link style={{textDecoration:"none", color: "white"}}to={`/${page}`}>{page}</Link>
+            { (page == "Projects") ? page : <Link style={{textDecoration:"none", color: "white"}}to={`/${page}`}>{page}</Link> }
         </Button>
       ))}
     </Box>
@@ -151,16 +151,16 @@ function NavBar() {
             </a>
             </Tooltip>
     </Box>
-    {/* <Box sx={{ flexGrow: 0 }}>
+    <Box sx={{ flexGrow: 0 }}>
       <Tooltip title="Open settings">
-        <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+        <IconButton onClick={handleOpenProjectsMenu} sx={{ p: 0 }}>
           <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
         </IconButton>
       </Tooltip>
       <Menu
         sx={{ mt: '45px' }}
         id="menu-appbar"
-        anchorEl={anchorElUser}
+        anchorEl={anchorElProjects}
         anchorOrigin={{
           vertical: 'top',
           horizontal: 'right',
@@ -170,16 +170,18 @@ function NavBar() {
           vertical: 'top',
           horizontal: 'right',
         }}
-        open={Boolean(anchorElUser)}
-        onClose={handleCloseUserMenu}
+        open={Boolean(anchorElProjects)}
+        onClose={handleCloseProjectsMenu}
       >
-        {settings.map((setting) => (
-          <MenuItem key={setting} onClick={handleCloseUserMenu}>
-            <Typography textAlign="center">{setting}</Typography>
+        {projects.map((project) => (
+          <MenuItem key={project.route} onClick={handleCloseProjectsMenu}>
+            <Typography textAlign="center">
+              <Link style={{textDecoration:"none", color: "black"}}to={`/${project.route}`}>{project.name}</Link>
+              </Typography>
           </MenuItem>
         ))}
-      </Menu> */}
-    {/* </Box> */}
+      </Menu>
+    </Box>
   </Toolbar>
 </Container>
 </AppBar>
