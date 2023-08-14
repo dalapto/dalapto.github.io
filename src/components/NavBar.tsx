@@ -13,8 +13,8 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import SickSharpIcon from '@mui/icons-material/SickSharp';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import GitHubIcon from '@mui/icons-material/GitHub';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import { blue } from '@mui/material/colors';
 import {Link} from "react-router-dom";
 
@@ -45,15 +45,17 @@ function NavBar() {
 <AppBar id="NavBar" position="static">
 <Container maxWidth={false}>
   <Toolbar disableGutters>
-    <SickSharpIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 2 }} />
+    <SickSharpIcon sx={{ display: { xs: 'flex', md: 'flex' }, mr: 3 }} />
     <Typography
-      variant="h6"
+      variant="h5"
       noWrap
       component="a"
       href="/"
       sx={{
         mr: 2,
-        display: { xs: 'none', md: 'flex' },
+        display: { xs: 'flex', md: 'flex' },
+        flexGrow: 1,
+        fontSize: '1.5rem',
         fontFamily: 'monospace',
         fontWeight: 700,
         letterSpacing: '.3rem',
@@ -61,10 +63,11 @@ function NavBar() {
         textDecoration: 'none',
       }}
     >
-      LOGO
+      DM
     </Typography>
 
-    <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none'} }}>
+    {/* //burger menu for mobile instead of navbar */}
+    <Box sx={{ display: { xs: 'flex', md: 'none'} }}>  
       <IconButton
         size="large"
         aria-label="account of current user"
@@ -75,7 +78,7 @@ function NavBar() {
       >
         <MenuIcon />
       </IconButton>
-      <Menu //burger menu for mobile
+      <Menu 
         id="menu-appbar"
         anchorEl={anchorElNav}
         anchorOrigin={{
@@ -94,69 +97,47 @@ function NavBar() {
         }}
       >
         {pages.map((page) => (
-          <MenuItem key={page} onClick={handleCloseNavMenu}>
-            <Typography textAlign="center">
+          <MenuItem key={page} onClick={(page == "Projects") ? handleOpenProjectsMenu : handleCloseNavMenu}>
             { (page == "Projects") ? page : <Link style={{textDecoration:"none", color: "black"}}to={`/${page}`}>{page}</Link> } 
-            </Typography>
+
           </MenuItem>
         ))}
       </Menu>
     </Box>
-    <SickSharpIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-    <Typography
-      variant="h5"
-      noWrap
-      component="a"
-      href="/"
-      sx={{
-        mr: 2,
-        display: { xs: 'flex', md: 'none' },
-        flexGrow: 1,
-        fontFamily: 'monospace',
-        fontWeight: 700,
-        letterSpacing: '.3rem',
-        color: 'inherit',
-        textDecoration: 'none',
-      }}
-    >
-      LOGO
-    </Typography>
-    <Box sx={{ flexGrow: 1, display: { justifyContent: "flex-end", xs: 'none', md: 'flex' } }}>
+
+    
+    {/* pages as normal */}
+    <Box sx={{ flexGrow: 0.25, display: { justifyContent: "space-around", xs: 'none', md: 'flex' } }}>
       {pages.map((page) => (
         <Button
-          key={page}
-          onClick={handleCloseNavMenu}
-          sx={{ my: 2, color: 'white', display: 'block' }}>
+        key={page}
+        onClick={(page == "Projects") ? handleOpenProjectsMenu : handleCloseNavMenu}
+        sx={{ my: 2, color: 'white', display: 'block' }}>
+            <Typography textAlign="center" sx={{textTransform:"capitalize", fontFamily:"arial", fontSize: '1.2rem'}}>
             { (page == "Projects") ? page : <Link style={{textDecoration:"none", color: "white"}}to={`/${page}`}>{page}</Link> }
+            </Typography>
         </Button>
       ))}
     </Box>
 
 
     <Box sx={{ flexGrow: 0, display: 'flex', mr: 2}}>
-            <Tooltip title="Link to LinkedIn">
               <a href="https://www.linkedin.com/in/david-mcalister/" target="_blank" rel="noopener noreferrer">
-                <IconButton sx={{ p: 0 }}>
-                    <LinkedInIcon sx={{ color: blue[500] }} />
+                <IconButton>
+                    {/* issues getting this to look 100% like normal icon, left for now */}
+                    <LinkedInIcon sx={{ color: 'blue', backgroundColor: 'white' }} />
+                    {/* could also move to a bottom navbar with a white bg instead, which would avert issue */}
                 </IconButton>
               </a>
-            </Tooltip>
           </Box>
         <Box sx={{ flexGrow: 0, display: 'flex', mr:1, justifyContent: "" }}>
-            <Tooltip title="Link to GitHub">
             <a href="https://github.com/dalapto/react-arcgis" target="_blank" rel="noopener noreferrer">
-                <IconButton sx={{ p: 0 }}>
-                    <GitHubIcon sx={{ color: blue[50] }} />
+                <IconButton>
+                    <GitHubIcon sx={{ color: 'white' }} />
                 </IconButton>
             </a>
-            </Tooltip>
     </Box>
     <Box sx={{ flexGrow: 0 }}>
-      <Tooltip title="Open settings">
-        <IconButton onClick={handleOpenProjectsMenu} sx={{ p: 0 }}>
-          <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-        </IconButton>
-      </Tooltip>
       <Menu
         sx={{ mt: '45px' }}
         id="menu-appbar"
