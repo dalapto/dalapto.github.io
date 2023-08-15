@@ -49,8 +49,7 @@ function NavBar() {
     <Typography
       variant="h5"
       noWrap
-      component="a"
-      href="/"
+      component="p"
       sx={{
         mr: 2,
         display: { xs: 'flex', md: 'flex' },
