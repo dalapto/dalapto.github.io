@@ -8,15 +8,12 @@ import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import SickSharpIcon from '@mui/icons-material/SickSharp';
+import HomeIcon from '@mui/icons-material/Home';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import { blue } from '@mui/material/colors';
-import {Link} from "react-router-dom";
+import {Link,useLocation} from "react-router-dom";
 import Popper from '@mui/material/Popper';
 
 const projects = [{ name: 'WebDev - ArcGIS JS', route: "arcgis"  }, 
@@ -42,15 +39,19 @@ function NavBar() {
     setAnchorElProjects(null);
   };
 
+  const currentPage = useLocation().pathname;
+
   return (
-<AppBar id="NavBar" position="static">
+<AppBar id="navbar" position="static">
 <Container maxWidth={false}>
   <Toolbar disableGutters>
-    <SickSharpIcon sx={{ display: { xs: 'flex', md: 'flex' }, mr: 3 }} />
+  <Box id="navbar">  
+    <HomeIcon sx={{ display: { xs: 'flex', md: 'flex' }, mr: 3 }} />
     <Typography
       variant="h5"
       noWrap
       component="p"
+      id={currentPage == '/' ? 'home-text-selected' : 'home-text'}
       sx={{
         mr: 2,
         display: { xs: 'flex', md: 'flex' },
@@ -63,14 +64,17 @@ function NavBar() {
         textDecoration: 'none',
       }}
     >
-      DM
+      HOME
     </Typography>
+    </Box>
+
+    {/* Used for empty space on bar */}
+    <Box sx={{ flexGrow: 0.75}}> </Box>
 
     {/* //burger menu for mobile instead of navbar */}
     <Box sx={{ display: { xs: 'flex', md: 'none'} }}>  
       <IconButton
         size="large"
-        aria-label="account of current user"
         aria-controls="menu-appbar"
         aria-haspopup="true"
         onClick={handleOpenNavMenu}
@@ -108,7 +112,7 @@ function NavBar() {
     {/* pages as normal */}
     <Box sx={{ flexGrow: 0.25, display: { justifyContent: "space-around", xs: 'none', md: 'flex' } }}>
       {pages.map((page) => (
-        <Button id={`NavButton`}
+        <Button id={'/'+page == currentPage ? `navbar-button-selected` : `navbar-button`}
         key={page}
         onMouseEnter={(page == "Projects") ? handleOpenProjectsMenu : handleCloseNavMenu}
         onClick={handleCloseProjectsMenu}
@@ -137,7 +141,7 @@ function NavBar() {
                 </IconButton>
             </a>
     </Box>
-    <Box sx={{ flexGrow: 0, display: { xs: 'none', mt: '200' }, }}>
+    <Box sx={{ flexGrow: 0, display: { xs: 'none' }, }}>
       <Popper
         id="menu-appbar"
         anchorEl={anchorElProjects}
@@ -179,11 +183,11 @@ function NavBar() {
         onMouseLeave={handleCloseProjectsMenu}
       >
         {projects.map((project) => (
-          <MenuItem key={project.route} onClick={handleCloseProjectsMenu}>
-            <Typography id="menu-appbar-item" textAlign="center">
-              <Link style={{textDecoration:"none", color: "white"}}to={`/${project.route}`}>{project.name}</Link>
-              </Typography>
-          </MenuItem>
+          <MenuItem key={project.route} component={Link} to={`/${project.route}`}>
+          <Typography id="menu-appbar-item" textAlign="center" color={"white"} onClick={handleCloseProjectsMenu}>
+            {project.name}
+          </Typography>
+        </MenuItem>
         ))}
       </Popper>
     </Box>
