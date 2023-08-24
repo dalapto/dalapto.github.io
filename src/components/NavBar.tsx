@@ -17,6 +17,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import { blue } from '@mui/material/colors';
 import {Link} from "react-router-dom";
+import Popper from '@mui/material/Popper';
 
 const projects = [{ name: 'WebDev - ArcGIS JS', route: "arcgis"  }, 
 {name: 'Modding: Rise of Nations - WW2', route: "ron"}, {name: 'Modding: M2TW - Early to Late', route: "m2tw"}];
@@ -24,13 +25,13 @@ const pages = ['About', 'Projects' , 'Blog'];
 
 function NavBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
-  const [anchorElProjects, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+  const [anchorElProjects, setAnchorElProjects] = React.useState<null | HTMLElement>(null);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
   const handleOpenProjectsMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget);
+    setAnchorElProjects(event.currentTarget);
   };
 
   const handleCloseNavMenu = () => {
@@ -38,7 +39,7 @@ function NavBar() {
   };
 
   const handleCloseProjectsMenu = () => {
-    setAnchorElUser(null);
+    setAnchorElProjects(null);
   };
 
   return (
@@ -96,9 +97,8 @@ function NavBar() {
         }}
       >
         {pages.map((page) => (
-          <MenuItem key={page} onClick={(page == "Projects") ? handleOpenProjectsMenu : handleCloseNavMenu}>
-            { (page == "Projects") ? page : <Link style={{textDecoration:"none", color: "black"}}to={`/${page}`}>{page}</Link> } 
-
+          <MenuItem key={page} onClick={handleCloseNavMenu}>
+            <Link style={{textDecoration:"none", color: "black"}}to={`/${page}`}>{page}</Link>
           </MenuItem>
         ))}
       </Menu>
@@ -108,12 +108,13 @@ function NavBar() {
     {/* pages as normal */}
     <Box sx={{ flexGrow: 0.25, display: { justifyContent: "space-around", xs: 'none', md: 'flex' } }}>
       {pages.map((page) => (
-        <Button
+        <Button id={`NavButton`}
         key={page}
-        onClick={(page == "Projects") ? handleOpenProjectsMenu : handleCloseNavMenu}
+        onMouseEnter={(page == "Projects") ? handleOpenProjectsMenu : handleCloseNavMenu}
+        onClick={handleCloseProjectsMenu}
         sx={{ my: 2, color: 'white', display: 'block' }}>
             <Typography textAlign="center" sx={{textTransform:"capitalize", fontFamily:"arial", fontSize: '1.2rem'}}>
-            { (page == "Projects") ? page : <Link style={{textDecoration:"none", color: "white"}}to={`/${page}`}>{page}</Link> }
+            <Link style={{textDecoration:"none", color: "white"}}to={`/${page}`}>{page}</Link>
             </Typography>
         </Button>
       ))}
@@ -136,31 +137,55 @@ function NavBar() {
                 </IconButton>
             </a>
     </Box>
-    <Box sx={{ flexGrow: 0 }}>
-      <Menu
-        sx={{ mt: '45px' }}
+    <Box sx={{ flexGrow: 0, display: { xs: 'none', mt: '200' }, }}>
+      <Popper
         id="menu-appbar"
         anchorEl={anchorElProjects}
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        keepMounted
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
+        placement="bottom"
+        modifiers={[
+          {
+            name: 'offset',
+            enabled: true,
+            options: {
+              offset: [0, 10],
+            },
+          },
+          {
+            name: 'flip',
+            enabled: false,
+            options: {
+              altBoundary: false,
+              rootBoundary: 'document',
+              padding: 20,
+            },
+          },
+          {
+            name: 'preventOverflow',
+            enabled: true,
+            options: {
+              altAxis: true,
+              altBoundary: true,
+              tether: true,
+              rootBoundary: 'document',
+              padding: 20,
+            },
+          },
+          {
+            name: 'arrow',
+            enabled: false,
+            },
+        ]}
         open={Boolean(anchorElProjects)}
-        onClose={handleCloseProjectsMenu}
+        onMouseLeave={handleCloseProjectsMenu}
       >
         {projects.map((project) => (
           <MenuItem key={project.route} onClick={handleCloseProjectsMenu}>
-            <Typography textAlign="center">
-              <Link style={{textDecoration:"none", color: "black"}}to={`/${project.route}`}>{project.name}</Link>
+            <Typography id="menu-appbar-item" textAlign="center">
+              <Link style={{textDecoration:"none", color: "white"}}to={`/${project.route}`}>{project.name}</Link>
               </Typography>
           </MenuItem>
         ))}
-      </Menu>
+      </Popper>
     </Box>
   </Toolbar>
 </Container>

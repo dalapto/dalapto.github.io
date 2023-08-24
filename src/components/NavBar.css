@@ -8,3 +8,44 @@
     font-size: calc(10px + 2vmin);
     color: white;
   }
+
+#NavButton {
+  position: relative;
+  display: block;
+  text-decoration: none;
+  font-family: "Lato";
+  font-size: 2rem;;
+  color: #ecf0f1;
+  text-transform: uppercase;
+  padding: 4px 0;
+  transition: 0.5s;
+}
+#NavButton::after {
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 3px;
+  top: 100%;
+  left: 0;
+  background: #ffa865;
+  transition: transform 0.5s;
+  transform: scaleX(0);
+  transform-origin: right;
+}
+#NavButton:hover {
+  color: #95a5a6;
+}
+#NavButton:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+#menu-appbar {
+  background-color: #282c34;
+}
+
+#menu-appbar-item:hover {
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+  text-decoration-color: #ffa865;
+}

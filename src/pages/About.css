@@ -1,0 +1,11 @@
+#NavButton #About {
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 3px;
+  top: 100%;
+  left: 0;
+  background: #ffa865;
+  transition: transform 0.5s;
+  transform-origin: right;
+}

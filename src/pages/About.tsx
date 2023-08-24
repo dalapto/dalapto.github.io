@@ -1,7 +1,6 @@
 function About() {
   return (
-    <div className="App">About</div>
+    <div className="App">aboute</div>
   );
 }
-
 export default About;
