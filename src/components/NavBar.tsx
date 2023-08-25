@@ -72,7 +72,7 @@ function NavBar() {
     <Box sx={{ flexGrow: 0.75}}> </Box>
 
     {/* //burger menu for mobile instead of navbar */}
-    <Box sx={{ display: { xs: 'flex', md: 'none'} }}>  
+    <Box sx={{ display: { xs: 'flex', md: 'none'} }} >  
       <IconButton
         size="large"
         aria-controls="menu-appbar"
@@ -114,7 +114,7 @@ function NavBar() {
       {pages.map((page) => (
         <Button id={'/'+page == currentPage ? `navbar-button-selected` : `navbar-button`}
         key={page}
-        onMouseEnter={(page == "Projects") ? handleOpenProjectsMenu : handleCloseNavMenu}
+        onMouseEnter={(page == "Projects") ? handleOpenProjectsMenu : handleCloseProjectsMenu}
         onClick={handleCloseProjectsMenu}
         sx={{ my: 2, color: 'white', display: 'block' }}>
             <Typography textAlign="center" sx={{textTransform:"capitalize", fontFamily:"arial", fontSize: '1.2rem'}}>
