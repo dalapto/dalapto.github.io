@@ -151,7 +151,7 @@ function NavBar() {
 						<a href="https://www.linkedin.com/in/david-mcalister/" target="_blank" rel="noopener noreferrer">
 							<IconButton>
 								{/* issues getting this to look 100% like normal icon, left for now */}
-								<LinkedInIcon sx={{ color: 'blue', backgroundColor: 'white' }} />
+								<LinkedInIcon sx={{ color: 'white' }} />
 								{/* could also move to a bottom navbar with a white bg instead, which would avert issue */}
 							</IconButton>
 						</a>
