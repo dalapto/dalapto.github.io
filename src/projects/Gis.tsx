@@ -1,11 +1,11 @@
-import { useRef, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Bookmarks from '@arcgis/core/widgets/Bookmarks';
 import Expand from '@arcgis/core/widgets/Expand';
 import MapView from '@arcgis/core/views/MapView';
 import WebMap from '@arcgis/core/WebMap';
-
 import './Gis.css';
-import React from 'react';
+import Card from '@mui/material/Card';
+import Box from '@mui/material/Box';
 
 function Gis() {
 	const mapDiv = useRef(null);
@@ -52,7 +52,13 @@ function Gis() {
 		}
 	}, []);
 
-	return <div className="mapDiv" ref={mapDiv}></div>;
+	return (
+		<Box id="MapDiv">
+			<Card id="MapDiv" variant="outlined">
+				<div id="MapDiv" ref={mapDiv}></div>
+			</Card>
+		</Box>
+	);
 }
 
 export default Gis;

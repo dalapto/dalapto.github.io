@@ -13,7 +13,7 @@ import React, { useEffect } from 'react';
 function App() {
 	const currentPage = useLocation().pathname.slice(1);
 	useEffect(() => {
-		document.title = `${currentPage == '' ? 'dalapto.github.io | Welcome' : `${currentPage} | dalapto.github.io`}`;
+		document.title = `${currentPage == '' ? 'dalapto | Welcome' : `${currentPage} | dalapto.github.io`}`;
 	});
 
 	return (
