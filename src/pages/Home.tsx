@@ -9,7 +9,7 @@ function Home() {
 				<Box>
 					<p></p>
 					{/* need to change text dynamically to different languages */}
-					<Typography variant="h1">Welcome</Typography>
+					<Typography variant="h2">Welcome</Typography>
 				</Box>
 				<Box>
 					<Typography variant="h4">
