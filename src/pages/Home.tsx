@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Card, CardContent, CardMedia, Grid, Typography } from '@mui/material';
 import { Container } from '@mui/system';
 import React from 'react';
 
@@ -19,12 +19,39 @@ function Home() {
 						</p>
 					</Typography>
 					<span>Feel free to look around.</span>
+					<p></p>
 				</Box>
-				{/* grid with 3 rows */}
 				<Box>
-					<span>about (me)</span>
-					<span>projects (many)</span>
-					<span>blog (hc)</span>
+					{/* grid with 3 rows */}
+					<Grid container columnSpacing={3} justifyContent="center">
+						<Grid item>
+							<Card>
+								<CardMedia image="../src/img/tile-aboutmehome.png" sx={{ width: 300, height: 300 }}>
+									<Typography justifyItems="center" alignContent="center" color="white">
+										about (me)
+									</Typography>
+								</CardMedia>
+								<CardContent></CardContent>
+							</Card>
+						</Grid>
+						<Grid item>
+							<Card>
+								<CardMedia image="../src/img/tile-m2home.png" sx={{ width: 300, height: 300 }} />
+								<CardContent>
+									<span>projects (many)</span>
+								</CardContent>
+							</Card>
+						</Grid>
+
+						<Grid item>
+							<Card>
+								<CardMedia image="../src/img/tile-bloghome.png" sx={{ width: 300, height: 300 }} />
+								<CardContent>
+									<span>blog (many)</span>
+								</CardContent>
+							</Card>
+						</Grid>
+					</Grid>
 				</Box>
 			</Container>
 		</div>
