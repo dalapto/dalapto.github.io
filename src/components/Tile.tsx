@@ -17,7 +17,7 @@ function Tile({ image_path = '../src/img/tile-aboutmehome.png', text = '', img_w
 
 	return (
 		<Button onMouseEnter={() => setMouseOver(true)} onMouseLeave={() => setMouseOver(false)}>
-			<Card sx={{ backgroundColor: 'rgba(0,0,0,0)' }}>
+			<Card sx={{ backgroundColor: 'rgba(0,0,0,0)', boxShadow: 'none' }}>
 				<CardMedia
 					image={image_path}
 					sx={{
