@@ -205,7 +205,7 @@ function NavBar() {
 						onMouseLeave={handleCloseProjectsMenu}
 					>
 						{({ TransitionProps }) => (
-							<Fade {...TransitionProps}>
+							<Fade {...TransitionProps} timeout={300}>
 								<Box>
 									{projects.map((project) => (
 										<MenuItem key={project.route} component={Link} to={`/${project.route}`}>
