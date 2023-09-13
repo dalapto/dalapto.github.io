@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, CardMedia, Grid, Typography } from '@mui/material';
+import { Box, Card, CardContent, CardMedia, Grid, Stack, Typography } from '@mui/material';
 import { Container } from '@mui/system';
 import React from 'react';
 
@@ -27,11 +27,14 @@ function Home() {
 						<Grid item>
 							<Card>
 								<CardMedia image="../src/img/tile-aboutmehome.png" sx={{ width: 300, height: 300 }}>
-									<Typography justifyItems="center" alignContent="center" color="white">
-										about (me)
-									</Typography>
+									<Stack spacing={16}>
+										<Box></Box>
+										<Typography variant="h4" letterSpacing={3.5} justifyItems="center" alignContent="center" color="white">
+											About Me
+										</Typography>
+										<Box></Box>
+									</Stack>
 								</CardMedia>
-								<CardContent></CardContent>
 							</Card>
 						</Grid>
 						<Grid item>
