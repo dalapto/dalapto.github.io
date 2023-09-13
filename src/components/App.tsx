@@ -3,7 +3,6 @@ import Home from '../pages/Home';
 import About from '../pages/About';
 import Projects from '../pages/Projects';
 import Blog from '../pages/Blog';
-import Gis from '../projects/Gis';
 import Ron from '../projects/Ron';
 import Etl from '../projects/Etl';
 import './App.css';
@@ -26,7 +25,7 @@ function App() {
 				<Route path="Blog" element={<Blog />} />
 				<Route path="m2tw" element={<Etl />} />
 				<Route path="ron" element={<Ron />} />
-				<Route path="arcgis" element={<Gis />} />
+				<Route path="arcgis" element={<About />} />
 			</Routes>
 		</div>
 	);
