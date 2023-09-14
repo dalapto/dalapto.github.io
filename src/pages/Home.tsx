@@ -14,6 +14,7 @@ function Home() {
 		{ text: 'Vite', link: 'https://vitejs.dev/', img: '../src/img/logo-vite.png' },
 		{ text: 'React', link: 'https://react.dev/', img: '../src/img/logo-react.webp' },
 		{ text: 'TypeScript', link: 'https://www.typescriptlang.org/', img: '../src/img/logo-ts.png' },
+		{ text: 'Material UI', link: 'https://mui.com/', img: '../src/img/logo-mui.png' },
 		{ text: 'GitHub Pages', link: 'https://pages.github.com/', img: '../src/img/logo-github.png' },
 	];
 	return (
@@ -31,7 +32,7 @@ function Home() {
 						<p>
 							Making websites is fun.<br></br>So I made this one. <br></br>
 							<Typography fontSize={'1.6rem'} fontFamily={'monospace'}>
-								<span>{'It uses'}</span>
+								<span>It uses</span>
 								{tooltips.map((tooltip) => (
 									<span key={tooltip.text}>
 										{tooltip.text != tooltips[tooltips.length - 1].text ? ' ' : ' and '}

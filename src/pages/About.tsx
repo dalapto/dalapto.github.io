@@ -2,10 +2,12 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import React from 'react';
+import Temp from '../components/Temp';
 
 function About() {
 	return (
 		<div className="App">
+			<Temp></Temp>
 			<Container>
 				<Box>
 					<p></p>
