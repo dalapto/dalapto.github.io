@@ -18,7 +18,7 @@ import Popper from '@mui/material/Popper';
 import Fade from '@mui/material/Fade';
 
 const projects = [
-	{ name: 'VueJS Face Labeller', route: 'arcgis' },
+	{ name: 'VueJS Face Labeller', route: 'vue' },
 	{ name: 'Modding: Rise of Nations - WW2', route: 'ron' },
 	{ name: 'Modding: M2TW - Early to Late', route: 'm2tw' },
 ];

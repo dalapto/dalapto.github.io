@@ -25,7 +25,7 @@ function App() {
 				<Route path="Blog" element={<Blog />} />
 				<Route path="m2tw" element={<Etl />} />
 				<Route path="ron" element={<Ron />} />
-				<Route path="arcgis" element={<About />} />
+				<Route path="vue" element={<About />} />
 			</Routes>
 		</div>
 	);

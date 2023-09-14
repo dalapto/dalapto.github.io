@@ -16,8 +16,8 @@ function Tile({ image_path = '../src/img/tile-aboutmehome.png', text = '', img_w
 	const [isMouseOver, setMouseOver] = React.useState<boolean>(false);
 
 	return (
-		<Button onMouseEnter={() => setMouseOver(true)} onMouseLeave={() => setMouseOver(false)}>
-			<Card sx={{ backgroundColor: 'rgba(0,0,0,0)', boxShadow: 'none' }}>
+		<Card onMouseEnter={() => setMouseOver(true)} onMouseLeave={() => setMouseOver(false)} sx={{ backgroundColor: 'rgba(0,0,0,0)', boxShadow: 'none' }}>
+			<Button disabled>
 				<CardMedia
 					image={image_path}
 					sx={{
@@ -38,8 +38,8 @@ function Tile({ image_path = '../src/img/tile-aboutmehome.png', text = '', img_w
 						</Stack>
 					</Fade>
 				</CardMedia>
-			</Card>
-		</Button>
+			</Button>
+		</Card>
 	);
 }
 export default Tile;
