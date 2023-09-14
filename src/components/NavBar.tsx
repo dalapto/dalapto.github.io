@@ -18,7 +18,7 @@ import Popper from '@mui/material/Popper';
 import Fade from '@mui/material/Fade';
 
 const projects = [
-	{ name: 'WebDev - ArcGIS JS', route: 'arcgis' },
+	{ name: 'VueJS Face Labeller', route: 'vue' },
 	{ name: 'Modding: Rise of Nations - WW2', route: 'ron' },
 	{ name: 'Modding: M2TW - Early to Late', route: 'm2tw' },
 ];
@@ -151,13 +151,13 @@ function NavBar() {
 						<a href="https://www.linkedin.com/in/david-mcalister/" target="_blank" rel="noopener noreferrer">
 							<IconButton>
 								{/* issues getting this to look 100% like normal icon, left for now */}
-								<LinkedInIcon sx={{ color: 'blue', backgroundColor: 'white' }} />
+								<LinkedInIcon sx={{ color: 'white' }} />
 								{/* could also move to a bottom navbar with a white bg instead, which would avert issue */}
 							</IconButton>
 						</a>
 					</Box>
 					<Box sx={{ flexGrow: 0, display: 'flex', mr: 1, justifyContent: '' }}>
-						<a href="https://github.com/dalapto/react-arcgis" target="_blank" rel="noopener noreferrer">
+						<a href="https://github.com/dalapto/dalapto.github.io" target="_blank" rel="noopener noreferrer">
 							<IconButton>
 								<GitHubIcon sx={{ color: 'white' }} />
 							</IconButton>
@@ -205,7 +205,7 @@ function NavBar() {
 						onMouseLeave={handleCloseProjectsMenu}
 					>
 						{({ TransitionProps }) => (
-							<Fade {...TransitionProps}>
+							<Fade {...TransitionProps} timeout={300}>
 								<Box>
 									{projects.map((project) => (
 										<MenuItem key={project.route} component={Link} to={`/${project.route}`}>
