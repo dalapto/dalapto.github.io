@@ -23,7 +23,7 @@ function Tile({ image_path = '../src/img/tile-aboutmehome.png', text = '', img_w
 					sx={{
 						width: img_width,
 						height: img_height,
-						filter: isMouseOver ? '' : 'blur(1.1px)',
+						filter: isMouseOver ? '' : 'blur(1px)',
 						opacity: isMouseOver ? '1' : '0.7',
 						transitionDuration: '1s',
 						transform: isMouseOver ? 'scale(1)' : 'scale(0.85)',

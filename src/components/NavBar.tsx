@@ -157,7 +157,7 @@ function NavBar() {
 						</a>
 					</Box>
 					<Box sx={{ flexGrow: 0, display: 'flex', mr: 1, justifyContent: '' }}>
-						<a href="https://github.com/dalapto/react-arcgis" target="_blank" rel="noopener noreferrer">
+						<a href="https://github.com/dalapto/dalapto.github.io" target="_blank" rel="noopener noreferrer">
 							<IconButton>
 								<GitHubIcon sx={{ color: 'white' }} />
 							</IconButton>
