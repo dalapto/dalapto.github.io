@@ -5,7 +5,6 @@ export interface TypedTextProps {
 	string_list: string[];
 }
 
-// TO DO:
 function TypedText({ string_list = [] }: TypedTextProps) {
 	const elAnchor = React.useRef(null);
 
