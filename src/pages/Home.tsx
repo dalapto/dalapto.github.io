@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Container } from '@mui/system';
 import React from 'react';
 import Tile from '../components/Tile';
+import TypedText from '../components/TypedText';
 
 function Home() {
 	const pages = [
@@ -17,13 +18,57 @@ function Home() {
 		{ text: 'Material UI', link: 'https://mui.com/', img: '../src/img/logo-mui.png' },
 		{ text: 'GitHub Pages', link: 'https://pages.github.com/', img: '../src/img/logo-github.png' },
 	];
+
+	const welcomes = [
+		'welcome',
+		'fáilte',
+		'croeso',
+		'bienvenue',
+		'willkommen',
+		'bienvenido',
+		'ようこそ',
+		'welkom',
+		'chào mừng',
+		'benvenuta',
+		'欢迎',
+		'mirë se erdhe',
+		'tervetuloa',
+		'welina',
+		'خوش آمدید',
+		'välkommen',
+		'добро пожаловать',
+		'olandiridwa',
+		'환영',
+		'Прошу',
+		'mile widziany',
+		'tunngasugit',
+		'vitaj',
+		'ברוך הבא',
+		'selamat datang',
+		'nabata',
+		'laipni lūdza',
+		'स्वागत है',
+		'maraba',
+		'hoş geldin',
+		'مەرھابا',
+		'byenvini',
+		'merħba',
+		`tun'ngahuktitauyut`,
+		'vælkomin',
+		'kαλώς ήρθες',
+		'أهلًا وسهلًا',
+		'benvingut',
+		'wamkelekile',
+		'歡迎',
+	];
+
 	return (
 		<div className="App">
 			<Container>
 				<Box marginTop={'5%'}>
 					{/* need to change text dynamically to different languages */}
-					<Typography variant="h2" letterSpacing={4}>
-						Welcome
+					<Typography variant="h2" fontFamily={'monospace'} letterSpacing={5}>
+						<TypedText string_list={welcomes} />
 					</Typography>
 				</Box>
 				<Box marginTop={'5%'}>

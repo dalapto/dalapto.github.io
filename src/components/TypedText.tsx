@@ -1,17 +1,30 @@
 import * as React from 'react';
-import Typography from '@mui/material/Typography';
-import './Tile.css';
+import Typed from 'typed.js';
 
 export interface TypedTextProps {
-	text: string;
+	string_list: string[];
 }
 
 // TO DO:
-function TypedText({ text = '' }: TypedTextProps) {
-	return (
-		<Typography id="tile-text" letterSpacing={3.5} fontFamily="monospace" variant="h4" color="white" sx={{ textTransform: 'capitalize' }}>
-			{text}
-		</Typography>
-	);
+function TypedText({ string_list = [] }: TypedTextProps) {
+	const elAnchor = React.useRef(null);
+
+	React.useEffect(() => {
+		const typed = new Typed(elAnchor.current, {
+			strings: string_list,
+			typeSpeed: 80,
+			backSpeed: 60,
+			loop: true,
+			backDelay: 2000,
+			startDelay: 3000,
+			smartBackspace: false,
+		});
+
+		return () => {
+			typed.destroy();
+		};
+	}, []);
+
+	return <span ref={elAnchor} />;
 }
 export default TypedText;
