@@ -7,16 +7,16 @@ import TypedText from '../components/TypedText';
 
 function Home() {
 	const pages = [
-		{ name: 'About Me', route: 'about', img: 'img/tile-aboutmehome.png' },
-		{ name: 'Projects', route: 'projects', img: 'img/tile-m2home.png' },
-		{ name: 'Blog', route: 'blog', img: 'img/tile-bloghome.png' },
+		{ name: 'About Me', route: 'about', img: 'about' },
+		{ name: 'Projects', route: 'projects', img: 'm2' },
+		{ name: 'Blog', route: 'blog', img: 'blog' },
 	];
 	const tooltips = [
-		{ text: 'Vite', link: 'https://vitejs.dev/', img: 'img/logo-vite.png' },
-		{ text: 'React', link: 'https://react.dev/', img: 'img/logo-react.webp' },
-		{ text: 'TypeScript', link: 'https://www.typescriptlang.org/', img: 'img/logo-ts.png' },
-		{ text: 'Material UI', link: 'https://mui.com/', img: 'img/logo-mui.png' },
-		{ text: 'GitHub Pages', link: 'https://pages.github.com/', img: 'img/logo-github.png' },
+		{ text: 'Vite', link: 'https://vitejs.dev/', img: 'vite.png' },
+		{ text: 'React', link: 'https://react.dev/', img: 'react.webp' },
+		{ text: 'TypeScript', link: 'https://www.typescriptlang.org/', img: 'ts.png' },
+		{ text: 'Material UI', link: 'https://mui.com/', img: 'mui.png' },
+		{ text: 'GitHub Pages', link: 'https://pages.github.com/', img: 'gh.png' },
 	];
 
 	const welcomes = [
@@ -81,7 +81,7 @@ function Home() {
 								{tooltips.map((tooltip) => (
 									<span key={tooltip.text}>
 										{tooltip.text != tooltips[tooltips.length - 1].text ? ' ' : ' and '}
-										<Tooltip followCursor={true} placement="top" title={<img width={25} height={25} src={tooltip.img}></img>}>
+										<Tooltip followCursor={true} placement="top" title={<img width={25} height={25} src={`/img/logo/${tooltip.img}`}></img>}>
 											<a href={tooltip.link} target="_blank" rel="noopener noreferrer">
 												<span>{tooltip.text}</span>
 											</a>
@@ -100,7 +100,7 @@ function Home() {
 						{pages.map((page) => (
 							<Grid key={page.route} item>
 								<Link to={`/${page.route}`}>
-									<Tile image_path={page.img} text={page.name} img_width={300} img_height={300} />
+									<Tile image_path={`/img/tile/${page.img}.png`} text={page.name} img_width={300} img_height={300} />
 								</Link>
 							</Grid>
 						))}
