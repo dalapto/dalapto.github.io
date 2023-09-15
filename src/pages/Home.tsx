@@ -7,16 +7,16 @@ import TypedText from '../components/TypedText';
 
 function Home() {
 	const pages = [
-		{ name: 'About Me', route: 'about', img: '../src/img/tile-aboutmehome.png' },
-		{ name: 'Projects', route: 'projects', img: '../src/img/tile-m2home.png' },
-		{ name: 'Blog', route: 'blog', img: '../src/img/tile-bloghome.png' },
+		{ name: 'About Me', route: 'about', img: 'img/tile-aboutmehome.png' },
+		{ name: 'Projects', route: 'projects', img: 'img/tile-m2home.png' },
+		{ name: 'Blog', route: 'blog', img: 'img/tile-bloghome.png' },
 	];
 	const tooltips = [
-		{ text: 'Vite', link: 'https://vitejs.dev/', img: '../src/img/logo-vite.png' },
-		{ text: 'React', link: 'https://react.dev/', img: '../src/img/logo-react.webp' },
-		{ text: 'TypeScript', link: 'https://www.typescriptlang.org/', img: '../src/img/logo-ts.png' },
-		{ text: 'Material UI', link: 'https://mui.com/', img: '../src/img/logo-mui.png' },
-		{ text: 'GitHub Pages', link: 'https://pages.github.com/', img: '../src/img/logo-github.png' },
+		{ text: 'Vite', link: 'https://vitejs.dev/', img: 'img/logo-vite.png' },
+		{ text: 'React', link: 'https://react.dev/', img: 'img/logo-react.webp' },
+		{ text: 'TypeScript', link: 'https://www.typescriptlang.org/', img: 'img/logo-ts.png' },
+		{ text: 'Material UI', link: 'https://mui.com/', img: 'img/logo-mui.png' },
+		{ text: 'GitHub Pages', link: 'https://pages.github.com/', img: 'img/logo-github.png' },
 	];
 
 	const welcomes = [
