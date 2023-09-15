@@ -1,10 +1,10 @@
-import NavBar from './NavBar';
-import Home from '../pages/Home';
-import About from '../pages/About';
-import Projects from '../pages/Projects';
-import Blog from '../pages/Blog';
-import Ron from '../projects/Ron';
-import Etl from '../projects/Etl';
+import NavBar from './components/NavBar';
+import Home from './pages/Home';
+import About from './pages/About';
+import Projects from './pages/Projects';
+import Blog from './pages/Blog';
+import Ron from './projects/Ron';
+import Etl from './projects/Etl';
 import './App.css';
 import { Route, Routes, useLocation } from 'react-router';
 import React, { useEffect } from 'react';
