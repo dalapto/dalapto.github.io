@@ -12,7 +12,7 @@ export interface TileProps {
 	img_height: number;
 }
 
-function Tile({ image_path = '../src/img/tile-aboutmehome.png', text = '', img_width = 300, img_height = 300 }: TileProps) {
+function Tile({ image_path = '/img/tile-aboutmehome.png', text = '', img_width = 300, img_height = 300 }: TileProps) {
 	const [isMouseOver, setMouseOver] = React.useState<boolean>(false);
 
 	return (

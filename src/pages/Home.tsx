@@ -3,27 +3,72 @@ import { Link } from 'react-router-dom';
 import { Container } from '@mui/system';
 import React from 'react';
 import Tile from '../components/Tile';
+import TypedText from '../components/TypedText';
 
 function Home() {
 	const pages = [
-		{ name: 'About Me', route: 'about', img: '../src/img/tile-aboutmehome.png' },
-		{ name: 'Projects', route: 'projects', img: '../src/img/tile-m2home.png' },
-		{ name: 'Blog', route: 'blog', img: '../src/img/tile-bloghome.png' },
+		{ name: 'About Me', route: 'about', img: 'img/tile-aboutmehome.png' },
+		{ name: 'Projects', route: 'projects', img: 'img/tile-m2home.png' },
+		{ name: 'Blog', route: 'blog', img: 'img/tile-bloghome.png' },
 	];
 	const tooltips = [
-		{ text: 'Vite', link: 'https://vitejs.dev/', img: '../src/img/logo-vite.png' },
-		{ text: 'React', link: 'https://react.dev/', img: '../src/img/logo-react.webp' },
-		{ text: 'TypeScript', link: 'https://www.typescriptlang.org/', img: '../src/img/logo-ts.png' },
-		{ text: 'Material UI', link: 'https://mui.com/', img: '../src/img/logo-mui.png' },
-		{ text: 'GitHub Pages', link: 'https://pages.github.com/', img: '../src/img/logo-github.png' },
+		{ text: 'Vite', link: 'https://vitejs.dev/', img: 'img/logo-vite.png' },
+		{ text: 'React', link: 'https://react.dev/', img: 'img/logo-react.webp' },
+		{ text: 'TypeScript', link: 'https://www.typescriptlang.org/', img: 'img/logo-ts.png' },
+		{ text: 'Material UI', link: 'https://mui.com/', img: 'img/logo-mui.png' },
+		{ text: 'GitHub Pages', link: 'https://pages.github.com/', img: 'img/logo-github.png' },
 	];
+
+	const welcomes = [
+		'welcome',
+		'fáilte',
+		'croeso',
+		'bienvenue',
+		'willkommen',
+		'bienvenido',
+		'ようこそ',
+		'welkom',
+		'chào mừng',
+		'benvenuta',
+		'欢迎',
+		'mirë se erdhe',
+		'tervetuloa',
+		'welina',
+		'خوش آمدید',
+		'välkommen',
+		'добро пожаловать',
+		'olandiridwa',
+		'환영',
+		'Прошу',
+		'mile widziany',
+		'tunngasugit',
+		'vitaj',
+		'ברוך הבא',
+		'selamat datang',
+		'nabata',
+		'laipni lūdza',
+		'स्वागत है',
+		'maraba',
+		'hoş geldin',
+		'مەرھابا',
+		'byenvini',
+		'merħba',
+		`tun'ngahuktitauyut`,
+		'vælkomin',
+		'kαλώς ήρθες',
+		'أهلًا وسهلًا',
+		'benvingut',
+		'wamkelekile',
+		'歡迎',
+	];
+
 	return (
 		<div className="App">
 			<Container>
 				<Box marginTop={'5%'}>
 					{/* need to change text dynamically to different languages */}
-					<Typography variant="h2" letterSpacing={4}>
-						Welcome
+					<Typography variant="h2" fontFamily={'monospace'} letterSpacing={5}>
+						<TypedText string_list={welcomes} />
 					</Typography>
 				</Box>
 				<Box marginTop={'5%'}>
