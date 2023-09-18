@@ -10,8 +10,8 @@ function About() {
 	return (
 		<div className="App">
 			<Container>
-				<Parallax pages={5}>
-					<ParallaxLayer offset={0} speed={0} style={{ ...alignCenter, justifyContent: 'center' }}>
+				<Parallax pages={3}>
+					<ParallaxLayer sticky={{ start: 0, end: 3 }} speed={0} style={{ ...alignCenter, justifyContent: 'center' }}>
 						<Container>
 							<Box>
 								<Card>
@@ -26,24 +26,27 @@ function About() {
 						</Container>
 					</ParallaxLayer>
 
-					<ParallaxLayer sticky={{ start: 1, end: 3 }} style={{ ...alignCenter, justifyContent: 'flex-end' }}>
+					<ParallaxLayer sticky={{ start: 1, end: 3 }} style={{ ...alignCenter, justifyContent: 'center' }}>
 						<Box>
 							<Typography variant="h4">
-								{/* parallax scroll down, contrast out the dog */}
+								<p></p>
 								<p>{`Not the dog. That's Bear.`}</p>
 							</Typography>
 						</Box>
 					</ParallaxLayer>
 
-					<ParallaxLayer offset={1.5} speed={1.5} style={{ ...alignCenter, justifyContent: 'flex-end' }}>
+					<ParallaxLayer sticky={{ start: 2, end: 3 }} style={{ ...alignCenter, justifyContent: 'center' }}>
 						<Box>
-							<span>I do not consider myself photogenic.</span>
+							<Typography variant="h4">
+								<p></p>
+								<p>{`That's me.`}</p>
+							</Typography>
 						</Box>
 						{/* discuss other avatars, parallax */}
 					</ParallaxLayer>
 
 					<ParallaxLayer offset={2.5} speed={1.5} style={{ ...alignCenter, justifyContent: 'flex-end' }}>
-						<p>Neither am I</p>
+						<span>I do not consider myself photogenic.</span>
 					</ParallaxLayer>
 				</Parallax>
 			</Container>
