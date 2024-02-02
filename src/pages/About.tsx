@@ -45,8 +45,8 @@ function About() {
 					<ParallaxLayer sticky={{ start: 1, end: 3 }} style={{ ...alignCenter, justifyContent: 'center', marginTop: '20%' }}>
 						<Box>
 							<Typography variant="h4">
-								<p></p>
-								<p>{`Not the dog. That's Bear.`}</p>
+								<br></br>
+								{`Not the dog. That's Bear.`}
 							</Typography>
 						</Box>
 					</ParallaxLayer>
@@ -54,8 +54,8 @@ function About() {
 					<ParallaxLayer sticky={{ start: 2, end: 3 }} style={{ ...alignCenter, justifyContent: 'center' }}>
 						<Box>
 							<Typography variant="h4">
-								<p></p>
-								<p>{`That's me.`}</p>
+								<br></br>
+								{`That's me.`}
 							</Typography>
 						</Box>
 						{/* discuss other avatars, parallax */}

@@ -74,23 +74,21 @@ function Home() {
 				<Box marginTop={'5%'}>
 					<Typography variant="h4">
 						{/* icons & links for each package */}
-						<p>
-							Making websites is fun.<br></br>So I made this one. <br></br>
-							<Typography fontSize={'1.6rem'} fontFamily={'monospace'}>
-								<span>It uses</span>
-								{tooltips.map((tooltip) => (
-									<span key={tooltip.text}>
-										{tooltip.text != tooltips[tooltips.length - 1].text ? ' ' : ' and '}
-										<Tooltip followCursor={true} placement="top" title={<img width={25} height={25} src={`/img/logo/${tooltip.img}`}></img>}>
-											<a href={tooltip.link} target="_blank" rel="noopener noreferrer">
-												<span>{tooltip.text}</span>
-											</a>
-										</Tooltip>
-										{tooltip.text != tooltips[tooltips.length - 1].text ? ', ' : '.'}
-									</span>
-								))}
-							</Typography>
-						</p>
+						Making websites is fun.<br></br>So I made this one. <br></br>
+						<Typography fontSize={'1.6rem'} fontFamily={'monospace'}>
+							<span>It uses</span>
+							{tooltips.map((tooltip) => (
+								<span key={tooltip.text}>
+									{tooltip.text != tooltips[tooltips.length - 1].text ? ' ' : ' and '}
+									<Tooltip followCursor={true} placement="top" title={<img width={25} height={25} src={`/img/logo/${tooltip.img}`}></img>}>
+										<a href={tooltip.link} target="_blank" rel="noopener noreferrer">
+											<span>{tooltip.text}</span>
+										</a>
+									</Tooltip>
+									{tooltip.text != tooltips[tooltips.length - 1].text ? ', ' : '.'}
+								</span>
+							))}
+						</Typography>
 					</Typography>
 					<span>Feel free to look around.</span>
 				</Box>
