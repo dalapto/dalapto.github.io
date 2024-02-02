@@ -1,72 +1,29 @@
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
 import React from 'react';
-import { Parallax, ParallaxLayer } from '@react-spring/parallax';
 
 function About() {
 	const alignCenter = { display: 'grid', alignItems: 'center' };
 	return (
-		<div className="App">
-			<Container>
-				<Parallax pages={4}>
-					<ParallaxLayer sticky={{ start: 1, end: 2 }} style={{ ...alignCenter, justifyContent: 'left' }}>
-						<Box
-							component="img"
-							src="/img/about/par1-brt.png"
-							sx={{
-								width: 300,
-								height: 300,
-							}}
-						/>
-					</ParallaxLayer>
-					<ParallaxLayer sticky={{ start: 2, end: 2 }} style={{ ...alignCenter, justifyContent: 'left' }}>
-						<Box
-							component="img"
-							src="/img/about/par2-bg.png"
-							sx={{
-								width: 300,
-								height: 300,
-							}}
-						/>
-					</ParallaxLayer>
-					<ParallaxLayer sticky={{ start: 0, end: 3 }} speed={0} style={{ ...alignCenter, justifyContent: 'center' }}>
-						<Container>
-							<Box>
-								<Typography variant="h3">
-									{`Hello.`}
-									<br></br>
-									{`That's me.`}
-								</Typography>
-							</Box>
-						</Container>
-					</ParallaxLayer>
-
-					<ParallaxLayer sticky={{ start: 1, end: 3 }} style={{ ...alignCenter, justifyContent: 'center', marginTop: '20%' }}>
-						<Box>
-							<Typography variant="h4">
-								<br></br>
-								{`Not the dog. That's Bear.`}
-							</Typography>
-						</Box>
-					</ParallaxLayer>
-
-					<ParallaxLayer sticky={{ start: 2, end: 3 }} style={{ ...alignCenter, justifyContent: 'center' }}>
-						<Box>
-							<Typography variant="h4">
-								<br></br>
-								{`That's me.`}
-							</Typography>
-						</Box>
-						{/* discuss other avatars, parallax */}
-					</ParallaxLayer>
-					{/* 
-					<ParallaxLayer offset={2.5} speed={1.5} style={{ ...alignCenter, justifyContent: 'flex-end' }}>
-						<span>I do not consider myself photogenic.</span>
-					</ParallaxLayer> */}
-				</Parallax>
-			</Container>
-		</div>
+		<>
+			<div className="App" style={{ backgroundColor: '#7F7164' }}>
+				<figure style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
+					<img src="/img/about/arch-move.png" width={'40%'} />
+					<div className="divider" style={{ height: '100%' }} />
+					<figcaption style={{ width: '40%' }}>
+						<p>
+							My name is David McAlister. I'm a Software Developer with a Computer Science background. <br></br>I am currently upskilling in{' '}
+							<strong>React + TypeScript</strong>, in and out of my job.
+						</p>
+						<p>
+							I'm looking to specialise in Front-End Web Development.<br></br> I'm excited to learn more of what JavaScript, CSS & HTML can do.
+						</p>
+						<p>
+							When not creating software, I'm usually creating something else. I love cooking, writing and modding video games. My idea of a good holiday is a good
+							book, good food and long walks by the sea.
+						</p>
+					</figcaption>
+				</figure>
+			</div>
+		</>
 	);
 }
 
