@@ -3,20 +3,36 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 import { Parallax, ParallaxLayer } from '@react-spring/parallax';
-import { Card, CardMedia } from '@mui/material';
 
 function About() {
-	const alignCenter = { display: 'flex', alignItems: 'center' };
+	const alignCenter = { display: 'grid', alignItems: 'center' };
 	return (
 		<div className="App">
 			<Container>
-				<Parallax pages={3}>
+				<Parallax pages={4}>
+					<ParallaxLayer sticky={{ start: 1, end: 2 }} style={{ ...alignCenter, justifyContent: 'left' }}>
+						<Box
+							component="img"
+							src="/img/about/par1-brt.png"
+							sx={{
+								width: 300,
+								height: 300,
+							}}
+						/>
+					</ParallaxLayer>
+					<ParallaxLayer sticky={{ start: 2, end: 2 }} style={{ ...alignCenter, justifyContent: 'left' }}>
+						<Box
+							component="img"
+							src="/img/about/par2-bg.png"
+							sx={{
+								width: 300,
+								height: 300,
+							}}
+						/>
+					</ParallaxLayer>
 					<ParallaxLayer sticky={{ start: 0, end: 3 }} speed={0} style={{ ...alignCenter, justifyContent: 'center' }}>
 						<Container>
 							<Box>
-								<Card>
-									<CardMedia image="/img/about/par1-brt.png" />
-								</Card>
 								<Typography variant="h3">
 									{`Hello.`}
 									<br></br>
@@ -26,7 +42,7 @@ function About() {
 						</Container>
 					</ParallaxLayer>
 
-					<ParallaxLayer sticky={{ start: 1, end: 3 }} style={{ ...alignCenter, justifyContent: 'center' }}>
+					<ParallaxLayer sticky={{ start: 1, end: 3 }} style={{ ...alignCenter, justifyContent: 'center', marginTop: '20%' }}>
 						<Box>
 							<Typography variant="h4">
 								<p></p>
@@ -44,10 +60,10 @@ function About() {
 						</Box>
 						{/* discuss other avatars, parallax */}
 					</ParallaxLayer>
-
+					{/* 
 					<ParallaxLayer offset={2.5} speed={1.5} style={{ ...alignCenter, justifyContent: 'flex-end' }}>
 						<span>I do not consider myself photogenic.</span>
-					</ParallaxLayer>
+					</ParallaxLayer> */}
 				</Parallax>
 			</Container>
 		</div>
