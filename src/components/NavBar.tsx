@@ -24,7 +24,7 @@ import NavBarMenu from './NavBarMenu';
 import NavBarMenuPopper from './NavBarMenuPopper';
 
 const projects = [
-	{ name: 'Jack Change It', route: 'jack-change-it' },
+	{ name: 'Jack Change It', route: 'jack-change-it/' },
 	{ name: 'VueJS Face Labeller', route: 'vue' },
 	{ name: 'Modding: Rise of Nations - WW2', route: 'ron' },
 	{ name: 'Modding: M2TW - Early to Late', route: 'm2tw' },
