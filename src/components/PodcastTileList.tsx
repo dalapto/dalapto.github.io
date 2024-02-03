@@ -25,6 +25,8 @@ function PodcastTileList({ podcasts, imgSize = '100px', direction = 'row', ...de
 								opacityValue={1}
 								growFromValue={0.9}
 								backgroundColour={'#7F7164'}
+								showLabelOnMouseOver={true}
+								className={''}
 							></Tile>
 						</Link>
 					);

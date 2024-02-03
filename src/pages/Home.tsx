@@ -99,6 +99,7 @@ function Home() {
 							<Grid key={page.route} item>
 								<Link to={`/${page.route}`}>
 									<Tile
+										className="tile-pc"
 										image_path={`/img/tile/${page.img}.png`}
 										text={page.name}
 										imgWidth={300}
@@ -107,6 +108,19 @@ function Home() {
 										opacityValue={0.7}
 										growFromValue={0.85}
 										backgroundColour={'rgb(0,0,0,0)'}
+										showLabelOnMouseOver={true}
+									/>
+									<Tile
+										className="tile-mobile"
+										image_path={`/img/tile/${page.img}.png`}
+										text={page.name}
+										imgWidth={300}
+										imgHeight={300}
+										blurValue={1}
+										opacityValue={0.7}
+										growFromValue={0.85}
+										backgroundColour={'rgb(0,0,0,0)'}
+										showLabelOnMouseOver={false}
 									/>
 								</Link>
 							</Grid>
