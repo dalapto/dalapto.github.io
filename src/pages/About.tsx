@@ -13,37 +13,13 @@ function About() {
 		{ text: 'The Rest is History', link: 'https://therestishistory.com/episodes/', img: 'rest_is_hist.jpg' },
 	];
 
-	const podcastTiles = (
-		<h3 className="podcast-tiles" style={{ marginBlock: '48px 5px' }}>
-			Favourite Podcasts:
-			<div style={{ flexDirection: 'column', display: 'flex', justifyContent: 'center' }}>
-				{podcasts.map(({ text, link, img }) => {
-					return (
-						<Link to={link}>
-							<Tile
-								image_path={`/img/podcasts/${img}`}
-								text={''}
-								imgWidth={'25vh'}
-								imgHeight={'25vh'}
-								blurValue={0}
-								opacityValue={1}
-								growFromValue={0.9}
-								backgroundColour={'#7F7164'}
-							></Tile>
-						</Link>
-					);
-				})}
-			</div>
-		</h3>
-	);
-
 	return (
 		<>
 			<div className="about-page">
 				<figure className="horizontal-figure">
 					<div className="image-column">
 						<img src="/img/about/arch-move.png" />
-						<PodcastTileList podcasts={podcasts} direction={'column'} />
+						<PodcastTileList podcasts={podcasts} imgSize="25vmax" direction={'column'} />
 					</div>
 					<div className="text-column">
 						<figcaption style={{ width: '80%' }}>
@@ -58,7 +34,7 @@ function About() {
 								When not creating software, I'm usually creating something else. I love cooking, writing and modding video games. I relax with a good book, good
 								food and long walks by the sea.
 							</p>
-							<PodcastTileList podcasts={podcasts} direction={'row'} />
+							<PodcastTileList podcasts={podcasts} imgSize="25vmin" direction={'row'} />
 						</figcaption>
 					</div>
 				</figure>
