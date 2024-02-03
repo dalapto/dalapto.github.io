@@ -8,35 +8,50 @@ import './Tile.css';
 export interface TileProps {
 	image_path: string;
 	text: string;
-	img_width: number;
-	img_height: number;
+	imgWidth: string | number;
+	imgHeight: string | number;
+	blurValue: string | number;
+	opacityValue: string | number;
+	growFromValue: string | number;
+	backgroundColour: string;
 }
 
-function Tile({ image_path = '/img/tile-aboutmehome.png', text = '', img_width = 300, img_height = 300 }: TileProps) {
+function Tile({
+	image_path = '/img/tile-aboutmehome.png',
+	text = '',
+	imgWidth = 300,
+	imgHeight = 300,
+	blurValue = '0px',
+	opacityValue = 0.7,
+	growFromValue = 0.85,
+	backgroundColour = 'rgba(0,0,0,0)',
+}: TileProps) {
 	const [isMouseOver, setMouseOver] = React.useState<boolean>(false);
 
 	return (
-		<Card onMouseEnter={() => setMouseOver(true)} onMouseLeave={() => setMouseOver(false)} sx={{ backgroundColor: 'rgba(0,0,0,0)', boxShadow: 'none' }}>
+		<Card onMouseEnter={() => setMouseOver(true)} onMouseLeave={() => setMouseOver(false)} sx={{ backgroundColor: backgroundColour, boxShadow: 'none' }}>
 			<Button disabled>
 				<CardMedia
 					image={image_path}
 					sx={{
-						width: img_width,
-						height: img_height,
-						filter: isMouseOver ? '' : 'blur(1px)',
-						opacity: isMouseOver ? '1' : '0.7',
+						width: imgWidth,
+						height: imgHeight,
+						filter: isMouseOver ? '' : `blur(${blurValue}px)`,
+						opacity: isMouseOver ? '1' : { opacityValue },
 						transitionDuration: '1s',
-						transform: isMouseOver ? 'scale(1)' : 'scale(0.85)',
+						transform: isMouseOver ? 'scale(1)' : `scale(${growFromValue})`,
 					}}
 				>
-					<Fade in={isMouseOver} timeout={1000}>
-						<Stack spacing={16}>
-							<Box></Box>
-							<Typography id="tile-text" letterSpacing={3.5} fontFamily="monospace" variant="h4" color="white" sx={{ textTransform: 'capitalize' }}>
-								{text}
-							</Typography>
-						</Stack>
-					</Fade>
+					{text.length > 0 && (
+						<Fade in={isMouseOver} timeout={1000}>
+							<Stack spacing={16}>
+								<Box></Box>
+								<Typography id="tile-text" letterSpacing={3.5} fontFamily="monospace" variant="h4" color="white" sx={{ textTransform: 'capitalize' }}>
+									{text}
+								</Typography>
+							</Stack>
+						</Fade>
+					)}
 				</CardMedia>
 			</Button>
 		</Card>

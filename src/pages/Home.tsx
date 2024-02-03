@@ -66,7 +66,7 @@ function Home() {
 		<div className="App">
 			<Container>
 				<Box marginTop={'5%'}>
-					{/* need to change text dynamically to different languages */}
+					{/* changes text dynamically to different languages */}
 					<Typography variant="h2" fontFamily={'monospace'} letterSpacing={5}>
 						<TypedText string_list={welcomes} />
 					</Typography>
@@ -98,7 +98,16 @@ function Home() {
 						{pages.map((page) => (
 							<Grid key={page.route} item>
 								<Link to={`/${page.route}`}>
-									<Tile image_path={`/img/tile/${page.img}.png`} text={page.name} img_width={300} img_height={300} />
+									<Tile
+										image_path={`/img/tile/${page.img}.png`}
+										text={page.name}
+										imgWidth={300}
+										imgHeight={300}
+										blurValue={1}
+										opacityValue={0.7}
+										growFromValue={0.85}
+										backgroundColour={'rgb(0,0,0,0)'}
+									/>
 								</Link>
 							</Grid>
 						))}
