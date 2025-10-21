@@ -1,17 +1,6 @@
 import * as React from 'react';
-import './NavBar.css';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
+import '../layout/NavBar/NavBar.css';
 import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
-import Container from '@mui/material/Container';
-import Button from '@mui/material/Button';
-import MenuItem from '@mui/material/MenuItem';
-import HomeIcon from '@mui/icons-material/Home';
-import GitHubIcon from '@mui/icons-material/GitHub';
 import { Link } from 'react-router-dom';
 
 interface NavBarHomeLogoProps {

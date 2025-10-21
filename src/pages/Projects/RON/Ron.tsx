@@ -1,7 +1,7 @@
 import React from 'react';
-import Temp from '../components/Temp';
+import Temp from '../../../components/common/Temp';
 
-function Projects() {
+function Ron() {
 	return (
 		<div className="App">
 			{' '}
@@ -9,4 +9,5 @@ function Projects() {
 		</div>
 	);
 }
-export default Projects;
+
+export default Ron;

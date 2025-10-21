@@ -51,9 +51,17 @@
 	margin-inline-start: 5%;
 }
 
+.horizontal-figure .text-column p {
+	margin-inline-start: 12px;
+}
+
 @media only screen and (min-width: 768px) {
 	.horizontal-figure .text-column {
 		margin-inline-start: -5%;
+	}
+	
+	.horizontal-figure .text-column p {
+		margin-block-start: 8px;
 	}
 }
 

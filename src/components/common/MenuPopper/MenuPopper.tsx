@@ -1,17 +1,16 @@
 import * as React from 'react';
-import './NavBar.css';
+import '../../layout/NavBar/NavBar.css';
 import Typography from '@mui/material/Typography';
 import { Link } from 'react-router-dom';
 import { Box, Fade, MenuItem, Popper } from '@mui/material';
 
-interface NavBarMenuPopperProps {
+interface MenuPopperProps {
 	anchorElement: Element | HTMLElement;
-	handleOpenMenu: Function;
-	handleCloseMenu: Function;
+	handleCloseMenu: () => void;
 	menuItems: { route: string; name: string }[]; // TODO define object type
 }
 
-function NavBarMenuPopper({ anchorElement, handleOpenMenu, handleCloseMenu, menuItems, ...delegated }: NavBarMenuPopperProps) {
+function MenuPopper({ anchorElement, handleCloseMenu, menuItems }: MenuPopperProps) {
 	return (
 		<Popper
 			id="menu-appbar"
@@ -70,4 +69,4 @@ function NavBarMenuPopper({ anchorElement, handleOpenMenu, handleCloseMenu, menu
 		</Popper>
 	);
 }
-export default NavBarMenuPopper;
+export default MenuPopper;

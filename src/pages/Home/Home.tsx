@@ -2,8 +2,8 @@ import { Box, Grid, Tooltip, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { Container } from '@mui/system';
 import React from 'react';
-import Tile from '../components/Tile';
-import TypedText from '../components/TypedText';
+import Tile from '../../components/common/Tile/Tile';
+import TypedText from '../../components/common/TypedText';
 
 function Home() {
 	const pages = [

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import './NavBar.css';
+import '../../layout/NavBar/NavBar.css';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
