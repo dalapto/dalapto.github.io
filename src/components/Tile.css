@@ -6,3 +6,23 @@
 		-1px 1px 0 #000,
 		1px 1px 0 #000;
 }
+
+.tile-pc {
+	display: none;
+}
+
+@media only screen and (min-width: 768px) {
+	.tile-pc {
+		display: block;
+	}
+}
+
+.tile-mobile {
+	display: block;
+}
+
+@media only screen and (min-width: 768px) {
+	.tile-mobile {
+		display: none;
+	}
+}

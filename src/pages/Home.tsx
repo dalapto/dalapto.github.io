@@ -66,7 +66,7 @@ function Home() {
 		<div className="App">
 			<Container>
 				<Box marginTop={'5%'}>
-					{/* need to change text dynamically to different languages */}
+					{/* changes text dynamically to different languages */}
 					<Typography variant="h2" fontFamily={'monospace'} letterSpacing={5}>
 						<TypedText string_list={welcomes} />
 					</Typography>
@@ -74,23 +74,21 @@ function Home() {
 				<Box marginTop={'5%'}>
 					<Typography variant="h4">
 						{/* icons & links for each package */}
-						<p>
-							Making websites is fun.<br></br>So I made this one. <br></br>
-							<Typography fontSize={'1.6rem'} fontFamily={'monospace'}>
-								<span>It uses</span>
-								{tooltips.map((tooltip) => (
-									<span key={tooltip.text}>
-										{tooltip.text != tooltips[tooltips.length - 1].text ? ' ' : ' and '}
-										<Tooltip followCursor={true} placement="top" title={<img width={25} height={25} src={`/img/logo/${tooltip.img}`}></img>}>
-											<a href={tooltip.link} target="_blank" rel="noopener noreferrer">
-												<span>{tooltip.text}</span>
-											</a>
-										</Tooltip>
-										{tooltip.text != tooltips[tooltips.length - 1].text ? ', ' : '.'}
-									</span>
-								))}
-							</Typography>
-						</p>
+						Making websites is fun.<br></br>So I made this one. <br></br>
+						<Typography fontSize={'1.6rem'} fontFamily={'monospace'}>
+							<span>It uses</span>
+							{tooltips.map((tooltip) => (
+								<span key={tooltip.text}>
+									{tooltip.text != tooltips[tooltips.length - 1].text ? ' ' : ' and '}
+									<Tooltip followCursor={true} placement="top" title={<img width={25} height={25} src={`/img/logo/${tooltip.img}`}></img>}>
+										<a href={tooltip.link} target="_blank" rel="noopener noreferrer">
+											<span>{tooltip.text}</span>
+										</a>
+									</Tooltip>
+									{tooltip.text != tooltips[tooltips.length - 1].text ? ', ' : '.'}
+								</span>
+							))}
+						</Typography>
 					</Typography>
 					<span>Feel free to look around.</span>
 				</Box>
@@ -100,7 +98,30 @@ function Home() {
 						{pages.map((page) => (
 							<Grid key={page.route} item>
 								<Link to={`/${page.route}`}>
-									<Tile image_path={`/img/tile/${page.img}.png`} text={page.name} img_width={300} img_height={300} />
+									<Tile
+										className="tile-pc"
+										image_path={`/img/tile/${page.img}.png`}
+										text={page.name}
+										imgWidth={300}
+										imgHeight={300}
+										blurValue={1}
+										opacityValue={0.7}
+										growFromValue={0.85}
+										backgroundColour={'rgb(0,0,0,0)'}
+										showLabelOnMouseOver={true}
+									/>
+									<Tile
+										className="tile-mobile"
+										image_path={`/img/tile/${page.img}.png`}
+										text={page.name}
+										imgWidth={300}
+										imgHeight={300}
+										blurValue={1}
+										opacityValue={0.7}
+										growFromValue={0.85}
+										backgroundColour={'rgb(0,0,0,0)'}
+										showLabelOnMouseOver={false}
+									/>
 								</Link>
 							</Grid>
 						))}
