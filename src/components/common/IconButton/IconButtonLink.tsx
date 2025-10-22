@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { SvgIcon } from '@mui/material';
 import { Link } from 'react-router-dom';
+import './IconButtonLink.css';
 
 interface BaseIconButtonProps {
 	icon: typeof SvgIcon;
@@ -21,23 +22,19 @@ type IconButtonLinkProps = ExternalLinkProps | InternalLinkProps;
 
 function IconButtonLink({ icon: Icon, style, href, to, ...delegated }: IconButtonLinkProps) {
 	const linkStyle: React.CSSProperties = {
-		display: 'inline-flex',
-		alignItems: 'center',
-		justifyContent: 'center',
-		textDecoration: 'none',
 		...style,
 	};
 	
 	if (href) {
 		return (
-			<a href={href} target="_blank" rel="noopener noreferrer" style={linkStyle} {...delegated}>
+			<a href={href} target="_blank" rel="noopener noreferrer" className="icon-button-link" style={linkStyle} {...delegated}>
 				<Icon sx={style} />
 			</a>
 		);
 	}
 	
 	return (
-		<Link to={to!} style={linkStyle} {...delegated}>
+		<Link to={to!} className="icon-button-link" style={linkStyle} {...delegated}>
 			<Icon sx={style} />
 		</Link>
 	);

@@ -1,21 +1,21 @@
 #navbar {
-  background-color: #282c34;
+  background-color: var(--color-primary);
   display: flex;
   flex-direction: row;
   align-items: center;
   padding: 0%;
   justify-content: space-around;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: var(--color-text);
 }
 
 #home-text-selected {
-  background-color: #282c34;
+  background-color: var(--color-primary);
   display: flex;
   flex-direction: row;
   align-items: center;
   text-transform: uppercase;
-  color: white;
+  color: var(--color-text);
 }
 
 #navbar-button {
@@ -24,10 +24,10 @@
   text-decoration: none;
   font-family: "Lato";
   font-size: 2rem;;
-  color: #ecf0f1;
+  color: var(--color-text);
   text-transform: uppercase;
   padding: 4px 0;
-  transition: 0.5s;
+  transition: var(--transition-standard);
 }
 #navbar-button::after {
   position: absolute;
@@ -36,15 +36,20 @@
   height: 3px;
   top: 100%;
   left: 0;
-  background: #ffa865;
-  transition: transform 0.5s;
+  background: var(--color-secondary);
+  transition: transform var(--transition-standard);
   transform: scaleX(0);
   transform-origin: right;
 }
-#navbar-button:hover {
+#navbar-button:hover,
+#navbar-button:focus,
+#navbar-button:focus-visible {
   color: #95a5a6;
+  outline: none;
 }
-#navbar-button:hover::after {
+#navbar-button:hover::after,
+#navbar-button:focus::after,
+#navbar-button:focus-visible::after {
   transform: scaleX(1);
   transform-origin: left;
 }
@@ -55,10 +60,10 @@
   text-decoration: none;
   font-family: "Lato";
   font-size: 2rem;;
-  color: #ecf0f1;
+  color: var(--color-text);
   text-transform: uppercase;
   padding: 4px 0;
-  transition: 0.5s;
+  transition: var(--transition-standard);
 }
 #navbar-button-selected::after {
   position: absolute;
@@ -67,16 +72,19 @@
   height: 3px;
   top: 100%;
   left: 0;
-  background: #ffa865;
+  background: var(--color-secondary);
 }
 
 #menu-appbar {
-  background-color: #282c34;
+  background-color: var(--color-primary);
 }
 
-#menu-appbar-item:hover {
+#menu-appbar-item:hover,
+#menu-appbar-item:focus,
+#menu-appbar-item:focus-visible {
   text-decoration-line: underline;
   text-decoration-thickness: 2px;
-  text-decoration-color: #ffa865;
+  text-decoration-color: var(--color-secondary);
   color: rgb(231, 231, 231);
+  outline: none;
 }

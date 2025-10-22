@@ -1,0 +1,42 @@
+.icon-button-link {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-decoration: none;
+	transition: transform var(--transition-fast) ease-in-out;
+	cursor: pointer;
+	padding: 4px;
+}
+
+.icon-button-link::after {
+	position: absolute;
+	content: "";
+	width: 100%;
+	height: 3px;
+	top: 100%;
+	left: 0;
+	background: var(--color-secondary);
+	transition: transform var(--transition-standard);
+	transform: scaleX(0);
+	transform-origin: right;
+}
+
+.icon-button-link:hover,
+.icon-button-link:focus,
+.icon-button-link:focus-visible {
+	transform: scale(1.1);
+	outline: none;
+}
+
+.icon-button-link:hover::after,
+.icon-button-link:focus::after,
+.icon-button-link:focus-visible::after {
+	transform: scaleX(1);
+	transform-origin: left;
+}
+
+.icon-button-link:active {
+	transform: scale(0.95);
+}
+
