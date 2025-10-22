@@ -1,10 +1,57 @@
 #tile-text {
+	position: relative;
 	color: white;
 	text-shadow:
-		-1px -1px 0 grey,
-		1px -1px 0 grey,
-		-1px 1px 0 #000,
-		1px 1px 0 #000;
+		/* Multiple layers of black blur shadows for strong depth */
+		0 1px 2px rgba(0, 0, 0, 1),
+		0 2px 4px rgba(0, 0, 0, 0.95),
+		0 3px 6px rgba(0, 0, 0, 0.9),
+		0 4px 8px rgba(0, 0, 0, 0.85),
+		0 6px 12px rgba(0, 0, 0, 0.8),
+		0 8px 16px rgba(0, 0, 0, 0.75),
+		0 12px 24px rgba(0, 0, 0, 0.7),
+		0 16px 32px rgba(0, 0, 0, 0.6);
+	display: inline-block;
+	padding-bottom: 4px;
+	width: fit-content;
+	max-width: 100%;
+}
+
+#tile-text::after {
+	position: absolute;
+	content: "";
+	width: 100%;
+	height: 3px;
+	bottom: 0;
+	left: 0;
+	background: var(--color-secondary);
+	transition: transform var(--transition-standard);
+	transform: scaleX(0);
+	transform-origin: right;
+}
+
+.tile-button:hover #tile-text::after,
+.tile-button:focus #tile-text::after,
+.tile-button:focus-visible #tile-text::after {
+	transform: scaleX(1);
+	transform-origin: left;
+}
+
+.tile-button {
+	position: relative;
+	transition: transform var(--transition-fast) ease-in-out;
+}
+
+.tile-button:focus,
+.tile-button:focus-visible {
+	outline: none;
+}
+
+.tile-text-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
 }
 
 .tile-pc {

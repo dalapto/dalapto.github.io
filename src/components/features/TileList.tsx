@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Tile from '../common/Tile/Tile';
-import { Link } from 'react-router-dom';
 
 interface TileListProps {
 	items: { text: string; link: string; img: string }[];
@@ -36,21 +35,22 @@ function TileList({
 			<div style={{ flexDirection: direction, display: 'flex', justifyContent: 'center' }}>
 				{items.map(({ text, link, img }) => {
 					return (
-						<Link key={img} to={link} aria-label={text}>
-							<Tile
-								{...delegated}
-								image_path={`${imgPathPrefix}${img}`}
-								text={''}
-								imgWidth={imgSize}
-								imgHeight={imgSize}
-								blurValue={blurValue}
-								opacityValue={opacityValue}
-								growFromValue={growFromValue}
-								backgroundColour={backgroundColour}
-								showLabelOnMouseOver={showLabelOnMouseOver}
-								className={''}
-							></Tile>
-						</Link>
+						<Tile
+							key={img}
+							{...delegated}
+							image_path={`${imgPathPrefix}${img}`}
+							text={''}
+							imgWidth={imgSize}
+							imgHeight={imgSize}
+							blurValue={blurValue}
+							opacityValue={opacityValue}
+							growFromValue={growFromValue}
+							backgroundColour={backgroundColour}
+							showLabelOnMouseOver={showLabelOnMouseOver}
+							className={''}
+							to={link}
+							ariaLabel={text}
+						/>
 					);
 				})}
 			</div>

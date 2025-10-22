@@ -5,22 +5,22 @@ import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { Link } from 'react-router-dom';
-import { Box } from '@mui/material';
 
-interface NavBarHamburgerMenuProps {
+interface HamburgerMenuProps {
 	anchorElement: Element | HTMLElement;
-	handleOpenMenu: Function;
-	handleCloseMenu: Function;
+	handleOpenMenu: () => void;
+	handleCloseMenu: () => void;
 	menuItems: string[]; // TODO define object type
 }
 
-function NavBarHamburgerMenu({ anchorElement, handleOpenMenu, handleCloseMenu, menuItems, ...delegated }: NavBarHamburgerMenuProps) {
+function HamburgerMenu({ anchorElement, handleOpenMenu, handleCloseMenu, menuItems, ...delegated }: HamburgerMenuProps) {
 	return (
 		<>
 			<IconButton size="large" aria-controls="menu-appbar" aria-haspopup="true" onClick={() => handleOpenMenu()} color="inherit">
 				<MenuIcon />
 			</IconButton>
 			<Menu
+				{...delegated}
 				id="menu-appbar"
 				anchorEl={anchorElement}
 				anchorOrigin={{
@@ -49,4 +49,4 @@ function NavBarHamburgerMenu({ anchorElement, handleOpenMenu, handleCloseMenu, m
 		</>
 	);
 }
-export default NavBarHamburgerMenu;
+export default HamburgerMenu;

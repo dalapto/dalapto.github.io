@@ -1,5 +1,4 @@
 import { Box, Grid, Tooltip, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
 import { Container } from '@mui/system';
 import React from 'react';
 import Tile from '../../components/common/Tile/Tile';
@@ -97,32 +96,34 @@ function Home() {
 					<Grid container columnSpacing={pages.length} justifyContent="center">
 						{pages.map((page) => (
 							<Grid key={page.route} item>
-								<Link to={`/${page.route}`}>
-									<Tile
-										className="tile-pc"
-										image_path={`/img/tile/${page.img}.png`}
-										text={page.name}
-										imgWidth={300}
-										imgHeight={300}
-										blurValue={1}
-										opacityValue={0.7}
-										growFromValue={0.85}
-										backgroundColour={'rgb(0,0,0,0)'}
-										showLabelOnMouseOver={true}
-									/>
-									<Tile
-										className="tile-mobile"
-										image_path={`/img/tile/${page.img}.png`}
-										text={page.name}
-										imgWidth={300}
-										imgHeight={300}
-										blurValue={1}
-										opacityValue={0.7}
-										growFromValue={0.85}
-										backgroundColour={'rgb(0,0,0,0)'}
-										showLabelOnMouseOver={false}
-									/>
-								</Link>
+								<Tile
+									className="tile-pc"
+									image_path={`/img/tile/${page.img}.png`}
+									text={page.name}
+									imgWidth={300}
+									imgHeight={300}
+									blurValue={0.5}
+									opacityValue={0.7}
+									growFromValue={0.85}
+									backgroundColour={'rgb(0,0,0,0)'}
+									showLabelOnMouseOver={true}
+									to={`/${page.route}`}
+									ariaLabel={page.name}
+								/>
+								<Tile
+									className="tile-mobile"
+									image_path={`/img/tile/${page.img}.png`}
+									text={page.name}
+									imgWidth={300}
+									imgHeight={300}
+									blurValue={0.5}
+									opacityValue={0.7}
+									growFromValue={0.85}
+									backgroundColour={'rgb(0,0,0,0)'}
+									showLabelOnMouseOver={false}
+									to={`/${page.route}`}
+									ariaLabel={page.name}
+								/>
 							</Grid>
 						))}
 					</Grid>

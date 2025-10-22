@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { Button, Card, CardMedia, Fade } from '@mui/material';
 import Stack from '@mui/material/Stack';
+import { Link } from 'react-router-dom';
 import './Tile.css';
 
 export interface TileProps {
@@ -16,6 +17,9 @@ export interface TileProps {
 	growFromValue: string | number;
 	backgroundColour: string;
 	showLabelOnMouseOver: boolean;
+	to?: string;
+	href?: string;
+	ariaLabel?: string;
 }
 
 function Tile({
@@ -29,6 +33,9 @@ function Tile({
 	growFromValue = 0.85,
 	backgroundColour = 'rgba(0,0,0,0)',
 	showLabelOnMouseOver = false,
+	to,
+	href,
+	ariaLabel,
 }: TileProps) {
 	const [showLabel, setShowLabel] = React.useState<boolean>(!showLabelOnMouseOver);
 
@@ -46,9 +53,36 @@ function Tile({
 		setShowLabel(false);
 	}
 
+	function handleFocus() {
+		if (!showLabelOnMouseOver) {
+			return;
+		}
+		setShowLabel(true);
+	}
+
+	function handleBlur() {
+		if (!showLabelOnMouseOver) {
+			return;
+		}
+		setShowLabel(false);
+	}
+
+	// Determine button props based on link type
+	const buttonProps = href
+		? { component: 'a', href, target: '_blank', rel: 'noopener noreferrer' }
+		: to
+		? { component: Link, to }
+		: {};
+
 	return (
 		<Card className={className} onMouseEnter={handleMouseOver} onMouseLeave={handleMouseLeave} sx={{ backgroundColor: backgroundColour, boxShadow: 'none' }}>
-			<Button disabled>
+			<Button 
+				className="tile-button"
+				onFocus={handleFocus}
+				onBlur={handleBlur}
+				aria-label={ariaLabel}
+				{...buttonProps}
+			>
 				<CardMedia
 					image={image_path}
 					sx={{
@@ -62,9 +96,9 @@ function Tile({
 				>
 					{text.length > 0 && (
 						<Fade in={showLabel} timeout={1000}>
-							<Stack spacing={16}>
+							<Stack spacing={16} className="tile-text-container">
 								<Box></Box>
-								<Typography id="tile-text" letterSpacing={3.5} fontFamily="monospace" variant="h4" color="white" sx={{ textTransform: 'capitalize' }}>
+								<Typography id="tile-text" letterSpacing={1.5} fontFamily="monospace" variant="h4" color="white" sx={{ textTransform: 'capitalize' }}>
 									{text}
 								</Typography>
 							</Stack>
