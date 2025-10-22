@@ -1,0 +1,74 @@
+.image-text-layout {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 20px;
+	justify-content: center;
+	background-color: inherit;
+}
+
+@media only screen and (min-width: 768px) {
+	.image-text-layout {
+		flex-direction: row;
+		gap: 30px;
+	}
+}
+
+.image-text-layout .image-column {
+	flex-direction: column;
+	display: flex;
+	justify-content: center;
+	align-self: start;
+	width: 100%;
+	overflow: hidden;
+}
+
+@media only screen and (min-width: 768px) {
+	.image-text-layout .image-column {
+		width: 50%;
+	}
+}
+
+.image-text-layout .image-column img {
+	width: 100%;
+	object-fit: cover;
+}
+
+@media only screen and (min-width: 768px) {
+	.image-text-layout .image-column img {
+		width: 100%;
+		align-self: center;
+		margin-inline-start: -10%;
+	}
+}
+
+.image-text-layout .text-column {
+	flex-direction: row;
+	display: flex;
+	justify-content: center;
+	align-self: center;
+	width: 100%;
+}
+
+@media only screen and (min-width: 768px) {
+	.image-text-layout .text-column {
+		margin-inline-start: -5%;
+		width: auto;
+	}
+}
+
+.image-text-layout .text-column figcaption {
+	width: 80%;
+}
+
+
+@media only screen and (min-width: 768px) {
+	.image-text-layout .text-column {
+		margin-inline-start: -5%;
+	}
+	
+	.image-text-layout .text-column p {
+		margin-block-start: 8px;
+	}
+}
+
