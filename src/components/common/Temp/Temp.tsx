@@ -11,4 +11,4 @@ function Temp() {
 		</div>
 	);
 }
-export default Temp;
+export { Temp };

@@ -1,13 +1,12 @@
 import React from 'react';
 import { Temp } from '../../../components/common/Temp/Temp';
 
-function RiseOfNations() {
+function Medieval2TotalWar() {
 	return (
 		<div className="App">
-			{' '}
 			<Temp></Temp>
 		</div>
 	);
 }
 
-export { RiseOfNations };
+export { Medieval2TotalWar };

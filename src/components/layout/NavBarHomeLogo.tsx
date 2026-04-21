@@ -33,4 +33,4 @@ function NavBarHomeLogo({ currentPage = '/', ...delegated }: NavBarHomeLogoProps
 		</Typography>
 	);
 }
-export default NavBarHomeLogo;
+export { NavBarHomeLogo };

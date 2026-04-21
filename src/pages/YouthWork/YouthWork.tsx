@@ -1,11 +1,12 @@
 import React from 'react';
 import { Temp } from '../../components/common/Temp/Temp';
 
-function Blog() {
+function YouthWork() {
 	return (
 		<div className="App">
+			{' '}
 			<Temp></Temp>
 		</div>
 	);
 }
-export { Blog };
+export { YouthWork };

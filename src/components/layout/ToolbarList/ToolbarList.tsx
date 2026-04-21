@@ -67,5 +67,5 @@ function ToolbarList({
 	);
 }
 
-export default ToolbarList;
+export { ToolbarList };
 

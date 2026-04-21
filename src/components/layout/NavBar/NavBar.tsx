@@ -6,10 +6,10 @@ import Toolbar from '@mui/material/Toolbar';
 import Container from '@mui/material/Container';
 import HomeIcon from '@mui/icons-material/Home';
 import { SvgIconComponent } from '@mui/icons-material';
-import IconButtonLink from '../../common/IconButton/IconButtonLink';
-import NavBarHomeLogo from '../NavBarHomeLogo';
-import ToolbarList, { ToolbarListItem } from '../../common/ToolbarList/ToolbarList';
-import MenuPopper from '../../common/MenuPopper/MenuPopper';
+import { IconButtonLink } from '../../common/IconButton/IconButtonLink';
+import { NavBarHomeLogo } from '../NavBarHomeLogo';
+import { ToolbarList, ToolbarListItem } from '../ToolbarList/ToolbarList';
+import { MenuPopper } from '../../common/MenuPopper/MenuPopper';
 
 export interface NavBarMenuItem {
 	name: string;
@@ -37,9 +37,8 @@ function NavBar({ currentPage, toolbarItems, menuAnchor = null, menuItems = [], 
 				<Toolbar disableGutters>
 					<Box id="navbar">
 						<Box sx={{ display: 'flex', mr: 3 }}>
-							<IconButtonLink to="/" icon={HomeIcon} style={{ marginBlock: '8px', color: 'white' }} />
+							<IconButtonLink to="/" icon={HomeIcon} ariaLabel="Home" style={{ marginBlock: '8px', color: 'white' }} />
 						</Box>
-						<NavBarHomeLogo currentPage={currentPage} />
 					</Box>
 
 					{/* Used for empty space on bar */}
@@ -53,7 +52,7 @@ function NavBar({ currentPage, toolbarItems, menuAnchor = null, menuItems = [], 
 
 					{externalLinks.map((link, index) => (
 						<Box key={index} sx={{ flexGrow: 0, display: 'flex', mr: index === 0 ? 2 : 1, justifyContent: '' }}>
-							<IconButtonLink href={link.href} icon={link.icon} style={{ color: 'white' }} />
+							<IconButtonLink href={link.href} icon={link.icon} ariaLabel={link.href} style={{ color: 'white' }} />
 						</Box>
 					))}
 				</Toolbar>
@@ -62,4 +61,4 @@ function NavBar({ currentPage, toolbarItems, menuAnchor = null, menuItems = [], 
 	);
 }
 
-export default NavBar;
+export { NavBar };

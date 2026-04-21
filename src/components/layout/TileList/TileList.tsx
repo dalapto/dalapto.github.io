@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Tile from '../common/Tile/Tile';
+import { Tile } from '../../common/Tile/Tile';
 
 interface TileListProps {
 	items: { text: string; link: string; img: string }[];
@@ -15,9 +15,9 @@ interface TileListProps {
 	showLabelOnMouseOver?: boolean;
 }
 
-function TileList({ 
-	items, 
-	imgSize = '100px', 
+function TileList({
+	items,
+	imgSize = '100px',
 	direction = 'row',
 	title,
 	imgPathPrefix = '',
@@ -27,7 +27,7 @@ function TileList({
 	growFromValue = 0.9,
 	backgroundColour = '#7F7164',
 	showLabelOnMouseOver = true,
-	...delegated 
+	...delegated
 }: TileListProps) {
 	return (
 		<div className={className} style={{ marginBlock: '48px 5px' }}>
@@ -57,4 +57,4 @@ function TileList({
 		</div>
 	);
 }
-export default TileList;
+export { TileList };

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Temp } from '../../components/common/Temp/Temp';
+import { Temp } from '../../../components/common/Temp/Temp';
 
-function Projects() {
+function Litter() {
 	return (
 		<div className="App">
 			{' '}
@@ -9,4 +9,5 @@ function Projects() {
 		</div>
 	);
 }
-export { Projects };
+
+export { Litter };

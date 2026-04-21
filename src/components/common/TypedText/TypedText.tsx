@@ -22,8 +22,8 @@ function TypedText({ string_list = [] }: TypedTextProps) {
 		return () => {
 			typed.destroy();
 		};
-	}, []);
+	}, [string_list]);
 
 	return <span ref={elAnchor} />;
 }
-export default TypedText;
+export { TypedText };

@@ -49,4 +49,4 @@ function HamburgerMenu({ anchorElement, handleOpenMenu, handleCloseMenu, menuIte
 		</>
 	);
 }
-export default HamburgerMenu;
+export { HamburgerMenu };

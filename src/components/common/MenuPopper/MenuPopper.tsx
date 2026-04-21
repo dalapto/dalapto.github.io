@@ -69,4 +69,4 @@ function MenuPopper({ anchorElement, handleCloseMenu, menuItems }: MenuPopperPro
 		</Popper>
 	);
 }
-export default MenuPopper;
+export { MenuPopper };

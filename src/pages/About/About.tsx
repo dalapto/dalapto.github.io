@@ -1,7 +1,7 @@
 import React from 'react';
 import './About.css';
-import TileList from '../../components/features/TileList';
-import ImageTextLayout from '../../components/layout/ImageTextLayout/ImageTextLayout';
+import { TileList } from '../../components/layout/TileList/TileList';
+import { ImageTextLayout } from '../../components/layout/ImageTextLayout/ImageTextLayout';
 import { podcasts } from '../../constants/constants';
 
 
@@ -15,14 +15,15 @@ function About() {
 				<ImageTextLayout
 					imageSrc="/img/about/arch-move.png"
 					imageAlt="Architectural photo"
+					imageColumnWidth="45%"
 					additionalContent={
-						<TileList 
-							items={podcasts} 
-							imgSize="25vmin" 
-							direction={'row'} 
-							imgPathPrefix="/img/podcasts/" 
-							title="Favourite Podcasts:" 
-							className="podcast-tiles" 
+						<TileList
+							items={podcasts}
+							imgSize="20vmin"
+							direction={'row'}
+							imgPathPrefix="/img/podcasts/"
+							title="Favourite Podcasts:"
+							className="podcast-tiles"
 						/>
 					}
 				>
@@ -36,9 +37,8 @@ function About() {
 						{'When not creating software, I\'m usually creating something else. I love cooking, writing and modding video games. I relax with a good book, good food and long walks by the sea.'}
 					</p>
 				</ImageTextLayout>
-			</div>
-		</>
+			</div>		</>
 	);
 }
 
-export default About;
+export { About };

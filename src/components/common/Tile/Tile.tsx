@@ -109,4 +109,4 @@ function Tile({
 		</Card>
 	);
 }
-export default Tile;
+export { Tile };

@@ -11,32 +11,34 @@ interface BaseIconButtonProps {
 interface ExternalLinkProps extends BaseIconButtonProps {
 	href: string;
 	to?: never;
+	ariaLabel: string;
 }
 
 interface InternalLinkProps extends BaseIconButtonProps {
 	to: string;
 	href?: never;
+	ariaLabel: string;
 }
 
 type IconButtonLinkProps = ExternalLinkProps | InternalLinkProps;
 
-function IconButtonLink({ icon: Icon, style, href, to, ...delegated }: IconButtonLinkProps) {
+function IconButtonLink({ icon: Icon, style, href, to, ariaLabel, ...delegated }: IconButtonLinkProps) {
 	const linkStyle: React.CSSProperties = {
 		...style,
 	};
 	
 	if (href) {
 		return (
-			<a href={href} target="_blank" rel="noopener noreferrer" className="icon-button-link" style={linkStyle} {...delegated}>
+			<a href={href} target="_blank" rel="noopener noreferrer" aria-label={ariaLabel} className="icon-button-link" style={linkStyle} {...delegated}>
 				<Icon sx={style} />
 			</a>
 		);
 	}
 	
 	return (
-		<Link to={to!} className="icon-button-link" style={linkStyle} {...delegated}>
+		<Link to={to!} aria-label={ariaLabel} className="icon-button-link" style={linkStyle} {...delegated}>
 			<Icon sx={style} />
 		</Link>
 	);
 }
-export default IconButtonLink;
+export { IconButtonLink };
