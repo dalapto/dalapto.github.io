@@ -1,7 +1,7 @@
 import React from 'react';
 import { Temp } from '../../../components/common/Temp/Temp';
 
-function EarlyToLate() {
+function m2ex() {
 	return (
 		<div className="App">
 			<Temp></Temp>
@@ -9,4 +9,4 @@ function EarlyToLate() {
 	);
 }
 
-export { EarlyToLate };
+export { m2ex };

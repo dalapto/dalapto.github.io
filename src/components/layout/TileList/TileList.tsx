@@ -32,7 +32,13 @@ function TileList({
 	return (
 		<div className={className} style={{ marginBlock: '48px 5px' }}>
 			{title && <h3>{title}</h3>}
-			<div style={{ flexDirection: direction, display: 'flex', justifyContent: 'center' }}>
+			<div
+				style={{
+					flexDirection: direction,
+					display: 'flex',
+					justifyContent: 'center',
+				}}
+			>
 				{items.map(({ text, link, img }) => {
 					return (
 						<Tile

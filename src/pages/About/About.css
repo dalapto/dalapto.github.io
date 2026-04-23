@@ -1,4 +1,7 @@
 .about-page {
 	background-color: #7f7164;
 	display: flex;
+	padding-top: 1vh;
+	padding-bottom: 25vh;
+	box-sizing: border-box;
 }

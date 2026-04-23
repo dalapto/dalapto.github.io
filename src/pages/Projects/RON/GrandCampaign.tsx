@@ -1,7 +1,7 @@
 import React from 'react';
 import { Temp } from '../../../components/common/Temp/Temp';
 
-function AlliesVersusAxis() {
+function GrandCampaign() {
 	return (
 		<div className="App">
 			{' '}
@@ -10,4 +10,4 @@ function AlliesVersusAxis() {
 	);
 }
 
-export { AlliesVersusAxis };
+export { GrandCampaign };

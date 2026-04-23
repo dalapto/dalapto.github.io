@@ -4,10 +4,9 @@ import React from 'react';
 import { Tile } from '../../components/common/Tile/Tile';
 import { TypedText } from '../../components/common/TypedText/TypedText';
 import { navRoutes } from '../../constants/routes';
+import './Home.css';
 
 function Home() {
-
-
 	const welcomes = [
 		'welcome',
 		'fáilte',
@@ -54,9 +53,9 @@ function Home() {
 	const pages = navRoutes.filter((r) => r.tileImg && r.label);
 
 	const pageTiles = pages.map((page) => (
-		<Grid key={page.path} item>
+		<Grid className='home-tile' key={page.path} item>
 			<Tile
-				className="tile-pc"
+				className='tile-pc'
 				image_path={`/img/tile/${page.tileImg}.png`}
 				text={page.label!}
 				imgWidth={300}
@@ -70,7 +69,7 @@ function Home() {
 				ariaLabel={page.label!}
 			/>
 			<Tile
-				className="tile-mobile"
+				className='tile-mobile'
 				image_path={`/img/tile/${page.tileImg}.png`}
 				text={page.label!}
 				imgWidth={300}
@@ -86,23 +85,25 @@ function Home() {
 		</Grid>
 	));
 
-
 	return (
-		<div className="App">
+		<div className='App'>
 			<Container>
 				<Box marginTop={'5%'}>
 					{/* changes text dynamically to different languages */}
-					<Typography variant="h2" fontFamily={'monospace'} letterSpacing={5}>
+					<Typography variant='h2' fontFamily={'monospace'} letterSpacing={5}>
 						<TypedText string_list={welcomes} />
 					</Typography>
 				</Box>
 				<Box marginTop={'5%'}>
-
 					<span>Feel free to look around.</span>
 				</Box>
 				<Box marginTop={'5%'}>
 					{/* Tiles to other pages */}
-					<Grid container columnSpacing={navRoutes.length} justifyContent="center">
+					<Grid
+						container
+						columnSpacing={navRoutes.length}
+						justifyContent='center'
+					>
 						{pageTiles}
 					</Grid>
 				</Box>

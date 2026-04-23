@@ -1,8 +1,8 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import { Button, Card, CardMedia, Fade } from '@mui/material';
+import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import * as React from 'react';
 import { Link } from 'react-router-dom';
 import './Tile.css';
 
@@ -37,7 +37,9 @@ function Tile({
 	href,
 	ariaLabel,
 }: TileProps) {
-	const [showLabel, setShowLabel] = React.useState<boolean>(!showLabelOnMouseOver);
+	const [showLabel, setShowLabel] = React.useState<boolean>(
+		!showLabelOnMouseOver,
+	);
 
 	function handleMouseOver() {
 		if (!showLabelOnMouseOver) {
@@ -75,9 +77,14 @@ function Tile({
 		: {};
 
 	return (
-		<Card className={className} onMouseEnter={handleMouseOver} onMouseLeave={handleMouseLeave} sx={{ backgroundColor: backgroundColour, boxShadow: 'none' }}>
-			<Button 
-				className="tile-button"
+		<Card
+			className={className}
+			onMouseEnter={handleMouseOver}
+			onMouseLeave={handleMouseLeave}
+			sx={{ backgroundColor: backgroundColour, boxShadow: 'none' }}
+		>
+			<Button
+				className='tile-button'
 				onFocus={handleFocus}
 				onBlur={handleBlur}
 				aria-label={ariaLabel}
@@ -96,9 +103,16 @@ function Tile({
 				>
 					{text.length > 0 && (
 						<Fade in={showLabel} timeout={1000}>
-							<Stack spacing={16} className="tile-text-container">
+							<Stack spacing={16} className='tile-text-container'>
 								<Box></Box>
-								<Typography id="tile-text" letterSpacing={1.5} fontFamily="monospace" variant="h4" color="white" sx={{ textTransform: 'capitalize' }}>
+								<Typography
+									id='tile-text'
+									letterSpacing={1.5}
+									fontFamily='monospace'
+									variant='h4'
+									color='white'
+									sx={{ textTransform: 'capitalize' }}
+								>
 									{text}
 								</Typography>
 							</Stack>

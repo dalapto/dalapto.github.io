@@ -1,18 +1,21 @@
-import * as React from 'react';
-import '../layout/NavBar/NavBar.css';
 import Typography from '@mui/material/Typography';
+import * as React from 'react';
 import { Link } from 'react-router-dom';
+import '../layout/NavBar/NavBar.css';
 
 interface NavBarHomeLogoProps {
 	currentPage: string;
 }
 
-function NavBarHomeLogo({ currentPage = '/', ...delegated }: NavBarHomeLogoProps) {
+function NavBarHomeLogo({
+	currentPage = '/',
+	...delegated
+}: NavBarHomeLogoProps) {
 	return (
 		<Typography
-			variant="h5"
+			variant='h5'
 			noWrap
-			component="p"
+			component='p'
 			id={currentPage === '/' ? 'home-text-selected' : 'home-text'}
 			sx={{
 				mr: 2,
@@ -27,7 +30,11 @@ function NavBarHomeLogo({ currentPage = '/', ...delegated }: NavBarHomeLogoProps
 			}}
 			{...delegated}
 		>
-			<Link style={{ textDecoration: 'none', color: 'white' }} to={`/`} {...delegated}>
+			<Link
+				style={{ textDecoration: 'none', color: 'white' }}
+				to={`/`}
+				{...delegated}
+			>
 				HOME
 			</Link>
 		</Typography>

@@ -1,10 +1,10 @@
-import * as React from 'react';
-import '../../layout/NavBar/NavBar.css';
+import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import * as React from 'react';
 import { Link } from 'react-router-dom';
+import '../../layout/NavBar/NavBar.css';
 
 interface HamburgerMenuProps {
 	anchorElement: Element | HTMLElement;
@@ -13,15 +13,27 @@ interface HamburgerMenuProps {
 	menuItems: string[]; // TODO define object type
 }
 
-function HamburgerMenu({ anchorElement, handleOpenMenu, handleCloseMenu, menuItems, ...delegated }: HamburgerMenuProps) {
+function HamburgerMenu({
+	anchorElement,
+	handleOpenMenu,
+	handleCloseMenu,
+	menuItems,
+	...delegated
+}: HamburgerMenuProps) {
 	return (
 		<>
-			<IconButton size="large" aria-controls="menu-appbar" aria-haspopup="true" onClick={() => handleOpenMenu()} color="inherit">
+			<IconButton
+				size='large'
+				aria-controls='menu-appbar'
+				aria-haspopup='true'
+				onClick={() => handleOpenMenu()}
+				color='inherit'
+			>
 				<MenuIcon />
 			</IconButton>
 			<Menu
 				{...delegated}
-				id="menu-appbar"
+				id='menu-appbar'
 				anchorEl={anchorElement}
 				anchorOrigin={{
 					vertical: 'bottom',
@@ -40,7 +52,10 @@ function HamburgerMenu({ anchorElement, handleOpenMenu, handleCloseMenu, menuIte
 			>
 				{menuItems.map((item) => (
 					<MenuItem key={item} onClick={() => handleCloseMenu()}>
-						<Link style={{ textDecoration: 'none', color: 'black' }} to={`/${item}`}>
+						<Link
+							style={{ textDecoration: 'none', color: 'black' }}
+							to={`/${item}`}
+						>
 							{item}
 						</Link>
 					</MenuItem>

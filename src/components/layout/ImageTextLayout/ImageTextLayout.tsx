@@ -29,16 +29,14 @@ function ImageTextLayout({
 			className={`image-text-layout ${className}`}
 			style={{ ['--image-column-width' as string]: imageColumnWidth }}
 		>
-			<div className="image-column">
+			<div className='image-column'>
 				<img src={imageSrc} alt={imageAlt} />
 			</div>
-			<div className="text-column">
+			<div className='text-column'>
 				<figcaption>
 					{children}
 					{additionalContent && (
-						<div className="additional-content">
-							{additionalContent}
-						</div>
+						<div className='additional-content'>{additionalContent}</div>
 					)}
 				</figcaption>
 			</div>
@@ -47,8 +45,3 @@ function ImageTextLayout({
 }
 
 export { ImageTextLayout };
-
-
-
-
-

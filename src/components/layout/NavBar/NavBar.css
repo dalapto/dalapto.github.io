@@ -79,12 +79,15 @@
   background-color: var(--color-primary);
 }
 
-#menu-appbar-item:hover,
-#menu-appbar-item:focus,
-#menu-appbar-item:focus-visible {
+#menu-appbar-item:hover .menu-appbar-item-text,
+#menu-appbar-item:focus .menu-appbar-item-text,
+#menu-appbar-item:focus-visible .menu-appbar-item-text {
   text-decoration-line: underline;
   text-decoration-thickness: 2px;
   text-decoration-color: var(--color-secondary);
   color: rgb(231, 231, 231);
+}
+#menu-appbar-item:focus,
+#menu-appbar-item:focus-visible {
   outline: none;
 }
