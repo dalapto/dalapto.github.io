@@ -78,12 +78,12 @@ function MenuPopper({
 					(index - 1 + menuItems.length) % menuItems.length
 				]?.focus();
 				break;
-			case ' ':
-			case 'Enter':
-				e.preventDefault();
-				navigate(`/${route}`);
-				closeAndReturnFocus();
-				break;
+		case ' ':
+		case 'Enter':
+			e.preventDefault();
+			navigate(route);
+			closeAndReturnFocus();
+			break;
 		}
 	};
 
@@ -133,20 +133,20 @@ function MenuPopper({
 				<Fade {...TransitionProps} timeout={300}>
 					<Box ref={menuRef} role='menu' aria-label='Projects submenu'>
 						{menuItems.map((item, index) => (
-							<MenuItem
-								key={item.path}
-								id='menu-appbar-item'
-								ref={(el: HTMLElement | null) => {
-									itemRefs.current[index] = el;
-								}}
-								component={Link}
-								to={`/${item.path}`}
-								role='menuitem'
-								tabIndex={0}
-								onClick={() => closeAndReturnFocus()}
-								onKeyDown={(e: React.KeyboardEvent) =>
-									handleMenuKeyDown(e, index, item.path!)
-								}
+					<MenuItem
+							key={item.route}
+							id='menu-appbar-item'
+							ref={(el: HTMLElement | null) => {
+								itemRefs.current[index] = el;
+							}}
+							component={Link}
+							to={item.route}
+							role='menuitem'
+							tabIndex={0}
+							onClick={() => closeAndReturnFocus()}
+							onKeyDown={(e: React.KeyboardEvent) =>
+								handleMenuKeyDown(e, index, item.route)
+							}
 							>
 								<Typography
 									className='menu-appbar-item-text'

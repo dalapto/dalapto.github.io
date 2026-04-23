@@ -10,11 +10,10 @@ import { YouthWork } from '../pages/YouthWork/YouthWork';
  */
 interface NavRoute {
 	label?: string;
-	path: string;
+	route: string;
 	tileImg?: string;
 	component?: () => React.ReactNode;
 	children?: NavRoute[];
-	route?: string;
 	onMouseEnter?: (_event: React.MouseEvent<HTMLElement>) => void;
 	onClick?: (_event: React.MouseEvent<HTMLElement>) => void;
 	onKeyDown?: (_event: React.KeyboardEvent<HTMLElement>) => void;
@@ -24,30 +23,30 @@ interface NavRoute {
 }
 
 const projectsRoutes: NavRoute[] = [
-	{ label: 'Cover Letter Generator', path: 'cover-letter-generator' },
-	{ label: 'Clipboard', path: 'clipboard' },
-	{ label: 'Litter', path: 'litter' },
+	{ label: 'Cover Letter Generator', route: '/cover-letter-generator' },
+	{ label: 'Clipboard', route: '/clipboard' },
+	{ label: 'Litter', route: '/litter' },
 	{
 		label: 'Medieval 2: Total War',
-		path: 'm2tw',
+		route: '/m2tw',
 		component: Medieval2TotalWar,
 	},
-	{ label: 'Rise of Nations', path: 'ron', component: RiseOfNations },
+	{ label: 'Rise of Nations', route: '/ron', component: RiseOfNations },
 ];
 
 const navRoutes: NavRoute[] = [
-	{ path: '/', component: Home },
-	{ label: 'About', path: '/about', tileImg: 'about', component: About },
+	{ route: '/', component: Home },
+	{ label: 'About', route: '/about', tileImg: 'about', component: About },
 	{
 		label: 'Projects',
-		path: '/projects',
+		route: '/projects',
 		tileImg: 'm2',
 		component: Projects,
 		children: [...projectsRoutes],
 	},
 	{
 		label: 'Youth Work',
-		path: '/youth',
+		route: '/youth',
 		tileImg: 'blog',
 		component: YouthWork,
 	},

@@ -62,24 +62,28 @@ function NavBar({ currentPage, navRoutes, externalLinks = [] }: NavBarProps) {
 			.filter((r) => r.label)
 			.map((r) => ({
 				label: r.label!,
-				route: r.path,
-				isActive: r.path === currentPage,
-				onMouseEnter: r.children ? (e) => openMenu(e, r.children!) : undefined,
-				onClick: r.children ? (e) => openMenu(e, r.children!) : undefined,
-				onKeyDown: r.children ? (e) => openMenu(e, r.children!) : undefined,
+				route: r.children ? undefined : r.route,
+				isActive: r.route === currentPage,
+				onMouseEnter: r.children
+					? (e) => openMenu(e, r.children!)
+					: r.onMouseEnter,
+				onClick: r.children ? (e) => openMenu(e, r.children!) : r.onClick,
+				onKeyDown: r.children ? (e) => openMenu(e, r.children!) : r.onKeyDown,
 				ariaHasPopup: r.children ? true : undefined,
 				ariaExpanded: r.children ? Boolean(menuAnchor) : undefined,
 			}));
 	}, [currentPage, menuAnchor, navRoutes, openMenu]) as NavRoute[];
 
 	const hamburgerItems = useMemo(() => {
-		return navRoutes
-			.filter((r) => r.label)
-			.map((r) => ({
-				label: r.label!,
-				route: r.path,
-			}));
-	}, [navRoutes]) as NavRoute[];
+		return navRoutes.map((r) => ({
+			label: r.label! ?? 'Home',
+			route: r.route,
+			isActive: r.route === currentPage,
+		}));
+	}, [currentPage, navRoutes]) as NavRoute[];
+
+	console.log('toolbarItems', toolbarItems);
+	console.log('hamburgerItems', hamburgerItems);
 
 	return (
 		<AppBar id='navbar' position='static'>
@@ -99,7 +103,7 @@ function NavBar({ currentPage, navRoutes, externalLinks = [] }: NavBarProps) {
 					{/* Used for empty space on bar */}
 					<Box sx={{ flexGrow: 0.75 }}> </Box>
 
-					<ToolbarItemList items={toolbarItems} closeMenu={closeMenu} />
+					<ToolbarItemList items={toolbarItems} />
 
 					{menuItems.length > 0 && isMenuOpen && (
 						<MenuPopper
@@ -134,7 +138,7 @@ function NavBar({ currentPage, navRoutes, externalLinks = [] }: NavBarProps) {
 						aria-haspopup='true'
 						onClick={(e) => openMenu(e, hamburgerItems)}
 						color='inherit'
-						sx={{ display: { xs: 'flex', md: 'none' } }}
+						sx={{ display: { xs: 'flex-end', md: 'none' } }}
 					>
 						<MenuIcon />
 					</IconButton>

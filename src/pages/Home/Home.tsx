@@ -53,7 +53,7 @@ function Home() {
 	const pages = navRoutes.filter((r) => r.tileImg && r.label);
 
 	const pageTiles = pages.map((page) => (
-		<Grid className='home-tile' key={page.path} item>
+		<Grid className='home-tile' key={page.route} item>
 			<Tile
 				className='tile-pc'
 				image_path={`/img/tile/${page.tileImg}.png`}
@@ -65,7 +65,7 @@ function Home() {
 				growFromValue={0.85}
 				backgroundColour={'rgb(0,0,0,0)'}
 				showLabelOnMouseOver={true}
-				to={page.path}
+				to={page.route}
 				ariaLabel={page.label!}
 			/>
 			<Tile
@@ -79,7 +79,7 @@ function Home() {
 				growFromValue={0.85}
 				backgroundColour={'rgb(0,0,0,0)'}
 				showLabelOnMouseOver={false}
-				to={page.path}
+				to={page.route}
 				ariaLabel={page.label!}
 			/>
 		</Grid>

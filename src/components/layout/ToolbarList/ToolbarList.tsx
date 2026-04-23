@@ -18,8 +18,6 @@ interface ToolbarItem {
 
 interface ToolbarListProps {
 	items: NavRoute[];
-	openMenu?: (_event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => void;
-	closeMenu?: () => void;
 	containerSx?: SxProps<Theme>;
 	buttonSx?: SxProps<Theme>;
 	typographySx?: SxProps<Theme>;
@@ -30,8 +28,6 @@ interface ToolbarListProps {
 
 function ToolbarItemList({
 	items,
-	openMenu,
-	closeMenu,
 	containerSx = {
 		flexGrow: 0.25,
 		display: {
@@ -61,15 +57,15 @@ function ToolbarItemList({
 	return (
 		<Box sx={containerSx}>
 			{items.map((item) => {
-				const commonProps = {
-					id: item.isActive ? activeButtonId : inactiveButtonId,
-					onMouseEnter: item.onMouseEnter ? item.onMouseEnter : openMenu,
-					onClick: item.onClick ? item.onClick : openMenu,
-					onKeyDown: item.onKeyDown ? item.onKeyDown : openMenu,
-					'aria-haspopup': item.ariaHasPopup ? ('true' as const) : undefined,
-					'aria-expanded': item.ariaExpanded,
-					sx: buttonSx,
-				};
+			const commonProps = {
+				id: item.isActive ? activeButtonId : inactiveButtonId,
+				'aria-haspopup': item.ariaHasPopup ? ('true' as const) : undefined,
+				'aria-expanded': item.ariaExpanded,
+				onMouseEnter: item.onMouseEnter,
+				onClick: item.onClick,
+				onKeyDown: item.onKeyDown,
+				sx: buttonSx,
+			};
 				return item.route ? (
 					<Button
 						key={item.label}

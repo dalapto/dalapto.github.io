@@ -1,14 +1,11 @@
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router';
 import './App.css';
 import { Temp } from './components/common/Temp/Temp';
 import { FooterBar } from './components/layout/FooterBar/FooterBar';
-import {
-	NavBar,
-	NavBarExternalLink,
-} from './components/layout/NavBar/NavBar';
+import { NavBar, NavBarExternalLink } from './components/layout/NavBar/NavBar';
 import { externalLinks as externalLinksConstants } from './constants/constants';
 import { navRoutes } from './constants/routes';
 
@@ -33,9 +30,6 @@ function App() {
 		}`;
 	}, [currentPageSlice]);
 
-
-
-
 	return (
 		<div className='App'>
 			<NavBar
@@ -47,8 +41,8 @@ function App() {
 				<Routes>
 					{navRoutes.map((r) => (
 						<Route
-							key={r.path}
-							path={r.path}
+							key={r.route}
+							path={r.route}
 							element={r.component ? r.component() : <Temp />}
 						/>
 					))}
