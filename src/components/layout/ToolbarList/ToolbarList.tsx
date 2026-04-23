@@ -3,8 +3,9 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
+import { NavRoute } from '../../../constants/routes';
 
-export interface ToolbarListItem {
+interface ToolbarItem {
 	label: string;
 	route?: string;
 	onMouseEnter?: (_event: React.MouseEvent<HTMLElement>) => void;
@@ -16,17 +17,21 @@ export interface ToolbarListItem {
 }
 
 interface ToolbarListProps {
-	items: ToolbarListItem[];
+	items: NavRoute[];
+	openMenu?: (_event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => void;
+	closeMenu?: () => void;
 	containerSx?: SxProps<Theme>;
 	buttonSx?: SxProps<Theme>;
 	typographySx?: SxProps<Theme>;
 	activeButtonId?: string;
 	inactiveButtonId?: string;
-	renderItem?: (_item: ToolbarListItem) => React.ReactNode;
+	renderItem?: (_item: NavRoute) => React.ReactNode;
 }
 
-function ToolbarList({
+function ToolbarItemList({
 	items,
+	openMenu,
+	closeMenu,
 	containerSx = {
 		flexGrow: 0.25,
 		display: {
@@ -45,20 +50,22 @@ function ToolbarList({
 	inactiveButtonId = 'navbar-button',
 	renderItem,
 }: ToolbarListProps) {
-	const defaultRenderItem = (item: ToolbarListItem) => (
+	const defaultRenderItem = (item: NavRoute) => (
 		<Typography textAlign='center' sx={typographySx}>
 			{item.label}
 		</Typography>
 	);
+	const buttonContent = (item: NavRoute) =>
+		renderItem ? renderItem(item) : defaultRenderItem(item);
 
 	return (
 		<Box sx={containerSx}>
 			{items.map((item) => {
 				const commonProps = {
 					id: item.isActive ? activeButtonId : inactiveButtonId,
-					onMouseEnter: item.onMouseEnter,
-					onClick: item.onClick,
-					onKeyDown: item.onKeyDown,
+					onMouseEnter: item.onMouseEnter ? item.onMouseEnter : openMenu,
+					onClick: item.onClick ? item.onClick : openMenu,
+					onKeyDown: item.onKeyDown ? item.onKeyDown : openMenu,
 					'aria-haspopup': item.ariaHasPopup ? ('true' as const) : undefined,
 					'aria-expanded': item.ariaExpanded,
 					sx: buttonSx,
@@ -70,11 +77,11 @@ function ToolbarList({
 						to={item.route}
 						{...commonProps}
 					>
-						{renderItem ? renderItem(item) : defaultRenderItem(item)}
+						{buttonContent(item)}
 					</Button>
 				) : (
 					<Button key={item.label} {...commonProps}>
-						{renderItem ? renderItem(item) : defaultRenderItem(item)}
+						{buttonContent(item)}
 					</Button>
 				);
 			})}
@@ -82,4 +89,4 @@ function ToolbarList({
 	);
 }
 
-export { ToolbarList };
+export { ToolbarItemList, ToolbarItem };

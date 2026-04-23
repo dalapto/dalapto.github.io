@@ -2,12 +2,14 @@ import { Box, Fade, MenuItem, Popper } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { NavRoute } from '../../../constants/routes';
+import { useClickOutside } from '../../../hooks/useClickOutside';
 import '../../layout/NavBar/NavBar.css';
 
 interface MenuPopperProps {
 	anchorElement: Element | HTMLElement;
 	handleCloseMenu: () => void;
-	menuItems: { route: string; name: string }[]; // TODO define object type
+	menuItems: NavRoute[];
 }
 
 function MenuPopper({
@@ -17,6 +19,8 @@ function MenuPopper({
 }: MenuPopperProps) {
 	const isOpen = Boolean(anchorElement);
 	const menuRef = React.useRef<HTMLDivElement>(null);
+	const anchorRef = React.useRef<Element>(anchorElement);
+	anchorRef.current = anchorElement;
 	const itemRefs = React.useRef<(HTMLElement | null)[]>([]);
 	const navigate = useNavigate();
 
@@ -31,22 +35,7 @@ function MenuPopper({
 		}
 	}, [isOpen]);
 
-	// Close when clicking outside
-	React.useEffect(() => {
-		if (!isOpen) return;
-		const handleClickOutside = (e: MouseEvent) => {
-			if (
-				menuRef.current &&
-				!menuRef.current.contains(e.target as Node) &&
-				anchorElement &&
-				!anchorElement.contains(e.target as Node)
-			) {
-				handleCloseMenu();
-			}
-		};
-		document.addEventListener('mousedown', handleClickOutside);
-		return () => document.removeEventListener('mousedown', handleClickOutside);
-	}, [isOpen, anchorElement, handleCloseMenu]);
+	useClickOutside(isOpen, [menuRef, anchorRef], handleCloseMenu);
 
 	const closeAndReturnFocus = React.useCallback(() => {
 		handleCloseMenu();
@@ -145,18 +134,18 @@ function MenuPopper({
 					<Box ref={menuRef} role='menu' aria-label='Projects submenu'>
 						{menuItems.map((item, index) => (
 							<MenuItem
-								key={item.route}
+								key={item.path}
 								id='menu-appbar-item'
 								ref={(el: HTMLElement | null) => {
 									itemRefs.current[index] = el;
 								}}
 								component={Link}
-								to={`/${item.route}`}
+								to={`/${item.path}`}
 								role='menuitem'
 								tabIndex={0}
 								onClick={() => closeAndReturnFocus()}
 								onKeyDown={(e: React.KeyboardEvent) =>
-									handleMenuKeyDown(e, index, item.route)
+									handleMenuKeyDown(e, index, item.path!)
 								}
 							>
 								<Typography
@@ -164,7 +153,7 @@ function MenuPopper({
 									textAlign='center'
 									color={'white'}
 								>
-									{item.name}
+									{item.label!}
 								</Typography>
 							</MenuItem>
 						))}

@@ -1,42 +1,86 @@
 import { SvgIconComponent } from '@mui/icons-material';
 import HomeIcon from '@mui/icons-material/Home';
+import MenuIcon from '@mui/icons-material/Menu';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
+import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
 import * as React from 'react';
+import { useCallback, useMemo } from 'react';
+import { NavRoute } from '../../../constants/routes';
 import { IconButtonLink } from '../../common/IconButton/IconButtonLink';
 import { MenuPopper } from '../../common/MenuPopper/MenuPopper';
-import { ToolbarList, ToolbarListItem } from '../ToolbarList/ToolbarList';
+import { ToolbarItemList } from '../ToolbarList/ToolbarList';
 import './NavBar.css';
-
-export interface NavBarMenuItem {
+interface NavItem {
 	name: string;
 	route: string;
 }
 
-export interface NavBarExternalLink {
+interface NavBarExternalLink {
 	href: string;
 	icon: SvgIconComponent;
 }
 
 interface NavBarProps {
 	currentPage: string;
-	toolbarItems: ToolbarListItem[];
-	menuAnchor?: HTMLElement | null;
-	menuItems?: NavBarMenuItem[];
-	onMenuClose?: () => void;
+	navRoutes: NavRoute[];
 	externalLinks?: NavBarExternalLink[];
 }
 
-function NavBar({
-	currentPage,
-	toolbarItems,
-	menuAnchor = null,
-	menuItems = [],
-	onMenuClose,
-	externalLinks = [],
-}: NavBarProps) {
+function NavBar({ currentPage, navRoutes, externalLinks = [] }: NavBarProps) {
+	const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+	const [menuAnchor, setMenuAnchor] = React.useState<HTMLElement | null>(null);
+	const [menuItems, setMenuItems] = React.useState<NavRoute[]>([]);
+
+	const closeMenu = () => {
+		setIsMenuOpen(false);
+		setMenuAnchor(null);
+	};
+
+	const openMenu = useCallback(
+		(
+			event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>,
+			children: NavRoute[],
+		) => {
+			const isKeyboardEvent = 'key' in event;
+			const spaceOrEnterKey =
+				isKeyboardEvent && (event.key === ' ' || event.key === 'Enter');
+
+			if (!isKeyboardEvent || spaceOrEnterKey) {
+				setMenuAnchor(event.currentTarget as HTMLElement);
+				setMenuItems(children);
+				setIsMenuOpen(true);
+			}
+		},
+		[],
+	);
+
+	const toolbarItems = useMemo(() => {
+		return navRoutes
+			.filter((r) => r.label)
+			.map((r) => ({
+				label: r.label!,
+				route: r.path,
+				isActive: r.path === currentPage,
+				onMouseEnter: r.children ? (e) => openMenu(e, r.children!) : undefined,
+				onClick: r.children ? (e) => openMenu(e, r.children!) : undefined,
+				onKeyDown: r.children ? (e) => openMenu(e, r.children!) : undefined,
+				ariaHasPopup: r.children ? true : undefined,
+				ariaExpanded: r.children ? Boolean(menuAnchor) : undefined,
+			}));
+	}, [currentPage, menuAnchor, navRoutes, openMenu]) as NavRoute[];
+
+	const hamburgerItems = useMemo(() => {
+		return navRoutes
+			.filter((r) => r.label)
+			.map((r) => ({
+				label: r.label!,
+				route: r.path,
+			}));
+	}, [navRoutes]) as NavRoute[];
+
 	return (
 		<AppBar id='navbar' position='static'>
 			<Container maxWidth={false}>
@@ -55,12 +99,12 @@ function NavBar({
 					{/* Used for empty space on bar */}
 					<Box sx={{ flexGrow: 0.75 }}> </Box>
 
-					<ToolbarList items={toolbarItems} />
+					<ToolbarItemList items={toolbarItems} closeMenu={closeMenu} />
 
-					{menuItems.length > 0 && onMenuClose && (
+					{menuItems.length > 0 && isMenuOpen && (
 						<MenuPopper
 							anchorElement={menuAnchor!}
-							handleCloseMenu={onMenuClose}
+							handleCloseMenu={closeMenu}
 							menuItems={menuItems}
 						/>
 					)}
@@ -83,10 +127,21 @@ function NavBar({
 							/>
 						</Box>
 					))}
+
+					<IconButton
+						size='large'
+						aria-controls='menu-appbar'
+						aria-haspopup='true'
+						onClick={(e) => openMenu(e, hamburgerItems)}
+						color='inherit'
+						sx={{ display: { xs: 'flex', md: 'none' } }}
+					>
+						<MenuIcon />
+					</IconButton>
 				</Toolbar>
 			</Container>
 		</AppBar>
 	);
 }
 
-export { NavBar };
+export { NavBar, NavBarExternalLink, NavItem };

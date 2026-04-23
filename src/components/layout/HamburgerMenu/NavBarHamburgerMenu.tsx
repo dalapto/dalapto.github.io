@@ -1,22 +1,20 @@
 import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { MenuPopper } from '../../common/MenuPopper/MenuPopper';
 import '../../layout/NavBar/NavBar.css';
+import { NavRoute } from '../../../constants/routes';
 
 interface HamburgerMenuProps {
 	anchorElement: Element | HTMLElement;
-	handleOpenMenu: () => void;
+	handleOpenMenu: (event: React.MouseEvent<HTMLElement>) => void;
 	handleCloseMenu: () => void;
-	menuItems: string[]; // TODO define object type
+	menuItems: NavRoute[];
 }
 
 function HamburgerMenu({
 	anchorElement,
 	handleOpenMenu,
-	handleCloseMenu,
 	menuItems,
 	...delegated
 }: HamburgerMenuProps) {
@@ -26,41 +24,11 @@ function HamburgerMenu({
 				size='large'
 				aria-controls='menu-appbar'
 				aria-haspopup='true'
-				onClick={() => handleOpenMenu()}
+				onClick={handleOpenMenu}
 				color='inherit'
 			>
 				<MenuIcon />
 			</IconButton>
-			<Menu
-				{...delegated}
-				id='menu-appbar'
-				anchorEl={anchorElement}
-				anchorOrigin={{
-					vertical: 'bottom',
-					horizontal: 'left',
-				}}
-				keepMounted
-				transformOrigin={{
-					vertical: 'top',
-					horizontal: 'left',
-				}}
-				open={Boolean(anchorElement)}
-				onClose={() => handleCloseMenu()}
-				sx={{
-					display: { xs: 'block', md: 'none' },
-				}}
-			>
-				{menuItems.map((item) => (
-					<MenuItem key={item} onClick={() => handleCloseMenu()}>
-						<Link
-							style={{ textDecoration: 'none', color: 'black' }}
-							to={`/${item}`}
-						>
-							{item}
-						</Link>
-					</MenuItem>
-				))}
-			</Menu>
 		</>
 	);
 }
