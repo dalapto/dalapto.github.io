@@ -1,0 +1,17 @@
+:root {
+	/* Color Palette */
+	--color-primary: #282c34;
+	--color-secondary: #ffa865;
+	--color-text: #ecf0f1;
+	--color-text-secondary: rgba(255, 255, 255, 0.87);
+	--color-background: #242424;
+	/* TO DO change link colour */
+	/* --color-link: #646cff; */
+	--color-link: #ffa865;
+	--color-link-hover: #ffa865;
+	--color-underline: #646cff;
+
+	/* Transitions */
+	--transition-standard: 0.5s;
+	--transition-fast: 0.2s;
+}
