@@ -1,9 +1,9 @@
 import React, { ReactNode } from 'react';
+import { Image } from '../../../types/basic.types';
 import './ImageTextLayout.css';
 
 interface ImageTextLayoutProps {
-	imageSrc: string;
-	imageAlt?: string;
+	image: Image;
 	children: ReactNode;
 	additionalContent?: ReactNode;
 	className?: string;
@@ -17,8 +17,7 @@ interface ImageTextLayoutProps {
  * Optional additional content can be displayed below the text.
  */
 function ImageTextLayout({
-	imageSrc,
-	imageAlt = '',
+	image,
 	children,
 	additionalContent,
 	className = '',
@@ -30,7 +29,7 @@ function ImageTextLayout({
 			style={{ ['--image-column-width' as string]: imageColumnWidth }}
 		>
 			<div className='image-column'>
-				<img src={imageSrc} alt={imageAlt} />
+				<img src={image.src} alt={image.alt} />
 			</div>
 			<div className='text-column'>
 				<figcaption>

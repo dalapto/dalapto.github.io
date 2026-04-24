@@ -1,16 +1,33 @@
 import React from 'react';
 import { ImageTextLayout } from '../../components/display/ImageTextLayout/ImageTextLayout';
 import { TileList } from '../../components/display/TileList/TileList';
+import { ImageHeader } from '../../components/layout/ImageHeader/ImageHeader';
 import { podcasts } from '../../constants/about-constants';
 import './About.css';
 
 function About() {
 	return (
 		<>
+			<ImageHeader
+				image={{
+					src: '/img/about/wall-smile.jpeg',
+					alt: 'Me smiling next to a sunny wall in Hamburg.',
+				}}
+				height='80vh'
+				imageWidth='90%'
+				imagePosition='center 90%'
+				blur={0.5}
+				imageHeight='100%'
+				titleStyle={{ margin: '0 0 15rem 0' }}
+				titleText='about'
+				subtitleText='(me)'
+			/>
 			<div className='about-page'>
 				<ImageTextLayout
-					imageSrc='/img/about/arch-move.png'
-					imageAlt='Architectural photo'
+					image={{
+						src: '/img/about/arch-move.png',
+						alt: 'Me standing in an archway looking into sunset in lake district.',
+					}}
 					imageColumnWidth='45%'
 					additionalContent={
 						<TileList
