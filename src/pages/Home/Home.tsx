@@ -2,7 +2,7 @@ import { Box, Grid, Typography } from '@mui/material';
 import { Container } from '@mui/system';
 import React from 'react';
 import { Tile } from '../../components/common/Tile/Tile';
-import { TypedText } from '../../components/common/TypedText/TypedText';
+import { SwapText } from '../../components/common/TypedText/SwapText';
 import { navRoutes } from '../../constants/routes';
 import './Home.css';
 
@@ -90,8 +90,13 @@ function Home() {
 			<Container>
 				<Box marginTop={'5%'}>
 					{/* changes text dynamically to different languages */}
-					<Typography variant='h2' fontFamily={'monospace'} letterSpacing={5}>
-						<TypedText string_list={welcomes} />
+					<Typography
+						variant='h2'
+						fontFamily={'monospace'}
+						letterSpacing={5}
+						aria-label='Welcome'
+					>
+						<SwapText string_list={welcomes}/>
 					</Typography>
 				</Box>
 				<Box marginTop={'5%'}>

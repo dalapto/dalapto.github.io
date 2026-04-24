@@ -1,7 +1,25 @@
-enum externalLinks {
-	linkedin = 'https://www.linkedin.com/in/david-mcalister/',
-	github = 'https://github.com/dalapto/dalapto.github.io',
+import GitHubIcon from '@mui/icons-material/GitHub';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import { SvgIconComponent } from '@mui/icons-material';
+
+interface ExternalLink {
+	href: string;
+	label: string;
+	icon: SvgIconComponent;
 }
+
+const externalLinks: ExternalLink[] = [
+	{
+		href: 'https://www.linkedin.com/in/david-mcalister/',
+		label: 'LinkedIn',
+		icon: LinkedInIcon,
+	},
+	{
+		href: 'https://github.com/dalapto',
+		label: 'GitHub',
+		icon: GitHubIcon,
+	},
+];
 
 const podcasts = [
 	{

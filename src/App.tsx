@@ -1,22 +1,10 @@
-import GitHubIcon from '@mui/icons-material/GitHub';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import React, { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router';
 import './App.css';
 import { Temp } from './components/common/Temp/Temp';
 import { FooterBar } from './components/layout/FooterBar/FooterBar';
-import { NavBar, NavBarExternalLink } from './components/layout/NavBar/NavBar';
-import { externalLinks as externalLinksConstants } from './constants/constants';
+import { NavBar } from './components/layout/NavBar/NavBar';
 import { navRoutes } from './constants/routes';
-
-const externalLinks: NavBarExternalLink[] = [
-	{ href: externalLinksConstants.linkedin, icon: LinkedInIcon },
-	{ href: externalLinksConstants.github, icon: GitHubIcon },
-];
-
-// const projectMenuItems: NavBarMenuItem[] = navRoutes
-// 	.filter((r) => r.parent === 'Projects')
-// 	.map((r) => ({ name: r.label!, route: r.path }));
 
 function App() {
 	const currentPage = useLocation().pathname;
@@ -32,11 +20,7 @@ function App() {
 
 	return (
 		<div className='App'>
-			<NavBar
-				currentPage={currentPage}
-				navRoutes={navRoutes}
-				externalLinks={externalLinks}
-			/>
+			<NavBar currentPage={currentPage} navRoutes={navRoutes} />
 			<div className='routes-container'>
 				<Routes>
 					{navRoutes.map((r) => (

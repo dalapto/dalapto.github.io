@@ -1,4 +1,3 @@
-import { SvgIconComponent } from '@mui/icons-material';
 import HomeIcon from '@mui/icons-material/Home';
 import MenuIcon from '@mui/icons-material/Menu';
 import AppBar from '@mui/material/AppBar';
@@ -8,6 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
+import { externalLinks } from '../../../constants/constants';
 import { NavRoute } from '../../../constants/routes';
 import { IconButtonLink } from '../../common/IconButton/IconButtonLink';
 import { MenuPopper } from '../../common/MenuPopper/MenuPopper';
@@ -17,19 +17,12 @@ interface NavItem {
 	name: string;
 	route: string;
 }
-
-interface NavBarExternalLink {
-	href: string;
-	icon: SvgIconComponent;
-}
-
 interface NavBarProps {
 	currentPage: string;
 	navRoutes: NavRoute[];
-	externalLinks?: NavBarExternalLink[];
 }
 
-function NavBar({ currentPage, navRoutes, externalLinks = [] }: NavBarProps) {
+function NavBar({ currentPage, navRoutes }: NavBarProps) {
 	const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 	const [menuAnchor, setMenuAnchor] = React.useState<HTMLElement | null>(null);
 	const [menuItems, setMenuItems] = React.useState<NavRoute[]>([]);
@@ -126,7 +119,7 @@ function NavBar({ currentPage, navRoutes, externalLinks = [] }: NavBarProps) {
 							<IconButtonLink
 								href={link.href}
 								icon={link.icon}
-								ariaLabel={link.href}
+								ariaLabel={link.label}
 								style={{ color: 'white' }}
 							/>
 						</Box>
@@ -149,4 +142,4 @@ function NavBar({ currentPage, navRoutes, externalLinks = [] }: NavBarProps) {
 	);
 }
 
-export { NavBar, NavBarExternalLink, NavItem };
+export { NavBar, NavItem };

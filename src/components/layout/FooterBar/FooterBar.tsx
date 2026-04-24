@@ -1,21 +1,10 @@
-import { SvgIconComponent } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
-import { IconButtonLink } from '../../common/IconButton/IconButtonLink';
 import './FooterBar.css';
-
-export interface FooterBarExternalLink {
-	href: string;
-	icon: SvgIconComponent;
-}
-
 interface FooterBarProps {
-	externalLinks?: FooterBarExternalLink[];
 	copyrightText?: string;
 }
 
@@ -36,8 +25,28 @@ const tooltipLinks = tooltips.map((tooltip) => (
 		{tooltip.text != tooltips[tooltips.length - 1].text ? ' ' : ' and '}
 		<br />
 		<Tooltip
-			followCursor={true}
-			placement='top'
+			followCursor={false}
+			placement='left'
+			slotProps={{
+				tooltip: {
+					sx: {
+						backgroundColor: 'transparent',
+						boxShadow: 'none',
+						padding: 0,
+						opacity: 1,
+					},
+				},
+				popper: {
+					modifiers: [
+						{
+							name: 'offset',
+							options: {
+								offset: [0, -1],
+							},
+						},
+					],
+				},
+			}}
 			title={
 				<img width={25} height={25} src={`/img/logo/${tooltip.img}`}></img>
 			}
@@ -50,7 +59,7 @@ const tooltipLinks = tooltips.map((tooltip) => (
 	</span>
 ));
 
-function FooterBar({ externalLinks = [], copyrightText }: FooterBarProps) {
+function FooterBar({ copyrightText }: FooterBarProps) {
 	return (
 		<AppBar id='footerbar' position='static' component='footer'>
 			<Container
@@ -59,43 +68,15 @@ function FooterBar({ externalLinks = [], copyrightText }: FooterBarProps) {
 					display: 'flex',
 					flexDirection: 'column',
 					alignItems: 'flex-center',
+					justifyContent: 'center',
+					padding: '5vh',
 				}}
 			>
 				{/* icons & links for each package */}
-				<Typography
-					fontSize={'1.1rem'}
-					fontFamily={'monospace'}
-					marginTop={'100px'}
-				>
+				<Typography fontSize={'1.1rem'} fontFamily={'monospace'}>
 					<span>This page is built with</span>
 					{tooltipLinks}
 				</Typography>
-
-				<Toolbar disableGutters>
-					{copyrightText && (
-						<Typography id='footer-copyright' variant='body2' sx={{ mr: 2 }}>
-							{copyrightText}
-						</Typography>
-					)}
-
-					{externalLinks.map((link, index) => (
-						<Box
-							key={index}
-							sx={{
-								flexGrow: 0,
-								display: 'flex',
-								mr: index === externalLinks.length - 1 ? 0 : 1,
-							}}
-						>
-							<IconButtonLink
-								href={link.href}
-								icon={link.icon}
-								ariaLabel={link.href}
-								style={{ color: 'white' }}
-							/>
-						</Box>
-					))}
-				</Toolbar>
 			</Container>
 		</AppBar>
 	);
