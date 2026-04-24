@@ -136,6 +136,7 @@ function NavBar({ currentPage, navRoutes, externalLinks = [] }: NavBarProps) {
 						size='large'
 						aria-controls='menu-appbar'
 						aria-haspopup='true'
+						aria-label='Menu'
 						onClick={(e) => openMenu(e, hamburgerItems)}
 						color='inherit'
 						sx={{ display: { xs: 'flex-end', md: 'none' } }}
