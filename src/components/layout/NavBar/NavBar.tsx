@@ -74,9 +74,6 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 		}));
 	}, [currentPage, navRoutes]) as NavRoute[];
 
-	console.log('toolbarItems', toolbarItems);
-	console.log('hamburgerItems', hamburgerItems);
-
 	return (
 		<AppBar id='navbar' position='static'>
 			<Container maxWidth={false}>

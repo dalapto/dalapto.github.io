@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router';
 import './App.css';
-import { Temp } from './components/common/Temp/Temp';
+import { PageInConstruction } from './components/display/PageInConstruction/PageInConstruction';
 import { FooterBar } from './components/layout/FooterBar/FooterBar';
 import { NavBar } from './components/layout/NavBar/NavBar';
 import { navRoutes } from './constants/routes';
@@ -27,7 +27,7 @@ function App() {
 						<Route
 							key={r.route}
 							path={r.route}
-							element={r.component ? r.component() : <Temp />}
+							element={r.component ? r.component() : <PageInConstruction />}
 						/>
 					))}
 				</Routes>

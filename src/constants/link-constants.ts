@@ -1,12 +1,6 @@
-import { SvgIconComponent } from '@mui/icons-material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
-
-interface ExternalLink {
-	href: string;
-	label: string;
-	icon: SvgIconComponent;
-}
+import { ExternalLink } from '../types/basic.types';
 
 const externalLinks: ExternalLink[] = [
 	{
@@ -33,4 +27,4 @@ const tooltipLinks = [
 	{ text: 'GitHub Pages', link: 'https://pages.github.com/', img: 'gh.png' },
 ];
 
-export { ExternalLink, externalLinks, tooltipLinks };
+export { externalLinks, tooltipLinks };
