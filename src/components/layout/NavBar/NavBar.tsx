@@ -1,17 +1,16 @@
 import HomeIcon from '@mui/icons-material/Home';
-import MenuIcon from '@mui/icons-material/Menu';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import { externalLinks } from '../../../constants/constants';
+import { externalLinks } from '../../../constants/link-constants';
 import { NavRoute } from '../../../constants/routes';
-import { IconButtonLink } from '../../common/IconButton/IconButtonLink';
-import { MenuPopper } from '../../common/MenuPopper/MenuPopper';
-import { ToolbarItemList } from '../ToolbarList/ToolbarList';
+import { HamburgerMenu } from '../../controls/HamburgerMenu/HamburgerMenu';
+import { IconButtonLink } from '../../controls/IconButton/IconButtonLink';
+import { MenuPopper } from '../../display/MenuPopper/MenuPopper';
+import { ToolbarItemList } from '../../display/ToolbarList/ToolbarList';
 import './NavBar.css';
 interface NavItem {
 	name: string;
@@ -125,17 +124,7 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 						</Box>
 					))}
 
-					<IconButton
-						size='large'
-						aria-controls='menu-appbar'
-						aria-haspopup='true'
-						aria-label='Menu'
-						onClick={(e) => openMenu(e, hamburgerItems)}
-						color='inherit'
-						sx={{ display: { xs: 'flex-end', md: 'none' } }}
-					>
-						<MenuIcon />
-					</IconButton>
+					<HamburgerMenu handleOpenMenu={(e) => openMenu(e, hamburgerItems)} />
 				</Toolbar>
 			</Container>
 		</AppBar>

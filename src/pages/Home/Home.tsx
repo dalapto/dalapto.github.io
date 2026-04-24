@@ -1,55 +1,13 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { Container } from '@mui/system';
 import React from 'react';
-import { Tile } from '../../components/common/Tile/Tile';
-import { SwapText } from '../../components/common/TypedText/SwapText';
+import { SwapText } from '../../components/display/SwapText/SwapText';
+import { Tile } from '../../components/display/Tile/Tile';
+import { welcomes } from '../../constants/home-constants';
 import { navRoutes } from '../../constants/routes';
 import './Home.css';
 
 function Home() {
-	const welcomes = [
-		'welcome',
-		'fáilte',
-		'croeso',
-		'bienvenue',
-		'willkommen',
-		'bienvenido',
-		'ようこそ',
-		'welkom',
-		'chào mừng',
-		'benvenuta',
-		'欢迎',
-		'mirë se erdhe',
-		'tervetuloa',
-		'welina',
-		'خوش آمدید',
-		'välkommen',
-		'добро пожаловать',
-		'olandiridwa',
-		'환영',
-		'Прошу',
-		'mile widziany',
-		'tunngasugit',
-		'vitaj',
-		'ברוך הבא',
-		'selamat datang',
-		'nabata',
-		'laipni lūdza',
-		'स्वागत है',
-		'maraba',
-		'hoş geldin',
-		'مەرھابا',
-		'byenvini',
-		'merħba',
-		`tun'ngahuktitauyut`,
-		'vælkomin',
-		'kαλώς ήρθες',
-		'أهلًا وسهلًا',
-		'benvingut',
-		'wamkelekile',
-		'歡迎',
-	];
-
 	const pages = navRoutes.filter((r) => r.tileImg && r.label);
 
 	const pageTiles = pages.map((page) => (
@@ -96,7 +54,7 @@ function Home() {
 						letterSpacing={5}
 						aria-label='Welcome'
 					>
-						<SwapText string_list={welcomes}/>
+						<SwapText string_list={welcomes} />
 					</Typography>
 				</Box>
 				<Box marginTop={'5%'}>

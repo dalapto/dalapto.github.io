@@ -3,26 +3,15 @@ import AppBar from '@mui/material/AppBar';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
+import { tooltipLinks } from '../../../constants/link-constants';
 import './FooterBar.css';
 interface FooterBarProps {
 	copyrightText?: string;
 }
 
-const tooltips = [
-	{ text: 'Vite', link: 'https://vitejs.dev/', img: 'vite.png' },
-	{ text: 'React', link: 'https://react.dev/', img: 'react.webp' },
-	{
-		text: 'TypeScript',
-		link: 'https://www.typescriptlang.org/',
-		img: 'ts.png',
-	},
-	{ text: 'Material UI', link: 'https://mui.com/', img: 'mui.png' },
-	{ text: 'GitHub Pages', link: 'https://pages.github.com/', img: 'gh.png' },
-];
-
-const tooltipLinks = tooltips.map((tooltip) => (
+const tooltipTextList = tooltipLinks.map((tooltip) => (
 	<span key={tooltip.text}>
-		{tooltip.text != tooltips[tooltips.length - 1].text ? ' ' : ' and '}
+		{tooltip.text != tooltipLinks[tooltipLinks.length - 1].text ? ' ' : ' and '}
 		<br />
 		<Tooltip
 			followCursor={false}
@@ -55,7 +44,7 @@ const tooltipLinks = tooltips.map((tooltip) => (
 				<span>{tooltip.text}</span>
 			</a>
 		</Tooltip>
-		{tooltip.text != tooltips[tooltips.length - 1].text ? ', ' : '.'}
+		{tooltip.text != tooltipLinks[tooltipLinks.length - 1].text ? ', ' : '.'}
 	</span>
 ));
 
@@ -75,7 +64,7 @@ function FooterBar({ copyrightText }: FooterBarProps) {
 				{/* icons & links for each package */}
 				<Typography fontSize={'1.1rem'} fontFamily={'monospace'}>
 					<span>This page is built with</span>
-					{tooltipLinks}
+					{tooltipTextList}
 				</Typography>
 			</Container>
 		</AppBar>

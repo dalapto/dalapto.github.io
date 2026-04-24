@@ -1,10 +1,10 @@
 import React from 'react';
-import { Temp } from '../../../components/common/Temp/Temp';
+import { PageInConstruction } from '../../../components/display/PageInConstruction/PageInConstruction';
 
 function Medieval2TotalWar() {
 	return (
-		<div className="App">
-			<Temp></Temp>
+		<div className='App'>
+			<PageInConstruction></PageInConstruction>
 		</div>
 	);
 }

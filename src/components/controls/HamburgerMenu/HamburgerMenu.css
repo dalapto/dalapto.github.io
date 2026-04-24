@@ -1,0 +1,35 @@
+.hamburger-menu {
+	position: relative;
+	transition: transform var(--transition-fast) ease-in-out;
+}
+
+.hamburger-menu::after {
+	position: absolute;
+	content: '';
+	width: 100%;
+	height: 3px;
+	bottom: 0;
+	left: 0;
+	background: var(--color-secondary);
+	transition: transform var(--transition-standard);
+	transform: scaleX(0);
+	transform-origin: right;
+}
+
+.hamburger-menu:hover,
+.hamburger-menu:focus,
+.hamburger-menu:focus-visible {
+	transform: scale(1.1);
+	outline: none;
+}
+
+.hamburger-menu:hover::after,
+.hamburger-menu:focus::after,
+.hamburger-menu:focus-visible::after {
+	transform: scaleX(1);
+	transform-origin: left;
+}
+
+.hamburger-menu:active {
+	transform: scale(0.95);
+}

@@ -1,7 +1,7 @@
 import React from 'react';
-import { ImageTextLayout } from '../../components/layout/ImageTextLayout/ImageTextLayout';
-import { TileList } from '../../components/layout/TileList/TileList';
-import { podcasts } from '../../constants/constants';
+import { ImageTextLayout } from '../../components/display/ImageTextLayout/ImageTextLayout';
+import { TileList } from '../../components/display/TileList/TileList';
+import { podcasts } from '../../constants/about-constants';
 import './About.css';
 
 function About() {

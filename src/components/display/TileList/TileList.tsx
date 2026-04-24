@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Tile } from '../../common/Tile/Tile';
+import { Tile } from '../Tile/Tile';
 
 interface TileListProps {
 	items: { text: string; link: string; img: string }[];
