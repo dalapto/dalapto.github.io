@@ -1,5 +1,6 @@
 #footerbar {
   background-color: var(--color-primary);
+
   display: flex;
   flex-direction: row;
   align-items: center;

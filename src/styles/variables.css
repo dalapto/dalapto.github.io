@@ -11,6 +11,9 @@
 	--color-link-hover: #ffa865;
 	--color-underline: #646cff;
 
+	/* Layout */
+	--navbar-height: 64px;
+
 	/* Transitions */
 	--transition-standard: 0.5s;
 	--transition-fast: 0.2s;
