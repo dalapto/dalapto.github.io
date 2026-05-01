@@ -2,13 +2,33 @@ import { Box, Grid, Typography } from '@mui/material';
 import { Container } from '@mui/system';
 import React from 'react';
 import { SwapText } from '../../components/display/SwapText/SwapText';
+import { TextList } from '../../components/display/TextList/TextList';
 import { Tile } from '../../components/display/Tile/Tile';
-import { welcomes } from '../../constants/home-constants';
+import { translations, welcomes } from '../../constants/home-constants';
 import { navRoutes } from '../../constants/routes';
+import { useBackground } from '../../context/BackgroundContext';
 import './Home.css';
 
 function Home() {
 	const pages = navRoutes.filter((r) => r.tileImg && r.label);
+	const { setBackground } = useBackground();
+
+	function handleTileMouseEnter(
+		tileImg: string,
+		label: string,
+		blur = 3,
+		imgPosition = 'center 10%',
+	) {
+		setBackground({
+			image: { src: `/img/tile/${tileImg}.png`, alt: label },
+			blur: blur,
+			imagePosition: imgPosition,
+		});
+	}
+
+	function handleTileMouseLeave() {
+		setBackground(null);
+	}
 
 	const pageTiles = pages.map((page) => (
 		<Grid className='home-tile' key={page.route} item>
@@ -25,6 +45,15 @@ function Home() {
 				showLabelOnMouseOver={true}
 				to={page.route}
 				ariaLabel={page.label!}
+				onMouseEnter={() =>
+					handleTileMouseEnter(
+						page.tileImg!,
+						page.label!,
+						3,
+						page.bgImgPosition!,
+					)
+				}
+				onMouseLeave={handleTileMouseLeave}
 			/>
 			<Tile
 				className='tile-mobile'
@@ -58,7 +87,7 @@ function Home() {
 					</Typography>
 				</Box>
 				<Box marginTop={'5%'}>
-					<span>Feel free to look around.</span>
+					<span>{<TextList strings={translations.welcome_blurb} />}</span>
 				</Box>
 				<Box marginTop={'5%'}>
 					{/* Tiles to other pages */}

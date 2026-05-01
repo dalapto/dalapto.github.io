@@ -5,6 +5,8 @@ interface BackgroundConfig {
 	image: Image;
 	imagePosition?: string;
 	blur?: number;
+	/** Fade transition duration in ms. Defaults to 400. */
+	transitionDuration?: number;
 }
 
 interface BackgroundContextValue {

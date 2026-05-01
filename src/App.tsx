@@ -1,4 +1,4 @@
-import { animated, useSpring, useTransition } from '@react-spring/web';
+import { animated, useTransition } from '@react-spring/web';
 import React, { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router';
 import './App.css';
@@ -6,32 +6,38 @@ import { PageInConstruction } from './components/display/PageInConstruction/Page
 import { FooterBar } from './components/layout/FooterBar/FooterBar';
 import { NavBar } from './components/layout/NavBar/NavBar';
 import { navRoutes } from './constants/routes';
-import { BackgroundProvider, useBackground } from './contexts/BackgroundContext';
+import { BackgroundProvider, useBackground } from './context/BackgroundContext';
 
 function AppBackground() {
 	const { background } = useBackground();
-	// Keep the last known config so we can fade out instead of snapping to null.
-	const lastBackground = React.useRef(background);
-	if (background) lastBackground.current = background;
-	const displayed = background ?? lastBackground.current;
 
-	const fade = useSpring({
-		opacity: background ? 1 : 0,
-		config: { duration: 500 },
+	const transitions = useTransition(background, {
+		keys: (bg) => bg?.image.src ?? 'none',
+		from: { opacity: 0 },
+		enter: (bg) => ({ opacity: bg ? 1 : 0 }),
+		leave: { opacity: 0 },
+		config: (bg) => ({
+			duration: bg?.transitionDuration ?? 400,
+		}),
 	});
 
-	if (!displayed) return null;
 	return (
-		<animated.img
-			className='app-background'
-			src={displayed.image.src}
-			alt={displayed.image.alt}
-			style={{
-				...fade,
-				objectPosition: displayed.imagePosition ?? 'center top',
-				filter: (displayed.blur ?? 0) > 0 ? `blur(${displayed.blur}px)` : undefined,
-			}}
-		/>
+		<>
+			{transitions((style, bg) =>
+				bg ? (
+					<animated.img
+						className='app-background'
+						src={bg.image.src}
+						alt={bg.image.alt}
+						style={{
+							...style,
+							objectPosition: bg.imagePosition ?? 'center top',
+							filter: (bg.blur ?? 0) > 0 ? `blur(${bg.blur}px)` : undefined,
+						}}
+					/>
+				) : null,
+			)}
+		</>
 	);
 }
 

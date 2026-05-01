@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect } from 'react';
-import { useBackground } from '../../../contexts/BackgroundContext';
+import { useBackground } from '../../../context/BackgroundContext';
 import { Image } from '../../../types/basic.types';
 import './ParallaxCanvas.css';
 

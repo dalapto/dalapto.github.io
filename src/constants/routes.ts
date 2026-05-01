@@ -20,6 +20,7 @@ interface NavRoute {
 	isActive?: boolean;
 	ariaHasPopup?: boolean;
 	ariaExpanded?: boolean;
+	bgImgPosition?: string;
 }
 
 const projectsRoutes: NavRoute[] = [
@@ -36,19 +37,27 @@ const projectsRoutes: NavRoute[] = [
 
 const navRoutes: NavRoute[] = [
 	{ route: '/', component: Home },
-	{ label: 'About', route: '/about', tileImg: 'about', component: About },
+	{
+		label: 'About',
+		route: '/about',
+		tileImg: 'about',
+		component: About,
+		bgImgPosition: 'center -10%',
+	},
 	{
 		label: 'Projects',
 		route: '/projects',
 		tileImg: 'm2',
 		component: Projects,
 		children: [...projectsRoutes],
+		bgImgPosition: 'center 100%',
 	},
 	{
 		label: 'Youth Work',
 		route: '/youth',
 		tileImg: 'blog',
 		component: YouthWork,
+		bgImgPosition: 'center 0%',
 	},
 ];
 

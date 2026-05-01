@@ -17,6 +17,8 @@ export interface TileProps {
 	growFromValue: string | number;
 	backgroundColour: string;
 	showLabelOnMouseOver: boolean;
+	onMouseEnter?: () => void;
+	onMouseLeave?: () => void;
 	to?: string;
 	href?: string;
 	ariaLabel?: string;
@@ -33,6 +35,8 @@ function Tile({
 	growFromValue = 0.85,
 	backgroundColour = 'rgba(0,0,0,0)',
 	showLabelOnMouseOver = false,
+	onMouseEnter = () => {},
+	onMouseLeave = () => {},
 	to,
 	href,
 	ariaLabel,
@@ -42,6 +46,7 @@ function Tile({
 	);
 
 	function handleMouseOver() {
+		onMouseEnter();
 		if (!showLabelOnMouseOver) {
 			return;
 		}
@@ -49,6 +54,7 @@ function Tile({
 	}
 
 	function handleMouseLeave() {
+		onMouseLeave();
 		if (!showLabelOnMouseOver) {
 			return;
 		}
@@ -56,6 +62,7 @@ function Tile({
 	}
 
 	function handleFocus() {
+		onMouseEnter();
 		if (!showLabelOnMouseOver) {
 			return;
 		}
@@ -63,6 +70,7 @@ function Tile({
 	}
 
 	function handleBlur() {
+		onMouseLeave();
 		if (!showLabelOnMouseOver) {
 			return;
 		}
