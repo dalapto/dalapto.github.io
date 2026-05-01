@@ -25,14 +25,14 @@ const uni_translations = {
 	before_uni: [
 		'My first real taste of the SDLC was in school.',
 		'Using VB6, I built a bookkeeping app for a local book shop, documenting the entire process.',
-		'I spent a couple days writing out two dozen if-statements, just to switch between currencies.',
+		'I recall spending a couple days writing out two dozen if-statements, just to switch between currencies...',
 		'',
 		'Thankfully, that code has been lost to time.',
 		'',
 		'After the fun of building my own app, I switched my university application from Chemistry to Computer Science.',
-		'This meant next year was getting my Maths A-level (which I had skipped) to meet requirements...',
+		'This meant next year was getting my Maths A-level (which I had skipped) to meet course requirements...',
 		'',
-		'...so my gap year was spent between a call centre job and trigonometry! 📐',
+		'...so my gap year was spent between a call centre job and trigonometry 📐',
 	],
 	at_uni: [
 		'I fumbled first and second year of uni, having to resit multiple exams. Every course was boring and hard. I often fell asleep in morning lectures. But those two years taught me the life-skills I needed to study well.',
