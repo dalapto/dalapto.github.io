@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useContext, useState } from 'react';
+import React, { createContext, ReactNode, useCallback, useContext, useRef, useState } from 'react';
 import { Image } from '../types/basic.types';
 
 interface BackgroundConfig {
@@ -9,15 +9,39 @@ interface BackgroundConfig {
 	transitionDuration?: number;
 }
 
+interface SetBackgroundOptions {
+	/** Delay in ms before clearing the background when passing null. Ignored for non-null configs. */
+	clearDelay?: number;
+}
+
 interface BackgroundContextValue {
 	background: BackgroundConfig | null;
-	setBackground: (config: BackgroundConfig | null) => void;
+	setBackground: (config: BackgroundConfig | null, opts?: SetBackgroundOptions) => void;
 }
 
 const BackgroundContext = createContext<BackgroundContextValue | null>(null);
 
 function BackgroundProvider({ children }: { children: ReactNode }) {
-	const [background, setBackground] = useState<BackgroundConfig | null>(null);
+	const [background, setBackgroundState] = useState<BackgroundConfig | null>(null);
+	const clearTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	const setBackground = useCallback(
+		(config: BackgroundConfig | null, opts?: SetBackgroundOptions) => {
+			if (clearTimer.current) {
+				clearTimeout(clearTimer.current);
+				clearTimer.current = null;
+			}
+			if (config === null && opts?.clearDelay) {
+				clearTimer.current = setTimeout(() => {
+					setBackgroundState(null);
+					clearTimer.current = null;
+				}, opts.clearDelay);
+			} else {
+				setBackgroundState(config);
+			}
+		},
+		[],
+	);
 
 	return (
 		<BackgroundContext.Provider value={{ background, setBackground }}>

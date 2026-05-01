@@ -1,6 +1,6 @@
 import { Box, Grid, Typography } from '@mui/material';
 import { Container } from '@mui/system';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SwapText } from '../../components/display/SwapText/SwapText';
 import { TextList } from '../../components/display/TextList/TextList';
 import { Tile } from '../../components/display/Tile/Tile';
@@ -26,9 +26,15 @@ function Home() {
 		});
 	}
 
+	const CLEAR_DELAY = 600;
+
 	function handleTileMouseLeave() {
-		setBackground(null);
+		setBackground(null, { clearDelay: CLEAR_DELAY });
 	}
+
+	useEffect(() => {
+		return () => setBackground(null, { clearDelay: CLEAR_DELAY });
+	}, [setBackground]);
 
 	const pageTiles = pages.map((page) => (
 		<Grid className='home-tile' key={page.route} item>
