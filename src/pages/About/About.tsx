@@ -37,6 +37,20 @@ function About() {
 					>
 						<TextList strings={uni_translations.before_uni} />
 					</span>
+
+					<span
+						style={{
+							maxWidth: '70%',
+							alignSelf: 'center',
+							backgroundColor: 'rgba(130, 60, 55, 0.95)',
+							padding: '1rem',
+							borderRadius: '0.5rem',
+						}}
+					>
+						<TextList strings={uni_translations.at_uni} />
+						{/* <TextList strings={uni_translations.recyclotron} />
+						<TextList strings={uni_translations.litter} /> */}
+					</span>
 				</div>
 			</ParallaxCanvas>
 			<div className='about-image-text-section'>
