@@ -7,6 +7,7 @@ import { Tile } from '../../components/display/Tile/Tile';
 import { translations, welcomes } from '../../constants/home-constants';
 import { NavRoute, navRoutes } from '../../constants/routes';
 import { useHoverBackground } from '../../hooks/useHoverBackground';
+import { useScrollBackground } from '../../hooks/useScrollBackground';
 import './Home.css';
 
 interface PageTileProps {
@@ -14,14 +15,16 @@ interface PageTileProps {
 }
 
 function PageTile({ page }: PageTileProps) {
-	const { onMouseEnter, onMouseLeave } = useHoverBackground({
-		config: {
-			image: { src: `/img/tile/${page.tileImg}.png`, alt: '' },
-			imagePosition: page.bgImgPosition,
-			transitionDuration: 300,
-			blur: 3,
-		},
-	});
+	const bgConfig = {
+		image: { src: `/img/tile/${page.tileImg}.png`, alt: '' },
+		imagePosition: page.bgImgPosition,
+		transitionDuration: 300,
+		blur: 3,
+	};
+
+	const { onMouseEnter, onMouseLeave } = useHoverBackground({ config: bgConfig });
+
+	const scrollRef = useScrollBackground<HTMLDivElement>({ config: bgConfig });
 
 	const sharedProps = {
 		image_path: `/img/tile/${page.tileImg}.png`,
@@ -34,14 +37,14 @@ function PageTile({ page }: PageTileProps) {
 		backgroundColour: 'rgb(0,0,0,0)',
 		to: page.route,
 		ariaLabel: page.label!,
-		onMouseEnter,
-		onMouseLeave,
 	};
 
 	return (
 		<Grid className='home-tile' key={page.route} item>
-			<Tile className='tile-pc' showLabelOnMouseOver={true} {...sharedProps} />
-			<Tile className='tile-mobile' showLabelOnMouseOver={false} {...sharedProps} />
+			<Tile className='tile-pc' showLabelOnMouseOver={true} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} {...sharedProps} />
+			<div ref={scrollRef}>
+				<Tile className='tile-mobile' showLabelOnMouseOver={false} {...sharedProps} />
+			</div>
 		</Grid>
 	);
 }
@@ -49,7 +52,9 @@ function PageTile({ page }: PageTileProps) {
 function Home() {
 	const pages = navRoutes.filter((r) => r.tileImg && r.label);
 
-	const pageTiles = pages.map((page) => <PageTile key={page.route} page={page} />);
+	const pageTiles = pages.map((page) => (
+		<PageTile key={page.route} page={page} />
+	));
 
 	return (
 		<div className='App'>
@@ -68,7 +73,11 @@ function Home() {
 					<span>{<TextList strings={translations.welcome_blurb} />}</span>
 				</Box>
 				<Box marginTop={'5%'}>
-					<Grid container columnSpacing={navRoutes.length} justifyContent='center'>
+					<Grid
+						container
+						columnSpacing={navRoutes.length}
+						justifyContent='center'
+					>
 						{pageTiles}
 					</Grid>
 				</Box>
