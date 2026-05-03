@@ -20,17 +20,17 @@ const books = [
 	{
 		text: 'The Great Divorce',
 		link: 'https://www.goodreads.com/en/book/show/25845273-the-great-divorce',
-		img: 'great_divorce.png',
+		img: 'great.jpg',
 	},
 	{
 		text: 'Name of the Wind',
 		link: 'https://www.goodreads.com/en/book/show/186074.The_Name_of_the_Wind',
-		img: 'name_of_the_wind.jpg',
+		img: 'wind.jpg',
 	},
 	{
 		text: 'A Silent Voice',
 		link: 'https://www.goodreads.com/book/show/57764673-silent-voice',
-		img: 'a_silent_voice.jpg',
+		img: 'silent.jpg',
 	},
 ];
 
@@ -38,17 +38,17 @@ const films = [
 	{
 		text: 'Hunt for the Wilderpeople',
 		link: 'https://www.rottentomatoes.com/m/hunt_for_the_wilderpeople',
-		img: 'hunt_for_wilderpeople.jpg',
+		img: 'hunt.jpg',
 	},
 	{
 		text: 'Only Yesterday',
 		link: 'https://www.rottentomatoes.com/m/only_yesterday_1991',
-		img: 'only_yesterday.png',
+		img: 'only.jpg',
 	},
 	{
 		text: 'Fifth Element',
 		link: 'https://www.rottentomatoes.com/m/fifth_element',
-		img: '5th_element.jpg',
+		img: '5th.png',
 	},
 ];
 
@@ -56,35 +56,35 @@ const tv = [
 	{
 		text: 'Ping Pong the Animation',
 		link: 'https://letterboxd.com/film/ping-pong-the-animation/',
-		img: 'pingpong.jpg',
+		img: 'pingpong1.jpg',
+	},
+	{
+		text: 'Fringe',
+		link: 'https://www.rottentomatoes.com/tv/fringe',
+		img: 'fringe.png',
 	},
 	{
 		text: 'Bondi Rescue',
 		link: 'https://www.rottentomatoes.com/tv/bondi_rescue',
-		img: 'bondi_rescue.png',
-	},
-	{
-		text: 'Battlestar Galactica',
-		link: 'https://www.rottentomatoes.com/tv/battlestar-galactica',
-		img: 'bsg.jpg',
+		img: 'bondi.jpg',
 	},
 ];
 
 const albums = [
 	{
-		text: 'Hovvdy',
-		link: 'https://letterboxd.com/film/ping-pong-the-animation/',
-		img: 'hovvdy.jpg',
+		text: 'Hold Still',
+		link: 'https://open.spotify.com/album/5BiPMSmuINHTP82jz0RE3l',
+		img: 'holdstill.jpg',
 	},
 	{
 		text: 'Zeal',
-		link: 'https://www.rottentomatoes.com/tv/bondi_rescue',
-		img: 'bondi_rescue.png',
+		link: 'https://open.spotify.com/album/1p9qFUWDth0hWAQYiKUB37',
+		img: 'zeal.jpg',
 	},
 	{
 		text: 'Suburban Legend',
-		link: 'https://www.rottentomatoes.com/tv/battlestar-galactica',
-		img: 'bsg.jpg',
+		link: 'https://open.spotify.com/album/0XBOirwu0hluwBbEb8hdMe',
+		img: 'suburb.jpg',
 	},
 ];
 
@@ -116,9 +116,6 @@ const gapYah2Link = {
 const gapYah2 = `<@${gapYah2Link.text}@${gapYah2Link.link}@>`;
 
 const uni_translations = {
-	uni: 'University of Edinburgh',
-	subject: 'BSc Computer Science',
-	grade: '1st',
 	before_uni: [
 		`My first real taste of the ${sdlc} was in school.`,
 		`Using ${vb6} I built a bookkeeping app for a local book shop 📚`,
@@ -146,10 +143,15 @@ const uni_translations = {
 		'Besides, the Informatics department was (mostly) well equipped to virtually assess.',
 		'',
 	],
+	ilp: {
+		title: '',
+		content: '',
+	},
 	recyclotron: {
 		title: 'Recyclotron',
-		content:
+		content: [
 			"There was also a 'build-us-a-robot' course. Our group decided to make an auto-sorting bin. We trained our NN AI on images of rubbish. As I had 4 other courses on-the-go, I decided to manage the team of ten and writeup reports. We had some smart cookies.",
+		],
 	},
 	litter: {
 		title: 'Litter',
@@ -162,4 +164,4 @@ const uni_translations = {
 	},
 };
 
-export { blurb, podcasts, uni_translations };
+export { albums, blurb, books, films, podcasts, tv, uni_translations };

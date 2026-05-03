@@ -6,8 +6,12 @@ import { TextList } from '../../components/display/TextList/TextList';
 import { TileList } from '../../components/display/TileList/TileList';
 import { ImageHeader } from '../../components/layout/ImageHeader/ImageHeader';
 import {
+	albums,
 	blurb,
+	books,
+	films,
 	podcasts,
+	tv,
 	uni_translations,
 } from '../../constants/about-constants';
 import './About.css';
@@ -118,11 +122,44 @@ function About() {
 							borderRadius: '0.5rem',
 						}}
 					>
-						<TextList strings={uni_translations.uni1} />
+						<TextList strings={uni_translations.recyclotron.content} />
+						<TextList strings={uni_translations.litter.content} />
 					</span>
 				</div>
 			</ParallaxCanvas>
 			<div className='about-image-text-section'>
+				<TileList
+					items={books}
+					imgSize='20vmin'
+					direction={'row'}
+					imgPathPrefix='/img/books/'
+					title='Favourite Books:'
+					className='podcast-tiles'
+				/>
+				<TileList
+					items={albums}
+					imgSize='20vmin'
+					direction={'row'}
+					imgPathPrefix='/img/music/'
+					title='Favourite Albums:'
+					className='podcast-tiles'
+				/>
+				<TileList
+					items={films}
+					imgSize='20vmin'
+					direction={'row'}
+					imgPathPrefix='/img/film/'
+					title='Favourite Films:'
+					className='podcast-tiles'
+				/>
+				<TileList
+					items={tv}
+					imgSize='20vmin'
+					direction={'row'}
+					imgPathPrefix='/img/tv/'
+					title='Favourite Shows:'
+					className='podcast-tiles'
+				/>
 				<ImageTextLayout
 					image={{
 						src: '/img/about/arch-move.png',
