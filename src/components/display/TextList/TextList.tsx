@@ -1,20 +1,28 @@
 import React from 'react';
+import { FormattedText } from '../FormattedText/FormattedText';
 
 interface TextListProps {
 	strings: string[];
 	separator?: React.ReactNode;
+	wrapper?: React.ElementType;
 }
+
+
 
 function TextList({
 	strings,
 	separator = <br />,
+	wrapper: Wrapper = React.Fragment,
 }: TextListProps): React.ReactNode {
-	return strings.map((line, i) => (
-		<React.Fragment key={i}>
-			{line}
+	
+	const textList = strings.map((line, i) => (
+		<Wrapper key={i}>
+			<FormattedText text={line}/>
 			{separator}
-		</React.Fragment>
+		</Wrapper>
 	));
+
+	return textList;
 }
 
 export { TextList };

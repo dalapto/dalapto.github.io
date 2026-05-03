@@ -6,6 +6,7 @@ interface TooltipLinkProps {
 	text: string;
 	imgSrc: string;
 	placement?: 'left' | 'top' | 'bottom' | 'right';
+	offset?: number[];
 }
 
 function TooltipLink({
@@ -13,6 +14,7 @@ function TooltipLink({
 	text,
 	imgSrc,
 	placement = 'left',
+	offset = [0, -1],
 }: TooltipLinkProps) {
 	return (
 		<Tooltip
@@ -32,7 +34,7 @@ function TooltipLink({
 						{
 							name: 'offset',
 							options: {
-								offset: [0, -1],
+								offset: offset,
 							},
 						},
 					],
@@ -47,5 +49,4 @@ function TooltipLink({
 	);
 }
 
-export { TooltipLink };
-export type { TooltipLinkProps };
+export { TooltipLink, TooltipLinkProps };

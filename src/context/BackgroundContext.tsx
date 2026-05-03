@@ -57,4 +57,4 @@ function useBackground() {
 }
 
 export { BackgroundProvider, useBackground };
-export type { BackgroundConfig };
+export type { BackgroundConfig, SetBackgroundOptions };

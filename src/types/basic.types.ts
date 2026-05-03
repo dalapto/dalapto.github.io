@@ -3,6 +3,7 @@ import { SvgIconComponent } from '@mui/icons-material';
 interface Image {
 	src: string;
 	alt: string;
+	caption?: string;
 }
 
 interface ExternalLink {
@@ -11,4 +12,10 @@ interface ExternalLink {
 	icon: SvgIconComponent;
 }
 
-export { ExternalLink, Image };
+interface TooltipLink {
+	text: string;
+	link: string;
+	img: string;
+}
+
+export { ExternalLink, Image, TooltipLink };

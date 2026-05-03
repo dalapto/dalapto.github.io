@@ -54,7 +54,7 @@ const films = [
 
 const tv = [
 	{
-		text: "Ping Pong the Animation",
+		text: 'Ping Pong the Animation',
 		link: 'https://letterboxd.com/film/ping-pong-the-animation/',
 		img: 'pingpong.jpg',
 	},
@@ -70,10 +70,9 @@ const tv = [
 	},
 ];
 
-
 const albums = [
 	{
-		text: "Hovvdy",
+		text: 'Hovvdy',
 		link: 'https://letterboxd.com/film/ping-pong-the-animation/',
 		img: 'hovvdy.jpg',
 	},
@@ -91,39 +90,61 @@ const albums = [
 
 const blurb = '(how I became a Software Engineer)';
 
+const vb6Link = {
+	text: 'VB6',
+	link: 'https://en.wikipedia.org/wiki/Visual_Basic_(classic)',
+	img: '/img/logo/vb6.png',
+};
+const vb6 = `<@${vb6Link.text}@${vb6Link.link}@${vb6Link.img}@>`;
+
+const sdlcLink = {
+	text: 'SDLC',
+	link: 'https://en.wikipedia.org/wiki/Systems_development_life_cycle',
+};
+const sdlc = `<@${sdlcLink.text}@${sdlcLink.link}@>`;
+
+const gapYahLink = {
+	text: 'gap yah',
+	link: 'https://en.wikipedia.org/wiki/Gap_Yah',
+};
+const gapYah = `<@${gapYahLink.text}@${gapYahLink.link}@>`;
+
+const gapYah2Link = {
+	text: '(video)',
+	link: 'https://www.youtube.com/watch?v=eKFjWR7X5dU',
+};
+const gapYah2 = `<@${gapYah2Link.text}@${gapYah2Link.link}@>`;
+
 const uni_translations = {
 	uni: 'University of Edinburgh',
 	subject: 'BSc Computer Science',
 	grade: '1st',
 	before_uni: [
-		'My first real taste of the SDLC was in school.',
-		'Using VB6, I built a bookkeeping app for a local book shop, documenting the entire process.',
+		`My first real taste of the ${sdlc} was in school.`,
+		`Using ${vb6} I built a bookkeeping app for a local book shop 📚`,
 		'',
-		'...I recall spending a couple days writing out two dozen if-statements, just to switch between currencies...',
+		'I recall spending days to add currency functionality, writing dozens of if-statements...',
 		'',
 		'Thankfully, that code has been lost to time.',
 		'',
-		'After the fun of building my own app, I switched my university application from Chemistry to Computer Science.',
-		'This meant next year was getting my Maths A-level (which I had skipped) to meet course requirements...',
+		'But it inspired me to switch my university application from Chemistry to Computer Science.',
+		"This meant next year was getting my Maths A-level (which I'd skipped) to meet course requirements...",
 		'',
-		'...so my gap year was spent between a call centre job and trigonometry 📐',
+		`...so my ${gapYah} ${gapYah2} was spent learning 📐 trigonometry...!`,
 	],
-	at_uni: [
-		'I fumbled first and second year of uni, having to resit multiple exams.',
-		'Every course was boring and hard. I often fell asleep in morning lectures.',
-		'But those two years taught me the life-skills I needed to study well.',
+	uni1: [
 		'',
-		'So, come year 3, I knew how to knuckle down.',
-		'It helped that, not only did courses now count towards my final grade, but I could choose areas I was actually interested in.',
-		'I was invested.',
+		"It wasn't until third year, I started enjoying uni.",
+		'I had fumbled my first two years, having to resit multiple exams.',
+		'I knuckled down, keen for the classes I had chosen.',
 		'',
-		'Then, come March 2020 - everything stopped. I flew back home, unsure what this coronavirus pandemic meant.',
-		'When it became obvious this was no Spring thing, I cancelled the flat lease, unsure when I would return.',
-		"My brother came to sort through all my things I had left behind. I wouldn't see them for another 2 years.",
+		'Then, come March 2020 - everything stopped. I flew back home, unsure of the future.',
+		'When obvious this was no Spring thing, I cancelled the flat lease.',
+		"I wouldn't return to Edinburgh until 2 years later.",
 		'',
-		'It was a good time to finish my degree.',
-		'I had swapped socialising for studying and besides, the Informatics department was well equipped to virtually assess.',
-		'Even if most lecturers recycled their old lecture recordings...',
+		'It was a good time to finish my degree - I had swapped socialising for studying anyway.',
+		'Besides, the Informatics department was (mostly) well equipped to virtually assess.',
+		'',
 	],
 	recyclotron: {
 		title: 'Recyclotron',

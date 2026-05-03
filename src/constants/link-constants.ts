@@ -1,6 +1,6 @@
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import { ExternalLink } from '../types/basic.types';
+import { ExternalLink, TooltipLink } from '../types/basic.types';
 
 const externalLinks: ExternalLink[] = [
 	{
@@ -15,7 +15,7 @@ const externalLinks: ExternalLink[] = [
 	},
 ];
 
-const tooltipLinks = [
+const footerLinks: TooltipLink[] = [
 	{ text: 'Vite', link: 'https://vitejs.dev/', img: 'vite.png' },
 	{ text: 'React', link: 'https://react.dev/', img: 'react.webp' },
 	{
@@ -27,4 +27,4 @@ const tooltipLinks = [
 	{ text: 'GitHub Pages', link: 'https://pages.github.com/', img: 'gh.png' },
 ];
 
-export { externalLinks, tooltipLinks };
+export { externalLinks, footerLinks };

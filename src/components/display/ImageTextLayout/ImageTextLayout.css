@@ -1,33 +1,26 @@
 .image-text-layout {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 20px;
-	justify-content: center;
-	background-color: inherit;
-}
+	--itl-image-min-width: 15rem;
+	--itl-image-max-width: 40%;
+	--itl-text-min-width: 12rem;
+	--itl-gap: 1.5rem;
+	--itl-side-padding: 1rem;
 
-@media only screen and (min-width: 768px) {
-	.image-text-layout {
-		flex-direction: row;
-		align-items: stretch;
-		gap: 30px;
-	}
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: row;
+	align-items: stretch;
+	gap: var(--itl-gap);
+	padding: 0 var(--itl-side-padding);
+	background-color: inherit;
+	box-sizing: border-box;
 }
 
 .image-text-layout .image-column {
-	flex-direction: column;
+	flex: 1 1 var(--itl-image-min-width);
+	max-width: var(--itl-image-max-width);
+	min-width: var(--itl-image-min-width);
 	display: flex;
-	justify-content: center;
-	align-self: stretch;
-	width: 100%;
-}
-
-@media only screen and (min-width: 768px) {
-	.image-text-layout .image-column {
-		flex: 0 0 var(--image-column-width, 40%);
-		width: var(--image-column-width, 40%);
-	}
+	flex-direction: column;
 }
 
 .image-text-layout .image-column img {
@@ -35,44 +28,50 @@
 	height: 100%;
 	display: block;
 	object-fit: contain;
-	object-position: left center;
+	object-position: center;
 }
 
-@media only screen and (min-width: 768px) {
-	.image-text-layout .image-column img {
-		width: 100%;
-		height: 100%;
-	}
+.image-text-layout .image-column .image-caption {
+	text-align: center;
+	font-size: 0.8rem;
+	color: rgba(255, 255, 255, 1);
+	margin-top: 0.4rem;
+	background-color: rgba(0, 0, 0, 0.7);
+	padding: 0.2rem 0.4rem;
 }
 
 .image-text-layout .text-column {
-	flex-direction: row;
+	flex: 1 1 var(--itl-text-min-width);
+	min-width: var(--itl-text-min-width);
 	display: flex;
-	justify-content: center;
 	align-items: center;
-	align-self: center;
-	width: 100%;
-}
-
-@media only screen and (min-width: 768px) {
-	.image-text-layout .text-column {
-		flex: 1;
-		width: auto;
-	}
+	overflow-y: auto;
 }
 
 .image-text-layout .text-column figcaption {
-	width: 80%;
+	width: 100%;
 }
 
+.image-text-layout .text-column p {
+	margin-block-start: 8px;
+}
 
-@media only screen and (min-width: 768px) {
-	.image-text-layout .text-column p {
-		margin-block-start: 8px;
+@media (max-width: 600px) {
+	.image-text-layout {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.image-text-layout .image-column {
+		max-width: 100%;
+		min-width: unset;
+		width: 100%;
+	}
+
+	.image-text-layout .text-column {
+		min-width: unset;
+		max-height: unset;
+		width: 100%;
+		overflow-y: visible;
 	}
 }
-
-
-
-
-
