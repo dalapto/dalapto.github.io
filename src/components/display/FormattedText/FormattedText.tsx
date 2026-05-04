@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { TooltipLink } from '../TooltipLink/TooltipLink';
 
-const SEGMENT_REGEX = /<([@#`~_!?])([\s\S]+?)\1>/g;
+const SEGMENT_REGEX = /<([@#])([\s\S]+?)>|<([`~_!?])([\s\S]+?)\3>/g;
 
 const WRAPPERS: Record<string, keyof JSX.IntrinsicElements> = {
 	'!': 'strong', '?': 'em', '_': 'u', '~': 's', '`': 'code',
@@ -15,7 +15,8 @@ function parseNodes(text: string): ReactNode[] {
 		if (match.index! > lastIndex)
 			nodes.push(text.slice(lastIndex, match.index));
 
-		const [, sigil, inner] = match;
+		const sigil = match[1] ?? match[3];
+		const inner = match[2] ?? match[4];
 
 		if (sigil === '@' || sigil === '#') {
 			const [label, href, img] = inner.split(sigil);

@@ -12,8 +12,7 @@
 	position: relative;
 	/* flex:1 fills remaining height in a fixed-height parent */
 	flex: 1 1 0;
-	/* Fallback intrinsic height when there is no fixed parent height (e.g. mobile stacked layout) */
-	min-height: 260px;
+	/* min-height is controlled via the minHeight prop (inline style) */
 	background-color: #111;
 }
 

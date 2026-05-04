@@ -19,6 +19,8 @@ interface ImageCyclerProps {
 	showDots?: boolean;
 	/** Show prev/next arrow buttons. Defaults to true. */
 	showArrows?: boolean;
+	/** Minimum height of the image area. Accepts any CSS length (e.g. '400px', '50vh'). Defaults to '400px'. */
+	minHeight?: string;
 }
 
 function ImageCycler({
@@ -29,6 +31,7 @@ function ImageCycler({
 	objectPosition = 'center',
 	showDots = true,
 	showArrows = true,
+	minHeight = '400px',
 }: ImageCyclerProps) {
 	const [index, setIndex] = useState(0);
 	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -86,7 +89,7 @@ function ImageCycler({
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
 		>
-			<div className='image-cycler-media'>
+			<div className='image-cycler-media' style={{ minHeight }}>
 				{images.map((img, i) => (
 					<img
 						key={img.src}

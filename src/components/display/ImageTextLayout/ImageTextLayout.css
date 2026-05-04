@@ -16,7 +16,7 @@
 }
 
 .image-text-layout .image-column {
-	flex: 1 1 var(--itl-image-min-width);
+	flex: 0 1 var(--itl-image-max-width);
 	max-width: var(--itl-image-max-width);
 	min-width: var(--itl-image-min-width);
 	display: flex;

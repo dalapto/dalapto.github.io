@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Tile } from '../Tile/Tile';
+import { Tile, TileActionKind } from '../Tile/Tile';
 
 interface TileListProps {
 	items: { text: string; link: string; img: string }[];
@@ -56,8 +56,8 @@ function TileList({
 							backgroundColour={backgroundColour}
 							showLabelOnMouseOver={showLabelOnMouseOver}
 							className={''}
-							to={link}
-							ariaLabel={text}
+					action={{ kind: TileActionKind.Href, href: link }}
+						ariaLabel={text}
 						/>
 					);
 				})}

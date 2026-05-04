@@ -1,10 +1,12 @@
-import React, { ReactNode } from 'react';
-import { ParallaxCanvas } from '../../display/ParallaxCanvas/ParallaxCanvas';
+import React, { ReactElement } from 'react';
+import type { BackgroundConfig } from '../../../context/BackgroundContext';
 import { Image } from '../../../types/basic.types';
-import { JsonImageHeader } from './JsonImageHeader';
-import { JsonImageTextLayout } from './JsonImageTextLayout';
+import { ParallaxCanvas } from '../../display/ParallaxCanvas/ParallaxCanvas';
 import type { JsonSectionHeader } from './JsonImageHeader';
+import { JsonImageHeader } from './JsonImageHeader';
 import type { JsonSectionPanel } from './JsonImageTextLayout';
+import { JsonImageTextLayout } from './JsonImageTextLayout';
+import { JsonSectionContent } from './JsonSectionContent';
 
 interface JsonSectionBackground {
 	image: Image;
@@ -14,18 +16,39 @@ interface JsonSectionBackground {
 	blur?: number;
 }
 
-interface JsonSectionProps {
-	/** Parallax background canvas that wraps everything. */
-	background: JsonSectionBackground;
-	/** One or more panels, each with an optional header rendered above it. */
-	panels: JsonSectionPanel[];
-	/** Extra class name applied to the parallax content wrapper. */
-	className?: string;
-	/** Any additional children rendered after all panels inside the parallax canvas. */
-	children?: ReactNode;
+interface JsonSectionGroup {
+	scrollBackground?: BackgroundConfig;
+	panels: (JsonSectionPanel | ReactElement)[];
 }
 
-function JsonSection({ background, panels, className, children }: JsonSectionProps) {
+type JsonSectionItem = JsonSectionPanel | JsonSectionGroup | ReactElement;
+
+interface JsonSectionProps {
+	background: JsonSectionBackground;
+	items: JsonSectionItem[];
+	className?: string;
+}
+
+function isElement(item: JsonSectionItem): item is ReactElement {
+	return React.isValidElement(item);
+}
+
+function isGroup(item: JsonSectionItem): item is JsonSectionGroup {
+	return !isElement(item) && 'panels' in item;
+}
+
+function renderPanelOrElement(item: JsonSectionPanel | ReactElement, key: number) {
+	if (React.isValidElement(item)) return <React.Fragment key={key}>{item}</React.Fragment>;
+	const panel = item as JsonSectionPanel;
+	return (
+		<React.Fragment key={key}>
+			{panel.header && <JsonImageHeader {...panel.header} />}
+			<JsonImageTextLayout {...panel} />
+		</React.Fragment>
+	);
+}
+
+function JsonSection({ background, items, className }: JsonSectionProps) {
 	return (
 		<ParallaxCanvas
 			image={background.image}
@@ -33,17 +56,35 @@ function JsonSection({ background, panels, className, children }: JsonSectionPro
 			blur={background.blur}
 			className={className}
 		>
-			{panels.map((panel, i) => (
+			{items.map((item, i) => {
+			if (isElement(item))
+				return <React.Fragment key={i}>{item}</React.Fragment>;
+			if (!isGroup(item)) return renderPanelOrElement(item, i);
+			if (item.scrollBackground) {
+				return (
+					<JsonSectionContent
+						key={i}
+						bgConfig={item.scrollBackground}
+						panels={item.panels}
+					/>
+				);
+			}
+			return (
 				<React.Fragment key={i}>
-					{panel.header && <JsonImageHeader {...panel.header} />}
-					<JsonImageTextLayout {...panel} />
+					{item.panels.map((panel, j) => renderPanelOrElement(panel, j))}
 				</React.Fragment>
-			))}
-
-			{children}
+			);
+			})}
 		</ParallaxCanvas>
 	);
 }
 
-export type { JsonSectionProps, JsonSectionBackground, JsonSectionHeader, JsonSectionPanel };
 export { JsonSection };
+export type {
+	JsonSectionBackground,
+	JsonSectionGroup,
+	JsonSectionHeader,
+	JsonSectionItem,
+	JsonSectionPanel,
+	JsonSectionProps,
+};

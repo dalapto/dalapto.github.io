@@ -19,6 +19,8 @@ type ImageTextLayoutProps = {
 	/** Minimum height of the whole row. */
 	minHeight?: string;
 	imageCaption?: string;
+	/** When true, renders the text column first and the image column second. */
+	reverseColumns?: boolean;
 } & (
 	| { image: Image; imageSlot?: never }
 	| { image?: never; imageSlot: ReactNode }
@@ -42,6 +44,7 @@ function ImageTextLayout({
 	sidePadding = '1rem',
 	minHeight,
 	imageCaption,
+	reverseColumns = false,
 }: ImageTextLayoutProps) {
 	return (
 		<figure
@@ -57,20 +60,41 @@ function ImageTextLayout({
 				} as React.CSSProperties
 			}
 		>
-			<div className='image-column'>
-				{imageSlot ?? <img src={image!.src} alt={image!.alt} />}
-				{imageCaption && (
-					<figcaption className='image-caption'>{imageCaption}</figcaption>
-				)}
-			</div>
-			<div className='text-column'>
-				<figcaption>
-					{children}
-					{additionalContent && (
-						<div className='additional-content'>{additionalContent}</div>
-					)}
-				</figcaption>
-			</div>
+			{reverseColumns ? (
+				<>
+					<div className='text-column'>
+						<figcaption>
+							{children}
+							{additionalContent && (
+								<div className='additional-content'>{additionalContent}</div>
+							)}
+						</figcaption>
+					</div>
+					<div className='image-column'>
+						{imageSlot ?? <img src={image!.src} alt={image!.alt} />}
+						{imageCaption && (
+							<figcaption className='image-caption'>{imageCaption}</figcaption>
+						)}
+					</div>
+				</>
+			) : (
+				<>
+					<div className='image-column'>
+						{imageSlot ?? <img src={image!.src} alt={image!.alt} />}
+						{imageCaption && (
+							<figcaption className='image-caption'>{imageCaption}</figcaption>
+						)}
+					</div>
+					<div className='text-column'>
+						<figcaption>
+							{children}
+							{additionalContent && (
+								<div className='additional-content'>{additionalContent}</div>
+							)}
+						</figcaption>
+					</div>
+				</>
+			)}
 		</figure>
 	);
 }

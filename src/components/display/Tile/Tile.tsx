@@ -6,6 +6,19 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import './Tile.css';
 
+enum TileActionKind {
+	Route = 'route',
+	Href = 'href',
+	Click = 'click',
+	None = 'none',
+}
+
+type TileAction =
+	| { kind: TileActionKind.Route; to: string }
+	| { kind: TileActionKind.Href; href: string }
+	| { kind: TileActionKind.Click; onClick: () => void }
+	| { kind: TileActionKind.None };
+
 export interface TileProps {
 	className: string;
 	image_path: string;
@@ -17,11 +30,18 @@ export interface TileProps {
 	growFromValue: string | number;
 	backgroundColour: string;
 	showLabelOnMouseOver: boolean;
+	action?: TileAction;
 	onMouseEnter?: () => void;
 	onMouseLeave?: () => void;
-	to?: string;
-	href?: string;
 	ariaLabel?: string;
+}
+
+function resolveButtonProps(action: TileAction | undefined) {
+	if (!action || action.kind === TileActionKind.None) return {};
+	if (action.kind === TileActionKind.Route) return { component: Link, to: action.to };
+	if (action.kind === TileActionKind.Href) return { component: 'a', href: action.href, target: '_blank', rel: 'noopener noreferrer' };
+	if (action.kind === TileActionKind.Click) return { onClick: action.onClick };
+	return {};
 }
 
 function Tile({
@@ -35,54 +55,36 @@ function Tile({
 	growFromValue = 0.85,
 	backgroundColour = 'rgba(0,0,0,0)',
 	showLabelOnMouseOver = false,
+	action,
 	onMouseEnter = () => {},
 	onMouseLeave = () => {},
-	to,
-	href,
 	ariaLabel,
 }: TileProps) {
-	const [showLabel, setShowLabel] = React.useState<boolean>(
-		!showLabelOnMouseOver,
-	);
+	const [showLabel, setShowLabel] = React.useState<boolean>(!showLabelOnMouseOver);
 
 	function handleMouseOver() {
 		onMouseEnter();
-		if (!showLabelOnMouseOver) {
-			return;
-		}
+		if (!showLabelOnMouseOver) return;
 		setShowLabel(true);
 	}
 
 	function handleMouseLeave() {
 		onMouseLeave();
-		if (!showLabelOnMouseOver) {
-			return;
-		}
+		if (!showLabelOnMouseOver) return;
 		setShowLabel(false);
 	}
 
 	function handleFocus() {
 		onMouseEnter();
-		if (!showLabelOnMouseOver) {
-			return;
-		}
+		if (!showLabelOnMouseOver) return;
 		setShowLabel(true);
 	}
 
 	function handleBlur() {
 		onMouseLeave();
-		if (!showLabelOnMouseOver) {
-			return;
-		}
+		if (!showLabelOnMouseOver) return;
 		setShowLabel(false);
 	}
-
-	// Determine button props based on link type
-	const buttonProps = href
-		? { component: 'a', href, target: '_blank', rel: 'noopener noreferrer' }
-		: to
-		? { component: Link, to }
-		: {};
 
 	return (
 		<Card
@@ -96,7 +98,7 @@ function Tile({
 				onFocus={handleFocus}
 				onBlur={handleBlur}
 				aria-label={ariaLabel}
-				{...buttonProps}
+				{...resolveButtonProps(action)}
 			>
 				<CardMedia
 					image={image_path}
@@ -131,4 +133,6 @@ function Tile({
 		</Card>
 	);
 }
-export { Tile };
+
+export type { TileAction };
+export { Tile, TileActionKind };

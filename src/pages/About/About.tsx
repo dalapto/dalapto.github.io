@@ -1,20 +1,105 @@
 import React from 'react';
 import { ImageTextLayout } from '../../components/display/ImageTextLayout/ImageTextLayout';
-import { TextList } from '../../components/display/TextList/TextList';
 import { TileList } from '../../components/display/TileList/TileList';
+import type { JsonSectionPanel } from '../../components/layout/JsonSection/JsonSection';
 import { JsonSection } from '../../components/layout/JsonSection/JsonSection';
+import { PageTile } from '../../components/layout/ResponsiveTile/PageTile';
+import { colors } from '../../constants/colors';
 import {
 	albums,
-	blurb,
+	archMoveImage,
+	blurbPanelData,
 	books,
+	edinburghImage,
 	films,
+	litterImages,
+	litterPanelData,
+	litterTileImage,
 	podcasts,
+	recyclotronImages,
+	recyclotronPanelData,
+	recyclotronTileImage,
 	tv,
-	uni_images,
-	uni_translations,
-} from '../../constants/about-constants';
-import { colors } from '../../constants/colors';
+	uniBackground,
+	uniImages,
+	uniPanelData,
+	vb6IdeImage,
+	wallSmileImage,
+} from './about-constants';
 import './About.css';
+
+const blurbPanel: JsonSectionPanel = {
+	header: {
+		titleText: blurbPanelData.title,
+		subtitleText: blurbPanelData.subtitle,
+	},
+	imageSlot: {
+		image: vb6IdeImage,
+	},
+	imageMaxWidth: '40%',
+	content: blurbPanelData.content,
+	contentBackground: colors.panelRust,
+};
+
+const uniPanel: JsonSectionPanel = {
+	header: {
+		image: edinburghImage,
+		titleText: uniPanelData.title,
+	},
+	imageSlot: {
+		images: uniImages,
+		cyclerInterval: 4000,
+	},
+	reverseColumns: true,
+	imageMinWidth: '30%',
+	imageMaxWidth: '35%',
+	textMinWidth: '50%',
+	minHeight: '60vh',
+	content: uniPanelData.content,
+	contentBackground: colors.panelTeal,
+};
+
+const recyclotronPanel: JsonSectionPanel = {
+	imageSlot: {
+		images: recyclotronImages,
+	},
+	imageMaxWidth: '40%',
+	content: recyclotronPanelData.content,
+	contentBackground: colors.panelTeal,
+	contentChildren: (
+		<div
+			style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}
+		>
+			<PageTile
+				page={{ label: 'Recylotron', route: '/recylotron' }}
+				image={recyclotronTileImage}
+				disableHoverBackground
+			/>
+		</div>
+	),
+};
+
+const litterPanel: JsonSectionPanel = {
+	imageSlot: {
+		images: litterImages,
+	},
+	imageMaxWidth: '30%',
+	minHeight: '80vh',
+	reverseColumns: true,
+	content: litterPanelData.content,
+	contentBackground: colors.panelTeal,
+	contentChildren: (
+		<div
+			style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}
+		>
+			<PageTile
+				page={{ label: 'Litter', route: '/litter' }}
+				image={litterTileImage}
+				disableHoverBackground
+			/>
+		</div>
+	),
+};
 
 function About() {
 	return (
@@ -22,62 +107,18 @@ function About() {
 			<JsonSection
 				className='about-page'
 				background={{
-					image: {
-						src: '/img/about/wall-smile.jpeg',
-						alt: 'Me smiling next to a sunny wall in Hamburg.',
-					},
+					image: wallSmileImage,
 					imagePosition: 'center 90%',
 					blur: 0.5,
 				}}
-				panels={[
+				items={[
+					blurbPanel,
 					{
-						header: {
-							titleText: 'about',
-							subtitleText: blurb,
-						},
-						imageSlot: {
-							image: uni_images.vb6,
-						},
-						imageMaxWidth: '40%',
-						content: uni_translations.before_uni,
-						contentBackground: colors.panelRust,
-					},
-					{
-						header: {
-							image: uni_images.header,
-							titleText: 'University',
-						},
-						imageSlot: {
-							images: uni_images.cycler,
-							cyclerInterval: 4000,
-						},
-						imageMinWidth: '30%',
-						imageMaxWidth: '35%',
-						textMinWidth: '50%',
-						minHeight: '60vh',
-						content: uni_translations.uni1,
-						contentBackground: colors.panelTeal,
-						scrollBackground: {
-							image: uni_images.header,
-							imagePosition: 'center 30%',
-							blur: 0.3,
-						},
+						scrollBackground: uniBackground,
+						panels: [uniPanel, recyclotronPanel, litterPanel],
 					},
 				]}
-			>
-				<span
-					style={{
-						maxWidth: '70%',
-						alignSelf: 'center',
-						backgroundColor: colors.panelRust,
-						padding: '1rem',
-						borderRadius: '0.5rem',
-					}}
-				>
-					<TextList strings={uni_translations.recyclotron.content} />
-					<TextList strings={uni_translations.litter.content} />
-				</span>
-			</JsonSection>
+			/>
 
 			<div className='about-image-text-section'>
 				<TileList
@@ -116,10 +157,7 @@ function About() {
 					className='podcast-tiles'
 				/>
 				<ImageTextLayout
-					image={{
-						src: '/img/about/arch-move.png',
-						alt: 'Me standing in an archway looking into sunset in lake district.',
-					}}
+					image={archMoveImage}
 					imageMaxWidth='45%'
 					additionalContent={
 						<TileList
