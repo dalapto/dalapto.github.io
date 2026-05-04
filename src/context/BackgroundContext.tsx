@@ -17,6 +17,8 @@ interface SetBackgroundOptions {
 interface ScrollObserverOptions {
 	rootMargin?: string;
 	threshold?: number[];
+	/** Higher priority wins over lower when multiple elements are intersecting. Defaults to 0. */
+	priority?: number;
 }
 
 interface BackgroundContextValue {
@@ -42,6 +44,8 @@ function BackgroundProvider({ children }: { children: ReactNode }) {
 	const elementConfigMap = useRef<Map<Element, BackgroundConfig>>(new Map());
 	// Map from element → current intersectionRatio
 	const intersectingMap = useRef<Map<Element, number>>(new Map());
+	// Map from element → its priority
+	const elementPriorityMap = useRef<Map<Element, number>>(new Map());
 	// Map from observer key → IntersectionObserver instance
 	const observersMap = useRef<Map<string, IntersectionObserver>>(new Map());
 	// Map from element → observer key (so we know which observer to unobserve from)
@@ -70,7 +74,12 @@ function BackgroundProvider({ children }: { children: ReactNode }) {
 			setBackground(null, { clearDelay: 150 });
 			return;
 		}
-		const [winnerEl] = [...intersectingMap.current.entries()].sort(([, a], [, b]) => b - a)[0];
+		const [winnerEl] = [...intersectingMap.current.entries()].sort(([elA, ratioA], [elB, ratioB]) => {
+			const priA = elementPriorityMap.current.get(elA) ?? 0;
+			const priB = elementPriorityMap.current.get(elB) ?? 0;
+			if (priB !== priA) return priB - priA;
+			return ratioB - ratioA;
+		})[0];
 		const config = elementConfigMap.current.get(winnerEl);
 		if (config) setBackground(config);
 	}, [setBackground]);
@@ -105,6 +114,7 @@ function BackgroundProvider({ children }: { children: ReactNode }) {
 	const registerScrollElement = useCallback(
 		(el: Element, config: BackgroundConfig, opts: ScrollObserverOptions = {}) => {
 			elementConfigMap.current.set(el, config);
+			elementPriorityMap.current.set(el, opts.priority ?? 0);
 			const key = observerKey(opts);
 			elementObserverKeyMap.current.set(el, key);
 			const observer = getOrCreateObserver(opts);
@@ -116,6 +126,7 @@ function BackgroundProvider({ children }: { children: ReactNode }) {
 	const unregisterScrollElement = useCallback((el: Element) => {
 		elementConfigMap.current.delete(el);
 		intersectingMap.current.delete(el);
+		elementPriorityMap.current.delete(el);
 		const key = elementObserverKeyMap.current.get(el);
 		if (key) {
 			observersMap.current.get(key)?.unobserve(el);

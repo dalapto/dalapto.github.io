@@ -164,4 +164,32 @@ const uni_translations = {
 	},
 };
 
-export { albums, blurb, books, films, podcasts, tv, uni_translations };
+const uni_images = {
+	vb6: {
+		src: '/img/about/vb6_ide.png',
+		alt: "Visual Basic 6's IDE",
+	},
+	header: {
+		src: 'img/about/edi.jpeg',
+		alt: 'The Edinburgh skyline as seen from my halls in first year.',
+	},
+	cycler: [
+		{
+			src: '/img/about/at.jpg',
+			alt: 'Outside of Appleton Tower at University of Edinburgh',
+			caption: 'Appleton Tower — home of Informatics.',
+		},
+		{
+			src: '/img/about/labs.JPEG',
+			alt: 'Me working in the computer labs with a pained expression.',
+			caption: "Me working hard in Appleton Tower's labs.",
+		},
+		{
+			src: '/img/about/subs.JPEG',
+			alt: 'A meme about auto-generated captions in lecture recordings.',
+			caption: "Lecture recordings didn't always have self-annotated captions...",
+		},
+	],
+};
+
+export { albums, blurb, books, films, podcasts, tv, uni_images, uni_translations };

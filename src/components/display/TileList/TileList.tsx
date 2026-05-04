@@ -4,6 +4,7 @@ import { Tile } from '../Tile/Tile';
 interface TileListProps {
 	items: { text: string; link: string; img: string }[];
 	imgSize?: number | string;
+	imgHeight?: number | string;
 	direction?: 'row' | 'column';
 	title?: string;
 	imgPathPrefix?: string;
@@ -18,6 +19,7 @@ interface TileListProps {
 function TileList({
 	items,
 	imgSize = '100px',
+	imgHeight,
 	direction = 'row',
 	title,
 	imgPathPrefix = '',
@@ -47,7 +49,7 @@ function TileList({
 							image_path={`${imgPathPrefix}${img}`}
 							text={''}
 							imgWidth={imgSize}
-							imgHeight={imgSize}
+							imgHeight={imgHeight ?? imgSize}
 							blurValue={blurValue}
 							opacityValue={opacityValue}
 							growFromValue={growFromValue}
