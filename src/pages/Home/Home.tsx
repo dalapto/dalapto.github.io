@@ -5,7 +5,7 @@ import { SwapText } from '../../components/display/SwapText/SwapText';
 import { TextList } from '../../components/display/TextList/TextList';
 import { PageTile } from '../../components/layout/ResponsiveTile/PageTile';
 import { translations, welcomes } from '../../constants/home-constants';
-import { navRoutes } from '../../constants/routes';
+import { navRoutes } from '../../routes';
 import './Home.css';
 
 function Home() {

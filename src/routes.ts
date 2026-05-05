@@ -1,9 +1,9 @@
-import { About } from '../pages/About/About';
-import { Home } from '../pages/Home/Home';
-import { Medieval2TotalWar } from '../pages/Projects/m2tw/m2tw';
-import { Projects } from '../pages/Projects/Projects';
-import { RiseOfNations } from '../pages/Projects/RON/Ron';
-import { YouthWork } from '../pages/YouthWork/YouthWork';
+import { About } from './pages/About/About';
+import { Home } from './pages/Home/Home';
+import { Medieval2TotalWar } from './pages/Projects/m2tw/m2tw';
+import { Projects } from './pages/Projects/Projects';
+import { RiseOfNations } from './pages/Projects/RON/Ron';
+import { YouthWork } from './pages/YouthWork/YouthWork';
 
 /**
  * Interface for a single route or page.
@@ -27,7 +27,7 @@ const projectsRoutes: NavRoute[] = [
 	{ label: 'Cover Letter Generator', route: '/cover-letter-generator' },
 	{ label: 'Clipboard', route: '/clipboard' },
 	{ label: 'LitterApp', route: '/litterapp' },
-	{ label: 'Reyclotron', route: '/recylotron' },
+	{ label: 'Reyclotron', route: '/recyclotron' },
 	{
 		label: 'Medieval 2: Total War',
 		route: '/m2tw',

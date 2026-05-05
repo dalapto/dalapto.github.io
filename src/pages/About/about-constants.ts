@@ -121,14 +121,14 @@ const archMoveImage: Image = {
 
 const recylotronLink = {
 	text: 'Recyclotron',
-	link: '/projects/recyclotron',
+	link: '/recyclotron',
 	img: '/img/recylotron/3dmodels/icon.png',
 };
 const recylotron = `<@${recylotronLink.text}@${recylotronLink.link}@${recylotronLink.img}@>`;
 
 const litterAppLink = {
 	text: 'LitterApp',
-	link: '/projects/litter',
+	link: '/litterapp',
 	img: '/img/litter/app/logo.png',
 };
 const litterApp = `<@${litterAppLink.text}@${litterAppLink.link}@${litterAppLink.img}@>`;
@@ -213,7 +213,6 @@ const panelData = {
 	},
 	job: {
 		title: 'Employment',
-		subtitle: '?',
 		content: [
 			'',
 			'I still try to scratch my creative itch outside of my day job...',

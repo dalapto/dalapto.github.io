@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavRoute } from '../../../constants/routes';
+import { NavRoute } from '../../../routes';
 import { Image } from '../../../types/basic.types';
 import { TileActionKind } from '../../display/Tile/Tile';
 import { ResponsiveTile } from './ResponsiveTile';

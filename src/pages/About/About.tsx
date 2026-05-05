@@ -1,6 +1,4 @@
 import React from 'react';
-import { ImageTextLayout } from '../../components/display/ImageTextLayout/ImageTextLayout';
-import { TileList } from '../../components/display/TileList/TileList';
 import type {
 	JsonSectionPanel,
 	JsonTextPanelData,
@@ -9,11 +7,9 @@ import { JsonSection } from '../../components/layout/JsonSection/JsonSection';
 import { PageTile } from '../../components/layout/ResponsiveTile/PageTile';
 import { colors } from '../../constants/colors';
 import {
-	archMoveImage,
 	litterImages,
 	litterTileImage,
 	panelData,
-	recommendations,
 	recyclotronImages,
 	recyclotronTileImage,
 	uniBackground,
@@ -66,7 +62,7 @@ const recyclotronPanel: JsonSectionPanel = {
 			style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}
 		>
 			<PageTile
-				page={{ label: 'Recylotron', route: '/recylotron' }}
+				page={{ label: 'Recylotron', route: '/recyclotron' }}
 				image={recyclotronTileImage}
 				disableHoverBackground
 			/>
@@ -89,7 +85,7 @@ const litterPanel: JsonSectionPanel = {
 			style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}
 		>
 			<PageTile
-				page={{ label: 'LitterApp', route: '/litter' }}
+				page={{ label: 'LitterApp', route: '/litterapp' }}
 				image={litterTileImage}
 				disableHoverBackground
 			/>
@@ -123,7 +119,7 @@ function About() {
 					jobPanel,
 				]}
 			/>
-{/* 
+			{/* 
 			<div className='about-image-text-section'>
 				<TileList
 					items={recommendations.books}

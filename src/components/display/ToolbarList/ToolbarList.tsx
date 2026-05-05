@@ -3,7 +3,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { NavRoute } from '../../../constants/routes';
+import { NavRoute } from '../../../routes';
 
 interface ToolbarItem {
 	label: string;
@@ -57,15 +57,15 @@ function ToolbarItemList({
 	return (
 		<Box sx={containerSx}>
 			{items.map((item) => {
-			const commonProps = {
-				id: item.isActive ? activeButtonId : inactiveButtonId,
-				'aria-haspopup': item.ariaHasPopup ? ('true' as const) : undefined,
-				'aria-expanded': item.ariaExpanded,
-				onMouseEnter: item.onMouseEnter,
-				onClick: item.onClick,
-				onKeyDown: item.onKeyDown,
-				sx: buttonSx,
-			};
+				const commonProps = {
+					id: item.isActive ? activeButtonId : inactiveButtonId,
+					'aria-haspopup': item.ariaHasPopup ? ('true' as const) : undefined,
+					'aria-expanded': item.ariaExpanded,
+					onMouseEnter: item.onMouseEnter,
+					onClick: item.onClick,
+					onKeyDown: item.onKeyDown,
+					sx: buttonSx,
+				};
 				return item.route ? (
 					<Button
 						key={item.label}
@@ -85,4 +85,4 @@ function ToolbarItemList({
 	);
 }
 
-export { ToolbarItemList, ToolbarItem };
+export { ToolbarItem, ToolbarItemList };

@@ -5,12 +5,12 @@ import './App.css';
 import { PageInConstruction } from './components/display/PageInConstruction/PageInConstruction';
 import { FooterBar } from './components/layout/FooterBar/FooterBar';
 import { NavBar } from './components/layout/NavBar/NavBar';
-import { NavRoute, navRoutes } from './constants/routes';
+import { BackgroundProvider, useBackground } from './context/BackgroundContext';
+import { NavRoute, navRoutes } from './routes';
 
 function flattenRoutes(routes: NavRoute[]): NavRoute[] {
 	return routes.flatMap((r) => [r, ...flattenRoutes(r.children ?? [])]);
 }
-import { BackgroundProvider, useBackground } from './context/BackgroundContext';
 
 function AppBackground() {
 	const { background } = useBackground();
@@ -84,13 +84,13 @@ function AppInner() {
 				{transitions((style, loc) => (
 					<animated.div style={style} className='page-transition-wrapper'>
 						<Routes location={loc}>
-					{flattenRoutes(navRoutes).map((r) => (
-							<Route
-								key={r.route}
-								path={r.route}
-								element={r.component ? r.component() : <PageInConstruction />}
-							/>
-						))}
+							{flattenRoutes(navRoutes).map((r) => (
+								<Route
+									key={r.route}
+									path={r.route}
+									element={r.component ? r.component() : <PageInConstruction />}
+								/>
+							))}
 						</Routes>
 					</animated.div>
 				))}
