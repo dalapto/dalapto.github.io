@@ -34,24 +34,31 @@ interface JsonSectionPanel {
 	textMinWidth?: string;
 	/** Minimum height of the whole row. */
 	minHeight?: string;
+	/** Max width of the content block (used when there is no image). */
+	maxWidth?: string;
 	/** When true, renders the text column first and the image column second. */
 	reverseColumns?: boolean;
 }
 
-function resolveImageSlot(slot: JsonSectionImageSlot): ReactNode {
+function resolveImageSlot(slot: JsonSectionImageSlot): { node: ReactNode; caption?: string } {
 	if (slot.images && slot.images.length > 0) {
-		return (
-			<ImageCycler
-				images={slot.images}
-				interval={slot.cyclerInterval ?? 4000}
-				minHeight={slot.cyclerMinHeight}
-			/>
-		);
+		return {
+			node: (
+				<ImageCycler
+					images={slot.images}
+					interval={slot.cyclerInterval ?? 4000}
+					minHeight={slot.cyclerMinHeight}
+				/>
+			),
+		};
 	}
 	if (slot.image) {
-		return <img src={slot.image.src} alt={slot.image.alt} />;
+		return {
+			node: <img src={slot.image.src} alt={slot.image.alt} />,
+			caption: slot.image.caption,
+		};
 	}
-	return null;
+	return { node: null };
 }
 
 function JsonImageTextLayout({
@@ -63,6 +70,7 @@ function JsonImageTextLayout({
 	imageMaxWidth = '35%',
 	textMinWidth = '50%',
 	minHeight,
+	maxWidth,
 	reverseColumns,
 }: JsonSectionPanel) {
 	const textContent = contentBackground ? (
@@ -84,18 +92,21 @@ function JsonImageTextLayout({
 	);
 
 	if (!imageSlot) {
-		return <div>{textContent}</div>;
+		return <div style={{ maxWidth, margin: maxWidth ? '0 auto' : undefined }}>{textContent}</div>;
 	}
+
+	const { node: imageNode, caption: imageCaption } = resolveImageSlot(imageSlot);
 
 	return (
 		<div>
 			<ImageTextLayout
-				imageSlot={resolveImageSlot(imageSlot)}
+				imageSlot={imageNode}
 				imageMinWidth={imageMinWidth}
 				imageMaxWidth={imageMaxWidth}
 				textMinWidth={textMinWidth}
 				minHeight={minHeight}
 				reverseColumns={reverseColumns}
+				imageCaption={imageCaption}
 			>
 				{textContent}
 			</ImageTextLayout>

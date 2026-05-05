@@ -7,6 +7,8 @@ import { JsonImageHeader } from './JsonImageHeader';
 import type { JsonSectionPanel } from './JsonImageTextLayout';
 import { JsonImageTextLayout } from './JsonImageTextLayout';
 import { JsonSectionContent } from './JsonSectionContent';
+import type { JsonTextPanelData } from './JsonTextPanel';
+import { JsonTextPanel } from './JsonTextPanel';
 
 interface JsonSectionBackground {
 	image: Image;
@@ -21,12 +23,14 @@ interface JsonSectionGroup {
 	panels: (JsonSectionPanel | ReactElement)[];
 }
 
-type JsonSectionItem = JsonSectionPanel | JsonSectionGroup | ReactElement;
+type JsonSectionItem = JsonSectionPanel | JsonTextPanelData | JsonSectionGroup | ReactElement;
 
 interface JsonSectionProps {
 	background: JsonSectionBackground;
 	items: JsonSectionItem[];
 	className?: string;
+	/** Gap between top-level items. Accepts any CSS length (e.g. '2rem', '40px'). */
+	gap?: string;
 }
 
 function isElement(item: JsonSectionItem): item is ReactElement {
@@ -35,6 +39,10 @@ function isElement(item: JsonSectionItem): item is ReactElement {
 
 function isGroup(item: JsonSectionItem): item is JsonSectionGroup {
 	return !isElement(item) && 'panels' in item;
+}
+
+function isTextPanel(item: JsonSectionItem): item is JsonTextPanelData {
+	return !isElement(item) && !isGroup(item) && !('imageSlot' in item) && !('header' in item);
 }
 
 function renderPanelOrElement(item: JsonSectionPanel | ReactElement, key: number) {
@@ -48,17 +56,20 @@ function renderPanelOrElement(item: JsonSectionPanel | ReactElement, key: number
 	);
 }
 
-function JsonSection({ background, items, className }: JsonSectionProps) {
+function JsonSection({ background, items, className, gap }: JsonSectionProps) {
 	return (
 		<ParallaxCanvas
 			image={background.image}
 			imagePosition={background.imagePosition}
 			blur={background.blur}
 			className={className}
+			gap={gap}
 		>
 			{items.map((item, i) => {
 			if (isElement(item))
 				return <React.Fragment key={i}>{item}</React.Fragment>;
+			if (isTextPanel(item))
+				return <JsonTextPanel key={i} {...item} />;
 			if (!isGroup(item)) return renderPanelOrElement(item, i);
 			if (item.scrollBackground) {
 				return (
@@ -87,4 +98,5 @@ export type {
 	JsonSectionItem,
 	JsonSectionPanel,
 	JsonSectionProps,
+	JsonTextPanelData,
 };

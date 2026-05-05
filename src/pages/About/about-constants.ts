@@ -1,95 +1,5 @@
 import type { BackgroundConfig } from '../../context/BackgroundContext';
-import type { Image, TooltipLink } from '../../types/basic.types';
-
-const podcasts: TooltipLink[] = [
-	{
-		text: 'Fall of Civilizations',
-		link: 'https://fallofcivilizationspodcast.com/',
-		img: 'fall_of_civs.jpg',
-	},
-	{
-		text: 'History of Rome',
-		link: 'https://thehistoryofrome.typepad.com/',
-		img: 'The_History_of_Rome.png',
-	},
-	{
-		text: 'The Rest is History',
-		link: 'https://therestishistory.com/episodes/',
-		img: 'rest_is_hist.jpg',
-	},
-];
-
-const books: TooltipLink[] = [
-	{
-		text: 'The Great Divorce',
-		link: 'https://www.goodreads.com/en/book/show/25845273-the-great-divorce',
-		img: 'great.jpg',
-	},
-	{
-		text: 'Name of the Wind',
-		link: 'https://www.goodreads.com/en/book/show/186074.The_Name_of_the_Wind',
-		img: 'wind.jpg',
-	},
-	{
-		text: 'A Silent Voice',
-		link: 'https://www.goodreads.com/book/show/57764673-silent-voice',
-		img: 'silent.jpg',
-	},
-];
-
-const films: TooltipLink[] = [
-	{
-		text: 'Hunt for the Wilderpeople',
-		link: 'https://www.rottentomatoes.com/m/hunt_for_the_wilderpeople',
-		img: 'hunt.jpg',
-	},
-	{
-		text: 'Only Yesterday',
-		link: 'https://www.rottentomatoes.com/m/only_yesterday_1991',
-		img: 'only.jpg',
-	},
-	{
-		text: 'Fifth Element',
-		link: 'https://www.rottentomatoes.com/m/fifth_element',
-		img: '5th.png',
-	},
-];
-
-const tv: TooltipLink[] = [
-	{
-		text: 'Ping Pong the Animation',
-		link: 'https://letterboxd.com/film/ping-pong-the-animation/',
-		img: 'pingpong1.jpg',
-	},
-	{
-		text: 'Fringe',
-		link: 'https://www.rottentomatoes.com/tv/fringe',
-		img: 'fringe.png',
-	},
-	{
-		text: 'Bondi Rescue',
-		link: 'https://www.rottentomatoes.com/tv/bondi_rescue',
-		img: 'bondi.jpg',
-	},
-];
-
-const albums: TooltipLink[] = [
-	{
-		text: 'Hold Still',
-		link: 'https://open.spotify.com/album/5BiPMSmuINHTP82jz0RE3l',
-		img: 'holdstill.jpg',
-	},
-	{
-		text: 'Zeal',
-		link: 'https://open.spotify.com/album/1p9qFUWDth0hWAQYiKUB37',
-		img: 'zeal.jpg',
-	},
-	{
-		text: 'Suburban Legend',
-		link: 'https://open.spotify.com/album/0XBOirwu0hluwBbEb8hdMe',
-		img: 'suburb.jpg',
-	},
-];
+import type { Image } from '../../types/basic.types';
 
 const blurb = '(how I became a Software Engineer)';
 
@@ -149,7 +59,8 @@ const uniImages: Image[] = [
 
 const vb6IdeImage: Image = {
 	src: '/img/about/vb6_ide.png',
-	alt: "Visual Basic 6's IDE",
+	alt: "Visual Basic 6's IDE, a blast from the past.",
+	caption: "Visual Basic 6's IDE - a blast from the past.",
 };
 
 const recyclotronTileImage: Image = {
@@ -170,7 +81,7 @@ const recyclotronImages: Image[] = [
 	},
 	{
 		src: '/img/recylotron/photos/rails_side.jpg',
-		alt: 'Photo of the chamber mounted on the bin rails.',
+		alt: 'Photo of a lego box mounted on two rails.',
 		caption: 'The lego chamber mounted on the bin rails.',
 	},
 ];
@@ -208,63 +119,12 @@ const archMoveImage: Image = {
 	alt: 'Me standing in an archway looking into sunset in lake district.',
 };
 
-const blurbPanelData = {
-	title: 'about',
-	subtitle: blurb,
-	content: [
-		`My first real taste of the ${sdlc} was in school.`,
-		`Using ${vb6} I built a bookkeeping app for a local book shop 📚`,
-		'',
-		'I recall spending days to add currency functionality, writing dozens of if-statements...',
-		'',
-		'Thankfully, that code has been lost to time.',
-		'',
-		'But it inspired me to switch my university application from Chemistry to Computer Science.',
-		"This meant next year was getting my Maths A-level (which I'd skipped) to meet course requirements...",
-		'',
-		`...so my ${gapYah} ${gapYah2} was spent learning 📐 trigonometry...!`,
-	],
-};
-
-const uniPanelData = {
-	title: 'University',
-	content: [
-		'',
-		"It wasn't until third year, I started enjoying uni.",
-		'I had fumbled my first two years, having to resit multiple exams.',
-		'I knuckled down, keen for the classes I had chosen.',
-		'',
-		'Then, come March 2020 - everything stopped. I flew back home, unsure of the future.',
-		'When obvious this was no Spring thing, I cancelled the flat lease.',
-		"I wouldn't return to Edinburgh until 2 years later.",
-		'',
-		'It was a good time to finish my degree - I had swapped socialising for studying anyway.',
-		'Besides, the Informatics department was (mostly) well equipped to virtually assess.',
-		'',
-	],
-};
-
 const recylotronLink = {
 	text: 'Recyclotron',
 	link: '/projects/recyclotron',
 	img: '/img/recylotron/3dmodels/icon.png',
 };
 const recylotron = `<@${recylotronLink.text}@${recylotronLink.link}@${recylotronLink.img}@>`;
-
-const recyclotronPanelData = {
-	title: 'Recyclotron',
-	subtitle: 'auto-sorting bin robot',
-	content: [
-		'',
-		"There was also a 'build-us-a-robot' course.",
-		'Our group decided to make an auto-sorting bin.',
-		'',
-		'We trained a neural-network AI on images of rubbish to classify waste into categories.',
-		'',
-		`You can learn more on ${recylotron} project page.`,
-		'',
-	],
-};
 
 const litterAppLink = {
 	text: 'LitterApp',
@@ -278,43 +138,191 @@ const kotlinLink = {
 	link: 'https://kotlinlang.org',
 	img: '/img/logo/kotlin.png',
 };
-
 const kotlin = `<@${kotlinLink.text}@${kotlinLink.link}@${kotlinLink.img}@>`;
 
-const litterPanelData = {
-	title: 'LitterApp',
-	subtitle: 'Location-based Social Media',
-	content: [
-		'',
-		'My final year project was a software engineering project.',
-		`I was to create a Location-based Social Media app, for Android, using ${kotlin}.`,
-		'',
-		'It felt exactly like the school project that inspired the degree 5 years earlier...',
-		'',
-		`You can learn more on the ${litterApp} project page.`,
-		'',
+const linkedinLink = {
+	text: 'LinkedIn',
+	link: 'https://www.linkedin.com/in/david-mcalister/details/experience/',
+};
+const linkedin = `<@${linkedinLink.text}@${linkedinLink.link}@@>`;
+
+const panelData = {
+	school: {
+		title: 'about',
+		subtitle: blurb,
+		content: [
+			`My first real taste of the ${sdlc} was in school.`,
+			`Using ${vb6} I built a bookkeeping app for a local book shop 📚`,
+			'',
+			'I recall spending days to add currency functionality, writing dozens of if-statements...',
+			'',
+			'Thankfully, that code has been lost to time.',
+			'',
+			'But it inspired me to switch my university application from Chemistry to Computer Science.',
+			"This meant next year was getting my Maths A-level (which I'd skipped) to meet course requirements...",
+			'',
+			`...so my ${gapYah} ${gapYah2} was spent learning 📐 trigonometry...!`,
+		],
+	},
+	uni: {
+		title: 'University',
+		content: [
+			'',
+			"It wasn't until third year, I started enjoying uni.",
+			'I had fumbled my first two years, having to resit multiple exams.',
+			'I knuckled down, keen for the classes I had chosen.',
+			'',
+			'Then, come March 2020 - everything stopped. I flew back home, unsure of the future.',
+			'When obvious this was no Spring thing, I cancelled the flat lease.',
+			"I wouldn't return to Edinburgh until 2 years later.",
+			'',
+			'It was a good time to finish my degree - I had swapped socialising for studying anyway.',
+			'Besides, the Informatics department was (mostly) well equipped to virtually assess.',
+			'',
+		],
+	},
+	recyclotron: {
+		title: 'Recyclotron',
+		subtitle: 'auto-sorting bin robot',
+		content: [
+			'',
+			"There was also a 'build-us-a-robot' course.",
+			'Our group decided to make an auto-sorting bin.',
+			'',
+			'We trained a neural-network AI on images of rubbish to classify waste into categories.',
+			'The rubbish would enter a chamber which would analyse the properties of the material.',
+			'It would then be sorted into a different bin to recycle.',
+			'',
+			`You can learn more on ${recylotron} project page.`,
+			'',
+		],
+	},
+	litter: {
+		title: 'LitterApp',
+		subtitle: 'Location-based Social Media',
+		content: [
+			'',
+			'My final year project was a software engineering project.',
+			`I was to create a Location-based Social Media app, for Android, using ${kotlin}.`,
+			'',
+			'It felt exactly like the school project that inspired the degree 5 years earlier...',
+			'',
+			`You can learn more on the ${litterApp} project page.`,
+			'',
+		],
+	},
+	job: {
+		title: 'Employment',
+		subtitle: '?',
+		content: [
+			'',
+			'I still try to scratch my creative itch outside of my day job...',
+			'',
+			`You can visit my ${linkedin} page for info on my career projects.`,
+			'',
+		],
+	},
+};
+const recommendations = {
+	books: [
+		{
+			text: 'The Great Divorce',
+			link: 'https://www.goodreads.com/en/book/show/25845273-the-great-divorce',
+			img: 'great.jpg',
+		},
+		{
+			text: 'Name of the Wind',
+			link: 'https://www.goodreads.com/en/book/show/186074.The_Name_of_the_Wind',
+			img: 'wind.jpg',
+		},
+		{
+			text: 'A Silent Voice',
+			link: 'https://www.goodreads.com/book/show/57764673-silent-voice',
+			img: 'silent.jpg',
+		},
+	],
+	films: [
+		{
+			text: 'Hunt for the Wilderpeople',
+			link: 'https://www.rottentomatoes.com/m/hunt_for_the_wilderpeople',
+			img: 'hunt.jpg',
+		},
+		{
+			text: 'Only Yesterday',
+			link: 'https://www.rottentomatoes.com/m/only_yesterday_1991',
+			img: 'only.jpg',
+		},
+		{
+			text: 'Fifth Element',
+			link: 'https://www.rottentomatoes.com/m/fifth_element',
+			img: '5th.png',
+		},
+	],
+	podcasts: [
+		{
+			text: 'Fall of Civilizations',
+			link: 'https://fallofcivilizationspodcast.com/',
+			img: 'fall_of_civs.jpg',
+		},
+		{
+			text: 'History of Rome',
+			link: 'https://thehistoryofrome.typepad.com/',
+			img: 'The_History_of_Rome.png',
+		},
+		{
+			text: 'The Rest is History',
+			link: 'https://therestishistory.com/episodes/',
+			img: 'rest_is_hist.jpg',
+		},
+	],
+	tv: [
+		{
+			text: 'Ping Pong the Animation',
+			link: 'https://letterboxd.com/film/ping-pong-the-animation/',
+			img: 'pingpong1.jpg',
+		},
+		{
+			text: 'Fringe',
+			link: 'https://www.rottentomatoes.com/tv/fringe',
+			img: 'fringe.png',
+		},
+		{
+			text: 'Bondi Rescue',
+			link: 'https://www.rottentomatoes.com/tv/bondi_rescue',
+			img: 'bondi.jpg',
+		},
+	],
+	albums: [
+		{
+			text: 'Hold Still',
+			link: 'https://open.spotify.com/album/5BiPMSmuINHTP82jz0RE3l',
+			img: 'holdstill.jpg',
+		},
+		{
+			text: 'Zeal',
+			link: 'https://open.spotify.com/album/1p9qFUWDth0hWAQYiKUB37',
+			img: 'zeal.jpg',
+		},
+		{
+			text: 'Suburban Legend',
+			link: 'https://open.spotify.com/album/0XBOirwu0hluwBbEb8hdMe',
+			img: 'suburb.jpg',
+		},
 	],
 };
 
 export {
-	albums,
 	archMoveImage,
 	blurb,
-	blurbPanelData,
-	books,
 	edinburghImage,
-	films,
 	litterImages,
-	litterPanelData,
 	litterTileImage,
-	podcasts,
+	panelData,
+	recommendations,
 	recyclotronImages,
-	recyclotronPanelData,
 	recyclotronTileImage,
-	tv,
 	uniBackground,
 	uniImages,
-	uniPanelData,
 	vb6IdeImage,
 	wallSmileImage,
 };

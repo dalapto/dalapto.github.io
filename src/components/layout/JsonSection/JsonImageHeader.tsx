@@ -1,7 +1,7 @@
 import React from 'react';
+import { Image } from '../../../types/basic.types';
 import { ImageHeader } from '../ImageHeader/ImageHeader';
 import '../ImageHeader/ImageHeader.css';
-import { Image } from '../../../types/basic.types';
 
 interface JsonSectionHeader {
 	/** When omitted, a plain text header is rendered instead of an image header. */
@@ -42,8 +42,12 @@ function JsonImageHeader({
 	if (!image) {
 		return (
 			<div className='json-section-text-header'>
-				{titleText && <h1 className='json-section-text-header__title'>{titleText}</h1>}
-				{subtitleText && <p className='json-section-text-header__subtitle'>{subtitleText}</p>}
+				{titleText && (
+					<h1 className='json-section-text-header__title'>{titleText}</h1>
+				)}
+				{subtitleText && (
+					<p className='json-section-text-header__subtitle'>{subtitleText}</p>
+				)}
 			</div>
 		);
 	}
@@ -72,5 +76,5 @@ function JsonImageHeader({
 	);
 }
 
-export type { JsonSectionHeader };
 export { JsonImageHeader };
+export type { JsonSectionHeader };
