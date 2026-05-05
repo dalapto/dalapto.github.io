@@ -1,9 +1,9 @@
 import { Grid } from '@mui/material';
 import React from 'react';
-import { Tile, TileAction } from '../../display/Tile/Tile';
 import type { BackgroundConfig } from '../../../context/BackgroundContext';
 import { useHoverBackground } from '../../../hooks/useHoverBackground';
 import { useScrollBackground } from '../../../hooks/useScrollBackground';
+import { Tile, TileAction } from '../../display/Tile/Tile';
 
 interface ResponsiveTileProps {
 	imagePath: string;
@@ -14,15 +14,22 @@ interface ResponsiveTileProps {
 	disableHoverBackground?: boolean;
 }
 
-function ResponsiveTile({ imagePath, text, action, ariaLabel, bgConfig, disableHoverBackground }: ResponsiveTileProps) {
-	const { onMouseEnter, onMouseLeave } = useHoverBackground({ config: bgConfig });
+function ResponsiveTile({
+	imagePath,
+	text,
+	action,
+	ariaLabel,
+	bgConfig,
+	disableHoverBackground,
+}: ResponsiveTileProps) {
+	const { onMouseEnter, onMouseLeave } = useHoverBackground({
+		config: bgConfig,
+	});
 	const scrollRef = useScrollBackground<HTMLDivElement>({ config: bgConfig });
 
-	const sharedProps = {
+	const baseProps = {
 		image_path: imagePath,
 		text,
-		imgWidth: 300,
-		imgHeight: 300,
 		blurValue: 0.5,
 		opacityValue: 0.7,
 		growFromValue: 0.85,
@@ -33,13 +40,27 @@ function ResponsiveTile({ imagePath, text, action, ariaLabel, bgConfig, disableH
 
 	return (
 		<Grid className='home-tile' item sx={{ width: 'fit-content' }}>
-			<Tile className='tile-pc' showLabelOnMouseOver={true} onMouseEnter={disableHoverBackground ? undefined : onMouseEnter} onMouseLeave={disableHoverBackground ? undefined : onMouseLeave} {...sharedProps} />
+			<Tile
+				className='tile-pc'
+				showLabelOnMouseOver={true}
+				onMouseEnter={disableHoverBackground ? undefined : onMouseEnter}
+				onMouseLeave={disableHoverBackground ? undefined : onMouseLeave}
+				imgWidth={300}
+				imgHeight={300}
+				{...baseProps}
+			/>
 			<div ref={scrollRef}>
-				<Tile className='tile-mobile' showLabelOnMouseOver={false} {...sharedProps} />
+				<Tile
+					className='tile-mobile'
+					showLabelOnMouseOver={false}
+					imgWidth={250}
+					imgHeight={250}
+					{...baseProps}
+				/>
 			</div>
 		</Grid>
 	);
 }
 
-export type { ResponsiveTileProps };
 export { ResponsiveTile };
+export type { ResponsiveTileProps };

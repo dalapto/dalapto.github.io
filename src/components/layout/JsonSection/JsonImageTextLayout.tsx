@@ -38,9 +38,14 @@ interface JsonSectionPanel {
 	maxWidth?: string;
 	/** When true, renders the text column first and the image column second. */
 	reverseColumns?: boolean;
+	/** Override stacking order on mobile independently of the desktop layout. */
+	mobileOrder?: 'image-first' | 'text-first';
 }
 
-function resolveImageSlot(slot: JsonSectionImageSlot): { node: ReactNode; caption?: string } {
+function resolveImageSlot(slot: JsonSectionImageSlot): {
+	node: ReactNode;
+	caption?: string;
+} {
 	if (slot.images && slot.images.length > 0) {
 		return {
 			node: (
@@ -72,6 +77,7 @@ function JsonImageTextLayout({
 	minHeight,
 	maxWidth,
 	reverseColumns,
+	mobileOrder,
 }: JsonSectionPanel) {
 	const textContent = contentBackground ? (
 		<div
@@ -92,10 +98,15 @@ function JsonImageTextLayout({
 	);
 
 	if (!imageSlot) {
-		return <div style={{ maxWidth, margin: maxWidth ? '0 auto' : undefined }}>{textContent}</div>;
+		return (
+			<div style={{ maxWidth, margin: maxWidth ? '0 auto' : undefined }}>
+				{textContent}
+			</div>
+		);
 	}
 
-	const { node: imageNode, caption: imageCaption } = resolveImageSlot(imageSlot);
+	const { node: imageNode, caption: imageCaption } =
+		resolveImageSlot(imageSlot);
 
 	return (
 		<div>
@@ -106,6 +117,7 @@ function JsonImageTextLayout({
 				textMinWidth={textMinWidth}
 				minHeight={minHeight}
 				reverseColumns={reverseColumns}
+				mobileOrder={mobileOrder}
 				imageCaption={imageCaption}
 			>
 				{textContent}

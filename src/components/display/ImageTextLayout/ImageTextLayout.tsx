@@ -21,6 +21,8 @@ type ImageTextLayoutProps = {
 	imageCaption?: string;
 	/** When true, renders the text column first and the image column second. */
 	reverseColumns?: boolean;
+	/** Override stacking order on mobile. 'image-first' always puts the image on top; 'text-first' always puts text on top. Defaults to following the desktop order. */
+	mobileOrder?: 'image-first' | 'text-first';
 } & (
 	| { image: Image; imageSlot?: never }
 	| { image?: never; imageSlot: ReactNode }
@@ -45,10 +47,12 @@ function ImageTextLayout({
 	minHeight,
 	imageCaption,
 	reverseColumns = false,
+	mobileOrder,
 }: ImageTextLayoutProps) {
+	const mobileClass = mobileOrder ? `mobile-${mobileOrder}` : '';
 	return (
 		<figure
-			className={`image-text-layout ${className}`}
+			className={`image-text-layout ${mobileClass} ${className}`.trim()}
 			style={
 				{
 					'--itl-image-min-width': imageMinWidth,

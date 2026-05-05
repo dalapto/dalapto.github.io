@@ -74,4 +74,12 @@
 		width: 100%;
 		overflow-y: visible;
 	}
+
+	.image-text-layout.mobile-image-first .image-column {
+		order: -1;
+	}
+
+	.image-text-layout.mobile-text-first .text-column {
+		order: -1;
+	}
 }

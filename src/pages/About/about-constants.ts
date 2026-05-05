@@ -1,33 +1,6 @@
 import type { BackgroundConfig } from '../../context/BackgroundContext';
 import type { Image } from '../../types/basic.types';
 
-const blurb = '(how I became a Software Engineer)';
-
-const vb6Link = {
-	text: 'VB6',
-	link: 'https://en.wikipedia.org/wiki/Visual_Basic_(classic)',
-	img: '/img/logo/vb6.png',
-};
-const vb6 = `<@${vb6Link.text}@${vb6Link.link}@${vb6Link.img}@>`;
-
-const sdlcLink = {
-	text: 'SDLC',
-	link: 'https://en.wikipedia.org/wiki/Systems_development_life_cycle',
-};
-const sdlc = `<@${sdlcLink.text}@${sdlcLink.link}@>`;
-
-const gapYahLink = {
-	text: 'gap yah',
-	link: 'https://en.wikipedia.org/wiki/Gap_Yah',
-};
-const gapYah = `<@${gapYahLink.text}@${gapYahLink.link}@>`;
-
-const gapYah2Link = {
-	text: '(video)',
-	link: 'https://www.youtube.com/watch?v=eKFjWR7X5dU',
-};
-const gapYah2 = `<@${gapYah2Link.text}@${gapYah2Link.link}@>`;
-
 const edinburghImage: Image = {
 	src: 'img/about/edi.jpeg',
 	alt: 'The Edinburgh skyline as seen from my halls in first year.',
@@ -119,109 +92,6 @@ const archMoveImage: Image = {
 	alt: 'Me standing in an archway looking into sunset in lake district.',
 };
 
-const recylotronLink = {
-	text: 'Recyclotron',
-	link: '/recyclotron',
-	img: '/img/recylotron/3dmodels/icon.png',
-};
-const recylotron = `<@${recylotronLink.text}@${recylotronLink.link}@${recylotronLink.img}@>`;
-
-const litterAppLink = {
-	text: 'LitterApp',
-	link: '/litterapp',
-	img: '/img/litter/app/logo.png',
-};
-const litterApp = `<@${litterAppLink.text}@${litterAppLink.link}@${litterAppLink.img}@>`;
-
-const kotlinLink = {
-	text: 'Kotlin',
-	link: 'https://kotlinlang.org',
-	img: '/img/logo/kotlin.png',
-};
-const kotlin = `<@${kotlinLink.text}@${kotlinLink.link}@${kotlinLink.img}@>`;
-
-const linkedinLink = {
-	text: 'LinkedIn',
-	link: 'https://www.linkedin.com/in/david-mcalister/details/experience/',
-};
-const linkedin = `<@${linkedinLink.text}@${linkedinLink.link}@@>`;
-
-const panelData = {
-	school: {
-		title: 'about',
-		subtitle: blurb,
-		content: [
-			`My first real taste of the ${sdlc} was in school.`,
-			`Using ${vb6} I built a bookkeeping app for a local book shop 📚`,
-			'',
-			'I recall spending days to add currency functionality, writing dozens of if-statements...',
-			'',
-			'Thankfully, that code has been lost to time.',
-			'',
-			'But it inspired me to switch my university application from Chemistry to Computer Science.',
-			"This meant next year was getting my Maths A-level (which I'd skipped) to meet course requirements...",
-			'',
-			`...so my ${gapYah} ${gapYah2} was spent learning 📐 trigonometry...!`,
-		],
-	},
-	uni: {
-		title: 'University',
-		content: [
-			'',
-			"It wasn't until third year, I started enjoying uni.",
-			'I had fumbled my first two years, having to resit multiple exams.',
-			'I knuckled down, keen for the classes I had chosen.',
-			'',
-			'Then, come March 2020 - everything stopped. I flew back home, unsure of the future.',
-			'When obvious this was no Spring thing, I cancelled the flat lease.',
-			"I wouldn't return to Edinburgh until 2 years later.",
-			'',
-			'It was a good time to finish my degree - I had swapped socialising for studying anyway.',
-			'Besides, the Informatics department was (mostly) well equipped to virtually assess.',
-			'',
-		],
-	},
-	recyclotron: {
-		title: 'Recyclotron',
-		subtitle: 'auto-sorting bin robot',
-		content: [
-			'',
-			"There was also a 'build-us-a-robot' course.",
-			'Our group decided to make an auto-sorting bin.',
-			'',
-			'We trained a neural-network AI on images of rubbish to classify waste into categories.',
-			'The rubbish would enter a chamber which would analyse the properties of the material.',
-			'It would then be sorted into a different bin to recycle.',
-			'',
-			`You can learn more on ${recylotron} project page.`,
-			'',
-		],
-	},
-	litter: {
-		title: 'LitterApp',
-		subtitle: 'Location-based Social Media',
-		content: [
-			'',
-			'My final year project was a software engineering project.',
-			`I was to create a Location-based Social Media app, for Android, using ${kotlin}.`,
-			'',
-			'It felt exactly like the school project that inspired the degree 5 years earlier...',
-			'',
-			`You can learn more on the ${litterApp} project page.`,
-			'',
-		],
-	},
-	job: {
-		title: 'Employment',
-		content: [
-			'',
-			'I still try to scratch my creative itch outside of my day job...',
-			'',
-			`You can visit my ${linkedin} page for info on my career projects.`,
-			'',
-		],
-	},
-};
 const recommendations = {
 	books: [
 		{
@@ -312,11 +182,9 @@ const recommendations = {
 
 export {
 	archMoveImage,
-	blurb,
 	edinburghImage,
 	litterImages,
 	litterTileImage,
-	panelData,
 	recommendations,
 	recyclotronImages,
 	recyclotronTileImage,
