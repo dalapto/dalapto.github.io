@@ -26,7 +26,8 @@ interface NavRoute {
 const projectsRoutes: NavRoute[] = [
 	{ label: 'Cover Letter Generator', route: '/cover-letter-generator' },
 	{ label: 'Clipboard', route: '/clipboard' },
-	{ label: 'Litter', route: '/litter' },
+	{ label: 'LitterApp', route: '/litterapp' },
+	{ label: 'Reyclotron', route: '/recylotron' },
 	{
 		label: 'Medieval 2: Total War',
 		route: '/m2tw',

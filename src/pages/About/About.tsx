@@ -123,7 +123,7 @@ function About() {
 					jobPanel,
 				]}
 			/>
-
+{/* 
 			<div className='about-image-text-section'>
 				<TileList
 					items={recommendations.books}
@@ -177,8 +177,8 @@ function About() {
 					<p>{'hey'}</p>
 					<p>{'I make things, like this website'}</p>
 					<p>{'ye'}</p>
-				</ImageTextLayout>
-			</div>
+				</ImageTextLayout> */}
+			{/* </div> */}
 		</>
 	);
 }
