@@ -231,7 +231,7 @@ function JsonPanel(props: JsonPanelData) {
 							props.kind === 'text' ? props.padding ?? '2rem 1rem' : undefined,
 					}}
 				>
-					<div style={{ maxWidth }}>{textContent}</div>
+					<div style={{ maxWidth, minWidth: 'fit-content' }}>{textContent}</div>
 				</div>
 			)}
 		</>
