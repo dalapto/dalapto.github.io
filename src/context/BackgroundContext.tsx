@@ -52,6 +52,7 @@ function BackgroundProvider({ children }: { children: ReactNode }) {
 	const elementObserverKeyMap = useRef<Map<Element, string>>(new Map());
 	// When true, scroll observer callbacks are ignored (e.g. during page transitions).
 	const observersFrozen = useRef(false);
+	const unfreezeRaf = useRef<number | null>(null);
 
 	const setBackground = useCallback(
 		(config: BackgroundConfig | null, opts?: SetBackgroundOptions) => {
@@ -59,10 +60,19 @@ function BackgroundProvider({ children }: { children: ReactNode }) {
 				clearTimeout(clearTimer.current);
 				clearTimer.current = null;
 			}
-			// Freeze scroll observers so that the outgoing page's IntersectionObserver
-			// callbacks (triggered by scroll-to-top) cannot override this direct call.
+			// Briefly freeze scroll observers so that IntersectionObserver callbacks
+			// fired synchronously by scrollTo(0,0) cannot override this direct call.
+			// We unfreeze after two animation frames so the new page's observers can
+			// take over naturally — without relying on registerScrollElement to unfreeze.
 			observersFrozen.current = true;
 			intersectingMap.current.clear();
+			if (unfreezeRaf.current !== null) cancelAnimationFrame(unfreezeRaf.current);
+			unfreezeRaf.current = requestAnimationFrame(() => {
+				unfreezeRaf.current = requestAnimationFrame(() => {
+					observersFrozen.current = false;
+					unfreezeRaf.current = null;
+				});
+			});
 			if (config === null && opts?.clearDelay) {
 				clearTimer.current = setTimeout(() => {
 					setBackgroundState(null);
@@ -120,8 +130,6 @@ function BackgroundProvider({ children }: { children: ReactNode }) {
 
 	const registerScrollElement = useCallback(
 		(el: Element, config: BackgroundConfig, opts: ScrollObserverOptions = {}) => {
-			// A new page is registering its scroll elements — unfreeze so its observers can drive the background.
-			observersFrozen.current = false;
 			elementConfigMap.current.set(el, config);
 			elementPriorityMap.current.set(el, opts.priority ?? 0);
 			const key = observerKey(opts);
