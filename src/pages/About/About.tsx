@@ -74,7 +74,7 @@ const blurbPanel: JsonImageTextPanel = {
 		'',
 		`...so my ${gapYah} ${gapYah2} was spent learning 📐 trigonometry...!`,
 	],
-	contentBackground: colors.rust,
+	contentBackground: colors.primary,
 };
 
 const uniPanel: JsonImageTextPanel = {
@@ -105,7 +105,7 @@ const uniPanel: JsonImageTextPanel = {
 		'Besides, the Informatics department was (mostly) well equipped to virtually assess.',
 		'',
 	],
-	contentBackground: colors.rust,
+	contentBackground: colors.primary,
 };
 
 const recyclotronPanel: JsonImageTextPanel = {
@@ -128,7 +128,7 @@ const recyclotronPanel: JsonImageTextPanel = {
 		`You can learn more on ${recylotron} project page.`,
 		'',
 	],
-	contentBackground: colors.rust,
+	contentBackground: colors.primary,
 	contentChildren: projectTile(
 		{ label: 'Recylotron', route: '/recyclotron' },
 		recyclotronTileImage,
@@ -154,7 +154,7 @@ const litterPanel: JsonImageTextPanel = {
 		`You can learn more on the ${litterApp} project page.`,
 		'',
 	],
-	contentBackground: colors.rust,
+	contentBackground: colors.primary,
 	contentChildren: projectTile(
 		{ label: 'LitterApp', route: '/litterapp' },
 		litterTileImage,
@@ -177,7 +177,7 @@ const projectsPanel: JsonTextPanelData = {
 		`...you can explore my ${formatLink(projectsLink)} page.`,
 		'',
 	],
-	contentBackground: colors.teal,
+	contentBackground: colors.primary,
 	contentChildren: projectTile(
 		{ label: projectsLink.text, route: projectsLink.link },
 		{ src: projectsLink.img, alt: projectsLink.text },

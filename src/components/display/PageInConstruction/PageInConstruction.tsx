@@ -14,7 +14,7 @@ function PageInConstruction() {
 
 	useEffect(() => {
 		setBackground({ image: placeholderImg, imagePosition: 'center 100%' });
-		return () => setBackground(null);
+		return () => setBackground(null, { freezeObservers: false });
 	}, [setBackground]);
 
 	return (
