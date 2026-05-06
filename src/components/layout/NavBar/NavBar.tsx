@@ -6,7 +6,7 @@ import Toolbar from '@mui/material/Toolbar';
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import { externalLinks } from '../../../constants/link-constants';
-import { NavRoute } from '../../../constants/routes';
+import { NavRoute } from '../../../routes';
 import { HamburgerMenu } from '../../controls/HamburgerMenu/HamburgerMenu';
 import { IconButtonLink } from '../../controls/IconButton/IconButtonLink';
 import { MenuPopper } from '../../display/MenuPopper/MenuPopper';

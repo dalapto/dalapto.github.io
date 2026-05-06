@@ -41,4 +41,11 @@ const welcomes = [
 	'歡迎',
 ];
 
-export { welcomes };
+const translations = {
+	welcome_blurb: [
+		'This website is a portfolio for my hobbies and projects.',
+		'Feel free to look around.',
+	],
+};
+
+export { translations, welcomes };

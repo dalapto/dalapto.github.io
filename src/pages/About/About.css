@@ -1,7 +1,33 @@
 .about-page {
-	background-color: #7f7164;
+	background-color: transparent;
 	display: flex;
+	flex-direction: column;
 	padding-top: 1vh;
 	padding-bottom: 25vh;
 	box-sizing: border-box;
+}
+
+.about-header {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 6rem 1rem 4rem;
+	color: #fff;
+	text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.about-title {
+	font-size: clamp(2rem, 6vw, 4rem);
+	margin: 0 0 0.5rem;
+}
+
+.about-subtitle {
+	font-size: clamp(1rem, 2.5vw, 1.5rem);
+	margin: 0;
+	opacity: 0.9;
+}
+
+.about-image-text-section {
+	background-color: #7f7164;
+	padding-bottom: 4rem;
 }

@@ -2,52 +2,33 @@ import { Box, Grid, Typography } from '@mui/material';
 import { Container } from '@mui/system';
 import React from 'react';
 import { SwapText } from '../../components/display/SwapText/SwapText';
-import { Tile } from '../../components/display/Tile/Tile';
-import { welcomes } from '../../constants/home-constants';
-import { navRoutes } from '../../constants/routes';
+import { TextList } from '../../components/display/TextList/TextList';
+import { PageTile } from '../../components/layout/ResponsiveTile/PageTile';
+import { translations, welcomes } from '../../constants/home-constants';
+import { navRoutes } from '../../routes';
 import './Home.css';
+
+const tileBgPositions: Record<string, string> = {
+	'/about': 'center -10%',
+	'/projects': 'center 100%',
+	'/youth': 'center 0%',
+};
 
 function Home() {
 	const pages = navRoutes.filter((r) => r.tileImg && r.label);
 
 	const pageTiles = pages.map((page) => (
-		<Grid className='home-tile' key={page.route} item>
-			<Tile
-				className='tile-pc'
-				image_path={`/img/tile/${page.tileImg}.png`}
-				text={page.label!}
-				imgWidth={300}
-				imgHeight={300}
-				blurValue={0.5}
-				opacityValue={0.7}
-				growFromValue={0.85}
-				backgroundColour={'rgb(0,0,0,0)'}
-				showLabelOnMouseOver={true}
-				to={page.route}
-				ariaLabel={page.label!}
-			/>
-			<Tile
-				className='tile-mobile'
-				image_path={`/img/tile/${page.tileImg}.png`}
-				text={page.label!}
-				imgWidth={300}
-				imgHeight={300}
-				blurValue={0.5}
-				opacityValue={0.7}
-				growFromValue={0.85}
-				backgroundColour={'rgb(0,0,0,0)'}
-				showLabelOnMouseOver={false}
-				to={page.route}
-				ariaLabel={page.label!}
-			/>
-		</Grid>
+		<PageTile
+			key={page.route}
+			page={page}
+			bgImgPosition={tileBgPositions[page.route]}
+		/>
 	));
 
 	return (
 		<div className='App'>
 			<Container>
 				<Box marginTop={'5%'}>
-					{/* changes text dynamically to different languages */}
 					<Typography
 						variant='h2'
 						fontFamily={'monospace'}
@@ -58,10 +39,9 @@ function Home() {
 					</Typography>
 				</Box>
 				<Box marginTop={'5%'}>
-					<span>Feel free to look around.</span>
+					<span>{<TextList strings={translations.welcome_blurb} />}</span>
 				</Box>
 				<Box marginTop={'5%'}>
-					{/* Tiles to other pages */}
 					<Grid
 						container
 						columnSpacing={navRoutes.length}
@@ -74,4 +54,5 @@ function Home() {
 		</div>
 	);
 }
+
 export { Home };

@@ -1,14 +1,55 @@
+import { animated, useTransition } from '@react-spring/web';
 import React, { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router';
 import './App.css';
 import { PageInConstruction } from './components/display/PageInConstruction/PageInConstruction';
 import { FooterBar } from './components/layout/FooterBar/FooterBar';
 import { NavBar } from './components/layout/NavBar/NavBar';
-import { navRoutes } from './constants/routes';
+import { BackgroundProvider, useBackground } from './context/BackgroundContext';
+import { NavRoute, navRoutes } from './routes';
 
-function App() {
-	const currentPage = useLocation().pathname;
+function flattenRoutes(routes: NavRoute[]): NavRoute[] {
+	return routes.flatMap((r) => [r, ...flattenRoutes(r.children ?? [])]);
+}
+
+function AppBackground() {
+	const { background } = useBackground();
+
+	const transitions = useTransition(background, {
+		keys: (bg) => bg?.image.src ?? 'none',
+		from: { opacity: 0 },
+		enter: (bg) => ({ opacity: bg ? 1 : 0 }),
+		leave: { opacity: 0 },
+		config: (bg) => ({
+			duration: bg?.transitionDuration ?? 400,
+		}),
+	});
+
+	return (
+		<>
+			{transitions((style, bg) =>
+				bg ? (
+					<animated.img
+						className='app-background'
+						src={bg.image.src}
+						alt={bg.image.alt}
+						style={{
+							...style,
+							objectPosition: bg.imagePosition ?? 'center top',
+							filter: (bg.blur ?? 0) > 0 ? `blur(${bg.blur}px)` : undefined,
+						}}
+					/>
+				) : null,
+			)}
+		</>
+	);
+}
+
+function AppInner() {
+	const location = useLocation();
+	const currentPage = location.pathname;
 	const currentPageSlice = currentPage.slice(1);
+	const { setBackground } = useBackground();
 
 	useEffect(() => {
 		document.title = `${
@@ -18,22 +59,56 @@ function App() {
 		}`;
 	}, [currentPageSlice]);
 
+	useEffect(() => {
+		// Clear any scroll-observer-driven background immediately on navigation so
+		// the outgoing page's observers cannot win the background on the new page.
+		setBackground(null);
+		window.scrollTo(0, 0);
+	}, [currentPage, setBackground]);
+
+	const transitions = useTransition(location, {
+		keys: (loc) => loc.pathname,
+		from: { opacity: 0, transform: 'translateX(50px)' },
+		enter: { opacity: 1, transform: 'translateX(0px)' },
+		leave: { opacity: 0, transform: 'translateX(-20px)' },
+		config: (_item, _index, phase) => {
+			if (phase === 'enter') return { duration: 900 };
+			if (phase === 'leave') return { duration: 200 };
+			return { duration: 0 };
+		},
+		exitBeforeEnter: true,
+		delay: 500,
+	});
+
 	return (
 		<div className='App'>
+			<AppBackground />
 			<NavBar currentPage={currentPage} navRoutes={navRoutes} />
 			<div className='routes-container'>
-				<Routes>
-					{navRoutes.map((r) => (
-						<Route
-							key={r.route}
-							path={r.route}
-							element={r.component ? r.component() : <PageInConstruction />}
-						/>
-					))}
-				</Routes>
+				{transitions((style, loc) => (
+					<animated.div style={style} className='page-transition-wrapper'>
+						<Routes location={loc}>
+							{flattenRoutes(navRoutes).map((r) => (
+								<Route
+									key={r.route}
+									path={r.route}
+									element={r.component ? r.component() : <PageInConstruction />}
+								/>
+							))}
+						</Routes>
+					</animated.div>
+				))}
 			</div>
 			<FooterBar />
 		</div>
+	);
+}
+
+function App() {
+	return (
+		<BackgroundProvider>
+			<AppInner />
+		</BackgroundProvider>
 	);
 }
 

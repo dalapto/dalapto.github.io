@@ -11,6 +11,13 @@
 	--color-link-hover: #ffa865;
 	--color-underline: #646cff;
 
+	/* Panel / section accent colours */
+	--color-panel-rust: rgba(130, 60, 55, 0.95);
+	--color-panel-teal: rgba(62, 171, 164, 0.95);
+
+	/* Layout */
+	--navbar-height: 64px;
+
 	/* Transitions */
 	--transition-standard: 0.5s;
 	--transition-fast: 0.2s;

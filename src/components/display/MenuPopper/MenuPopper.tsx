@@ -2,8 +2,8 @@ import { Box, Fade, MenuItem, Popper } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { NavRoute } from '../../../constants/routes';
 import { useClickOutside } from '../../../hooks/useClickOutside';
+import { NavRoute } from '../../../routes';
 import '../../layout/NavBar/NavBar.css';
 
 interface MenuPopperProps {
@@ -78,12 +78,12 @@ function MenuPopper({
 					(index - 1 + menuItems.length) % menuItems.length
 				]?.focus();
 				break;
-		case ' ':
-		case 'Enter':
-			e.preventDefault();
-			navigate(route);
-			closeAndReturnFocus();
-			break;
+			case ' ':
+			case 'Enter':
+				e.preventDefault();
+				navigate(route);
+				closeAndReturnFocus();
+				break;
 		}
 	};
 
@@ -133,20 +133,20 @@ function MenuPopper({
 				<Fade {...TransitionProps} timeout={300}>
 					<Box ref={menuRef} role='menu' aria-label='Projects submenu'>
 						{menuItems.map((item, index) => (
-					<MenuItem
-							key={item.route}
-							id='menu-appbar-item'
-							ref={(el: HTMLElement | null) => {
-								itemRefs.current[index] = el;
-							}}
-							component={Link}
-							to={item.route}
-							role='menuitem'
-							tabIndex={0}
-							onClick={() => closeAndReturnFocus()}
-							onKeyDown={(e: React.KeyboardEvent) =>
-								handleMenuKeyDown(e, index, item.route)
-							}
+							<MenuItem
+								key={item.route}
+								id='menu-appbar-item'
+								ref={(el: HTMLElement | null) => {
+									itemRefs.current[index] = el;
+								}}
+								component={Link}
+								to={item.route}
+								role='menuitem'
+								tabIndex={0}
+								onClick={() => closeAndReturnFocus()}
+								onKeyDown={(e: React.KeyboardEvent) =>
+									handleMenuKeyDown(e, index, item.route)
+								}
 							>
 								<Typography
 									className='menu-appbar-item-text'
