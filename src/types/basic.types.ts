@@ -18,4 +18,10 @@ interface TooltipLink {
 	img: string;
 }
 
-export { ExternalLink, Image, TooltipLink };
+interface ProjectPanel {
+	title: string;
+	subtitle?: string;
+	content: string[];
+}
+
+export { ExternalLink, Image, ProjectPanel, TooltipLink };

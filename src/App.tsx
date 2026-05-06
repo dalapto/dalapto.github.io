@@ -49,6 +49,7 @@ function AppInner() {
 	const location = useLocation();
 	const currentPage = location.pathname;
 	const currentPageSlice = currentPage.slice(1);
+	const { setBackground } = useBackground();
 
 	useEffect(() => {
 		document.title = `${
@@ -59,8 +60,11 @@ function AppInner() {
 	}, [currentPageSlice]);
 
 	useEffect(() => {
+		// Clear any scroll-observer-driven background immediately on navigation so
+		// the outgoing page's observers cannot win the background on the new page.
+		setBackground(null);
 		window.scrollTo(0, 0);
-	}, [currentPage]);
+	}, [currentPage, setBackground]);
 
 	const transitions = useTransition(location, {
 		keys: (loc) => loc.pathname,

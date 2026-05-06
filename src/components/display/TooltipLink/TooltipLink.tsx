@@ -1,5 +1,6 @@
 import { Tooltip } from '@mui/material';
 import * as React from 'react';
+import { SmartLink } from '../SmartLink/SmartLink';
 
 interface TooltipLinkProps {
 	href: string;
@@ -42,9 +43,9 @@ function TooltipLink({
 			}}
 			title={<img width={25} height={25} src={imgSrc} />}
 		>
-			<a href={href} target='_blank' rel='noopener noreferrer'>
+			<SmartLink href={href}>
 				<span>{text}</span>
-			</a>
+			</SmartLink>
 		</Tooltip>
 	);
 }

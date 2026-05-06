@@ -1,8 +1,9 @@
 import type { BackgroundConfig } from '../../context/BackgroundContext';
+import { ImgPaths } from '../../constants/img-paths';
 import type { Image } from '../../types/basic.types';
 
 const edinburghImage: Image = {
-	src: 'img/about/edi.jpeg',
+	src: ImgPaths.pages.about.edi,
 	alt: 'The Edinburgh skyline as seen from my halls in first year.',
 };
 
@@ -14,81 +15,81 @@ const uniBackground: BackgroundConfig = {
 
 const uniImages: Image[] = [
 	{
-		src: '/img/about/at.jpg',
+		src: ImgPaths.pages.about.at,
 		alt: 'Outside of Appleton Tower at University of Edinburgh',
 		caption: 'Appleton Tower — home of Informatics.',
 	},
 	{
-		src: '/img/about/labs.JPEG',
+		src: ImgPaths.pages.about.labs,
 		alt: 'Me working in the computer labs with a pained expression.',
 		caption: "Me working hard in Appleton Tower's labs.",
 	},
 	{
-		src: '/img/about/subs.JPEG',
+		src: ImgPaths.pages.about.subs,
 		alt: 'A meme about auto-generated captions in lecture recordings.',
 		caption: "Lecture recordings didn't always have self-annotated captions...",
 	},
 ];
 
 const vb6IdeImage: Image = {
-	src: '/img/about/vb6_ide.png',
+	src: ImgPaths.pages.about.vb6Ide,
 	alt: "Visual Basic 6's IDE, a blast from the past.",
 	caption: "Visual Basic 6's IDE - a blast from the past.",
 };
 
 const recyclotronTileImage: Image = {
 	alt: '3D Concept Art of Recyclotron',
-	src: '/img/recylotron/3dmodels/onbins.png',
+	src: ImgPaths.pages.recylotron.models.onBins,
 };
 
 const recyclotronImages: Image[] = [
 	{
-		src: '/img/recylotron/art/concept1.jpg',
+		src: ImgPaths.pages.recylotron.art.concept1,
 		alt: 'Early concept art of the bin chamber.',
 		caption: 'Early concept art for the bin chamber.',
 	},
 	{
-		src: '/img/recylotron/3dmodels/icon.png',
+		src: ImgPaths.pages.recylotron.models.icon,
 		alt: '3D model of the final prototype.',
 		caption: 'Model of the final prototype.',
 	},
 	{
-		src: '/img/recylotron/photos/rails_side.jpg',
+		src: ImgPaths.pages.recylotron.photos.railsSide,
 		alt: 'Photo of a lego box mounted on two rails.',
 		caption: 'The lego chamber mounted on the bin rails.',
 	},
 ];
 
 const litterTileImage: Image = {
-	src: '/img/litter/app/background.png',
+	src: ImgPaths.pages.litter.app.background,
 	alt: 'LitterApp — location-based litter social media app.',
 };
 
 const litterImages: Image[] = [
 	{
-		src: '/img/litter/smaller/marker_new.png',
+		src: ImgPaths.pages.litter.smaller.markerNew,
 		alt: 'Screenshot of user being too far away to read a message on map.',
 		caption: 'Messages are geo-tagged to a location.',
 	},
 	{
-		src: '/img/litter/figma/map_mockup.png',
+		src: ImgPaths.pages.litter.figma.mapMockup,
 		alt: 'Mockup in Figma showing decoding mechanic',
 		caption: 'Mockup in Figma showing decoding mechanic.',
 	},
 	{
-		src: '/img/litter/smaller/editmessage_frag.png',
+		src: ImgPaths.pages.litter.smaller.editMessageFrag,
 		alt: 'Screenshot of message UI.',
 		caption: 'Users could post, update, like and comment messages.',
 	},
 ];
 
 const wallSmileImage: Image = {
-	src: '/img/about/wall-smile.jpeg',
+	src: ImgPaths.pages.about.wallSmile,
 	alt: 'Me smiling next to a sunny wall in Hamburg.',
 };
 
 const archMoveImage: Image = {
-	src: '/img/about/arch-move.png',
+	src: ImgPaths.pages.about.archMove,
 	alt: 'Me standing in an archway looking into sunset in lake district.',
 };
 

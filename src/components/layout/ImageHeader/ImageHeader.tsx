@@ -25,6 +25,8 @@ interface ImageHeaderProps {
 	className?: string;
 	/** CSS object-position — pans the image within its box. e.g. '50% 20%'. Defaults to 'center'. */
 	imagePosition?: string;
+	/** CSS object-fit for the image. Defaults to 'cover'. */
+	imageFit?: 'cover' | 'contain';
 	/** Blur amount applied directly to the image. Defaults to 0 (off). */
 	blur?: number;
 	/** Where to anchor the title overlay. Defaults to 'center'. */
@@ -103,6 +105,7 @@ const ImageHeader = React.forwardRef<HTMLElement, ImageHeaderProps>(
 			width = '100%',
 			className,
 			imagePosition = 'center',
+			imageFit = 'cover',
 			blur = 0,
 			titleAnchor = 'center',
 			onMouseEnter,
@@ -122,15 +125,16 @@ const ImageHeader = React.forwardRef<HTMLElement, ImageHeaderProps>(
 				onMouseLeave={onMouseLeave}
 			>
 				<div className='image-header-img-wrapper'>
-					<img
-						src={image.src}
-						alt={image.alt}
-						className='image-header-img'
-						style={{
-							objectPosition: imagePosition,
-							filter: blur > 0 ? `blur(${blur}px)` : undefined,
-						}}
-					/>
+				<img
+					src={image.src}
+					alt={image.alt}
+					className='image-header-img'
+					style={{
+						objectFit: imageFit,
+						objectPosition: imagePosition,
+						filter: blur > 0 ? `blur(${blur}px)` : undefined,
+					}}
+				/>
 					{titleText && (
 						<div
 							className='image-header-text'

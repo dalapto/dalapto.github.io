@@ -1,21 +1,25 @@
 import React from 'react';
 import type {
-	JsonSectionPanel,
+	JsonImageTextPanel,
 	JsonTextPanelData,
-} from '../../components/layout/JsonSection/JsonSection';
-import { JsonSection } from '../../components/layout/JsonSection/JsonSection';
+} from '../../components/JsonSection/JsonPanel';
+import { JsonSection } from '../../components/JsonSection/JsonSection';
 import { PageTile } from '../../components/layout/ResponsiveTile/PageTile';
 import { colors } from '../../constants/colors';
 import {
+	formatLink,
 	gapYah2Link,
 	gapYahLink,
 	kotlinLink,
 	linkedinProfileLink,
 	litterAppLink,
+	projectsLink,
 	recylotronLink,
 	sdlcLink,
 	vb6Link,
 } from '../../constants/link-constants';
+import { BackgroundConfig } from '../../context/BackgroundContext';
+import type { Image } from '../../types/basic.types';
 import {
 	litterImages,
 	litterTileImage,
@@ -28,16 +32,27 @@ import {
 } from './about-constants';
 import './About.css';
 
-const vb6 = `<@${vb6Link.text}@${vb6Link.link}@${vb6Link.img}@>`;
-const sdlc = `<@${sdlcLink.text}@${sdlcLink.link}@>`;
-const gapYah = `<@${gapYahLink.text}@${gapYahLink.link}@>`;
-const gapYah2 = `<@${gapYah2Link.text}@${gapYah2Link.link}@>`;
-const recylotron = `<@${recylotronLink.text}@${recylotronLink.link}@${recylotronLink.img}@>`;
-const litterApp = `<@${litterAppLink.text}@${litterAppLink.link}@${litterAppLink.img}@>`;
-const kotlin = `<@${kotlinLink.text}@${kotlinLink.link}@${kotlinLink.img}@>`;
-const linkedin = `<@${linkedinProfileLink.text}@${linkedinProfileLink.link}@@>`;
+const vb6 = formatLink(vb6Link);
+const sdlc = formatLink(sdlcLink);
+const gapYah = formatLink(gapYahLink);
+const gapYah2 = formatLink(gapYah2Link);
+const recylotron = formatLink(recylotronLink);
+const litterApp = formatLink(litterAppLink);
+const kotlin = formatLink(kotlinLink);
+const linkedin = formatLink(linkedinProfileLink);
 
-const blurbPanel: JsonSectionPanel = {
+function projectTile(page: { label: string; route: string }, image: Image) {
+	return (
+		<div
+			style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}
+		>
+			<PageTile page={page} image={image} disableHoverBackground />
+		</div>
+	);
+}
+
+const blurbPanel: JsonImageTextPanel = {
+	kind: 'image-text',
 	header: {
 		titleText: 'about',
 		subtitleText: '(how I became a Software Engineer)',
@@ -62,7 +77,8 @@ const blurbPanel: JsonSectionPanel = {
 	contentBackground: colors.rust,
 };
 
-const uniPanel: JsonSectionPanel = {
+const uniPanel: JsonImageTextPanel = {
+	kind: 'image-text',
 	header: {
 		titleText: 'University',
 	},
@@ -92,7 +108,8 @@ const uniPanel: JsonSectionPanel = {
 	contentBackground: colors.rust,
 };
 
-const recyclotronPanel: JsonSectionPanel = {
+const recyclotronPanel: JsonImageTextPanel = {
+	kind: 'image-text',
 	imageSlot: {
 		images: recyclotronImages,
 		cyclerInterval: 10000,
@@ -112,20 +129,14 @@ const recyclotronPanel: JsonSectionPanel = {
 		'',
 	],
 	contentBackground: colors.rust,
-	contentChildren: (
-		<div
-			style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}
-		>
-			<PageTile
-				page={{ label: 'Recylotron', route: '/recyclotron' }}
-				image={recyclotronTileImage}
-				disableHoverBackground
-			/>
-		</div>
+	contentChildren: projectTile(
+		{ label: 'Recylotron', route: '/recyclotron' },
+		recyclotronTileImage,
 	),
 };
 
-const litterPanel: JsonSectionPanel = {
+const litterPanel: JsonImageTextPanel = {
+	kind: 'image-text',
 	imageSlot: {
 		images: litterImages,
 		cyclerInterval: 10000,
@@ -144,115 +155,61 @@ const litterPanel: JsonSectionPanel = {
 		'',
 	],
 	contentBackground: colors.rust,
-	contentChildren: (
-		<div
-			style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}
-		>
-			<PageTile
-				page={{ label: 'LitterApp', route: '/litterapp' }}
-				image={litterTileImage}
-				disableHoverBackground
-			/>
-		</div>
+	contentChildren: projectTile(
+		{ label: 'LitterApp', route: '/litterapp' },
+		litterTileImage,
 	),
 };
 
-const jobPanel: JsonTextPanelData = {
+const projectsBackground: BackgroundConfig = {
+	image: { src: projectsLink.img, alt: projectsLink.text },
+	imagePosition: 'center 40%',
+	blur: 3,
+};
+
+const projectsPanel: JsonTextPanelData = {
+	kind: 'text',
 	content: [
-		'',
-		'I still try to scratch my creative itch outside of my day job...',
 		'',
 		`You can visit my ${linkedin} page for info on my career projects.`,
 		'',
+		'But for projects where I scratch my creative itch...',
+		`...you can explore my ${formatLink(projectsLink)} page.`,
+		'',
 	],
 	contentBackground: colors.teal,
+	contentChildren: projectTile(
+		{ label: projectsLink.text, route: projectsLink.link },
+		{ src: projectsLink.img, alt: projectsLink.text },
+	),
 	maxWidth: '50%',
 };
 
 function About() {
 	return (
-		<>
-			<JsonSection
-				className='about-page'
-				gap='10rem'
-				background={{
-					image: wallSmileImage,
-					imagePosition: 'center 90%',
-					blur: 0.5,
-				}}
-				items={[
-					blurbPanel,
-					{
-						scrollBackground: uniBackground,
-						panels: [uniPanel, recyclotronPanel, litterPanel],
-					},
-					jobPanel,
-				]}
-			/>
-		</>
+		<JsonSection
+			className='about-page'
+			gap='10rem'
+			background={{
+				image: wallSmileImage,
+				imagePosition: 'center 90%',
+				blur: 0.5,
+			}}
+			items={[
+				blurbPanel,
+				{
+					kind: 'group',
+					scrollBackground: uniBackground,
+					panels: [uniPanel, recyclotronPanel, litterPanel],
+				},
+				{
+					kind: 'group',
+					scrollBackground: projectsBackground,
+					panels: [projectsPanel],
+				},
+			]}
+		/>
 	);
-}
-
-//TODO - where should these recommendations live?
-{
-	/* 
-			<div className='about-image-text-section'>
-				<TileList
-					items={recommendations.books}
-					imgSize='30vmin'
-					imgHeight='50vmin'
-					direction={'row'}
-					imgPathPrefix='/img/books/'
-					title='Favourite Books:'
-					className='podcast-tiles'
-				/>
-				<TileList
-					items={recommendations.albums}
-					imgSize='30vmin'
-					direction={'row'}
-					imgPathPrefix='/img/music/'
-					title='Favourite Albums:'
-					className='podcast-tiles'
-				/>
-				<TileList
-					items={recommendations.films}
-					imgSize='30vmin'
-					imgHeight='50vmin'
-					direction={'row'}
-					imgPathPrefix='/img/film/'
-					title='Favourite Films:'
-					className='podcast-tiles'
-				/>
-				<TileList
-					items={recommendations.tv}
-					imgSize='30vmin'
-					imgHeight='50vmin'
-					direction={'row'}
-					imgPathPrefix='/img/tv/'
-					title='Favourite Shows:'
-					className='podcast-tiles'
-				/>
-				<ImageTextLayout
-					image={archMoveImage}
-					imageMaxWidth='45%'
-					additionalContent={
-						<TileList
-							items={recommendations.podcasts}
-							imgSize='20vmin'
-							direction={'row'}
-							imgPathPrefix='/img/podcasts/'
-							title='Favourite Podcasts:'
-							className='podcast-tiles'
-						/>
-					}
-				>
-					<p>{'hey'}</p>
-					<p>{'I make things, like this website'}</p>
-					<p>{'ye'}</p>
-				</ImageTextLayout> */
-}
-{
-	/* </div> */
 }
 
 export { About };

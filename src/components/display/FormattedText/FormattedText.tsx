@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import { SmartLink } from '../SmartLink/SmartLink';
 import { TooltipLink } from '../TooltipLink/TooltipLink';
 
 const SEGMENT_REGEX = /<([@#])([\s\S]+?)>|<([`~_!?])([\s\S]+?)\3>/g;
@@ -22,7 +23,7 @@ function parseNodes(text: string): ReactNode[] {
 			const [label, href, img] = inner.split(sigil);
 			nodes.push(img
 				? <TooltipLink key={match.index} text={label} href={href} imgSrc={img} placement='top' offset={[0, -13]} />
-				: <a key={match.index} href={href} target='_blank' rel='noopener noreferrer'>{label}</a>
+				: <SmartLink key={match.index} href={href}>{label}</SmartLink>
 			);
 		} else {
 			const Tag = WRAPPERS[sigil];

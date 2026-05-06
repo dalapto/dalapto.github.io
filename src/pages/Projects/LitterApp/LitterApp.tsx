@@ -1,9 +1,10 @@
 import React from 'react';
-import { JsonSection } from '../../../components/layout/JsonSection/JsonSection';
+import { JsonSection } from '../../../components/JsonSection/JsonSection';
+import { ImgPaths } from '../../../constants/img-paths';
 import { Image } from '../../../types/basic.types';
 
 const litterBackground: Image = {
-	src: '/img/app/background.png',
+	src: ImgPaths.pages.litter.app.background,
 	alt: 'A doodled earth in space.',
 };
 

@@ -50,6 +50,8 @@ function BackgroundProvider({ children }: { children: ReactNode }) {
 	const observersMap = useRef<Map<string, IntersectionObserver>>(new Map());
 	// Map from element → observer key (so we know which observer to unobserve from)
 	const elementObserverKeyMap = useRef<Map<Element, string>>(new Map());
+	// When true, scroll observer callbacks are ignored (e.g. during page transitions).
+	const observersFrozen = useRef(false);
 
 	const setBackground = useCallback(
 		(config: BackgroundConfig | null, opts?: SetBackgroundOptions) => {
@@ -57,6 +59,10 @@ function BackgroundProvider({ children }: { children: ReactNode }) {
 				clearTimeout(clearTimer.current);
 				clearTimer.current = null;
 			}
+			// Freeze scroll observers so that the outgoing page's IntersectionObserver
+			// callbacks (triggered by scroll-to-top) cannot override this direct call.
+			observersFrozen.current = true;
+			intersectingMap.current.clear();
 			if (config === null && opts?.clearDelay) {
 				clearTimer.current = setTimeout(() => {
 					setBackgroundState(null);
@@ -70,8 +76,9 @@ function BackgroundProvider({ children }: { children: ReactNode }) {
 	);
 
 	const pickWinner = useCallback(() => {
+		if (observersFrozen.current) return;
 		if (intersectingMap.current.size === 0) {
-			setBackground(null, { clearDelay: 150 });
+			setBackgroundState(null);
 			return;
 		}
 		const [winnerEl] = [...intersectingMap.current.entries()].sort(([elA, ratioA], [elB, ratioB]) => {
@@ -81,8 +88,8 @@ function BackgroundProvider({ children }: { children: ReactNode }) {
 			return ratioB - ratioA;
 		})[0];
 		const config = elementConfigMap.current.get(winnerEl);
-		if (config) setBackground(config);
-	}, [setBackground]);
+		if (config) setBackgroundState(config);
+	}, []);
 
 	const getOrCreateObserver = useCallback(
 		(opts: ScrollObserverOptions): IntersectionObserver => {
@@ -113,6 +120,8 @@ function BackgroundProvider({ children }: { children: ReactNode }) {
 
 	const registerScrollElement = useCallback(
 		(el: Element, config: BackgroundConfig, opts: ScrollObserverOptions = {}) => {
+			// A new page is registering its scroll elements — unfreeze so its observers can drive the background.
+			observersFrozen.current = false;
 			elementConfigMap.current.set(el, config);
 			elementPriorityMap.current.set(el, opts.priority ?? 0);
 			const key = observerKey(opts);

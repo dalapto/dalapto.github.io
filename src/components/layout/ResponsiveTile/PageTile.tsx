@@ -1,4 +1,5 @@
 import React from 'react';
+import { ImgPaths } from '../../../constants/img-paths';
 import { NavRoute } from '../../../routes';
 import { Image } from '../../../types/basic.types';
 import { TileActionKind } from '../../display/Tile/Tile';
@@ -8,19 +9,19 @@ interface PageTileProps {
 	page: NavRoute;
 	/** Override the tile image path (e.g. '/img/tile/foo.png'). Falls back to the path derived from `page.tileImg`. */
 	image?: Image;
-	/** Override the background image position. Falls back to `page.bgImgPosition`. */
+	/** CSS object-position for the hover/scroll background image. */
 	bgImgPosition?: string;
 	/** When true, hovering the tile will not update the page background. */
 	disableHoverBackground?: boolean;
 }
 
-function PageTile({ page, image, disableHoverBackground }: PageTileProps) {
-	const resolvedImagePath = image?.src ?? `/img/tile/${page.tileImg}.png`;
-	const resolvedBgPosition = page.bgImgPosition;
+function PageTile({ page, image, bgImgPosition, disableHoverBackground }: PageTileProps) {
+	const tileKey = page.tileImg as keyof typeof ImgPaths.pages.home.tile;
+	const resolvedImagePath = image?.src ?? ImgPaths.pages.home.tile[tileKey];
 
 	const bgConfig = {
 		image: { src: resolvedImagePath, alt: '' },
-		imagePosition: resolvedBgPosition,
+		imagePosition: bgImgPosition,
 		transitionDuration: 300,
 		blur: 3,
 	};

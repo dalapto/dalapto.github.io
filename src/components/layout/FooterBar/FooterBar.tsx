@@ -17,7 +17,7 @@ const tooltipTextList = footerLinks.map((tooltip) => (
 		<TooltipLink
 			href={tooltip.link}
 			text={tooltip.text}
-			imgSrc={`/img/logo/${tooltip.img}`}
+			imgSrc={tooltip.img}
 		/>
 		{tooltip.text != footerLinks[footerLinks.length - 1].text ? ', ' : '.'}
 	</span>

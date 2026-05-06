@@ -1,9 +1,9 @@
 import React from 'react';
-import { Image } from '../../../types/basic.types';
-import { ImageHeader } from '../ImageHeader/ImageHeader';
-import '../ImageHeader/ImageHeader.css';
+import { Image } from '../../types/basic.types.ts';
+import '../layout/ImageHeader/ImageHeader.css';
+import { ImageHeader } from '../layout/ImageHeader/ImageHeader.tsx';
 
-interface JsonSectionHeader {
+interface JsonHeaderProps {
 	/** When omitted, a plain text header is rendered instead of an image header. */
 	image?: Image;
 	titleText?: string;
@@ -14,6 +14,10 @@ interface JsonSectionHeader {
 	width?: string;
 	/** CSS object-position for the header image. Defaults to 'center 0%'. */
 	imagePosition?: string;
+	/** CSS object-fit for the header image. Defaults to 'cover'. */
+	imageFit?: 'cover' | 'contain';
+	/** Blur amount applied to the image. Defaults to 0 (off). */
+	blur?: number;
 	/** Desktop-only class. Defaults to 'image-header-pc'. */
 	pcClassName?: string;
 	/** Mobile-only class. Defaults to 'image-header-mobile'. */
@@ -26,19 +30,21 @@ interface JsonSectionHeader {
 	mobileImagePosition?: string;
 }
 
-function JsonImageHeader({
+function JsonHeader({
 	image,
 	titleText,
 	subtitleText,
 	height = '50vh',
 	width = '60%',
 	imagePosition = 'center 0%',
+	imageFit,
+	blur,
 	pcClassName = 'image-header-pc',
 	mobileClassName = 'image-header-mobile',
 	mobileHeight = '30vh',
 	mobileWidth = '90%',
 	mobileImagePosition = 'center 10%',
-}: JsonSectionHeader) {
+}: JsonHeaderProps) {
 	if (!image) {
 		return (
 			<div className='json-section-text-header'>
@@ -62,6 +68,8 @@ function JsonImageHeader({
 				height={height}
 				width={width}
 				imagePosition={imagePosition}
+				imageFit={imageFit}
+				blur={blur}
 			/>
 			<ImageHeader
 				className={mobileClassName}
@@ -71,10 +79,12 @@ function JsonImageHeader({
 				height={mobileHeight}
 				width={mobileWidth}
 				imagePosition={mobileImagePosition}
+				imageFit={imageFit}
+				blur={blur}
 			/>
 		</>
 	);
 }
 
-export { JsonImageHeader };
-export type { JsonSectionHeader };
+export { JsonHeader };
+export type { JsonHeaderProps };

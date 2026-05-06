@@ -8,11 +8,21 @@ import { translations, welcomes } from '../../constants/home-constants';
 import { navRoutes } from '../../routes';
 import './Home.css';
 
+const tileBgPositions: Record<string, string> = {
+	'/about': 'center -10%',
+	'/projects': 'center 100%',
+	'/youth': 'center 0%',
+};
+
 function Home() {
 	const pages = navRoutes.filter((r) => r.tileImg && r.label);
 
 	const pageTiles = pages.map((page) => (
-		<PageTile key={page.route} page={page} />
+		<PageTile
+			key={page.route}
+			page={page}
+			bgImgPosition={tileBgPositions[page.route]}
+		/>
 	));
 
 	return (

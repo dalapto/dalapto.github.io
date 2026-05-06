@@ -1,36 +1,25 @@
+import type { ProjectPanel } from '../../../types/basic.types';
 
 const blurb = 'Recylotron, Smart-Bin';
 
-const panelData = {
+const panelData: Record<string, ProjectPanel> = {
 	intro: {
 		title: 'What?',
-		content: [
-			'',
-		],
+		content: [''],
 	},
 	software: {
 		title: 'Software',
-		content: [
-			'',
-		],
+		content: [''],
 	},
 	ai: {
 		title: 'AI',
-		content: [
-			'',
-		],
+		content: [''],
 	},
-
 	hardware: {
 		title: 'Hardware',
 		subtitle: blurb,
-		content: [
-			'',
-		],
+		content: [''],
 	},
 };
 
-export {
-	blurb,
-	panelData,
-};
+export { blurb, panelData };

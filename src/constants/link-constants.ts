@@ -1,11 +1,17 @@
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import { ExternalLink, TooltipLink } from '../types/basic.types';
+import { ImgPaths } from './img-paths';
+
+/** Encodes a TooltipLink (or plain link) into the <@text@href@img@> format used by FormattedText. */
+function formatLink({ text, link, img = '' }: { text: string; link: string; img?: string }): string {
+	return `<@${text}@${link}@${img}@>`;
+}
 
 const vb6Link = {
 	text: 'VB6',
 	link: 'https://en.wikipedia.org/wiki/Visual_Basic_(classic)',
-	img: '/img/logo/vb6.png',
+	img: ImgPaths.logo.vb6,
 };
 
 const sdlcLink = {
@@ -26,24 +32,30 @@ const gapYah2Link = {
 const recylotronLink = {
 	text: 'Recyclotron',
 	link: '/recyclotron',
-	img: '/img/recylotron/3dmodels/icon.png',
+	img: ImgPaths.pages.recylotron.models.icon,
 };
 
 const litterAppLink = {
 	text: 'LitterApp',
 	link: '/litterapp',
-	img: '/img/litter/app/logo.png',
+	img: ImgPaths.pages.litter.app.logo,
 };
 
 const kotlinLink = {
 	text: 'Kotlin',
 	link: 'https://kotlinlang.org',
-	img: '/img/logo/kotlin.png',
+	img: ImgPaths.logo.kotlin,
 };
 
 const linkedinProfileLink = {
 	text: 'LinkedIn',
 	link: 'https://www.linkedin.com/in/david-mcalister/details/experience/',
+};
+
+const projectsLink = {
+	text: 'Projects',
+	link: '/projects',
+	img: ImgPaths.pages.home.tile.m2,
 };
 
 const externalLinks: ExternalLink[] = [
@@ -60,25 +72,23 @@ const externalLinks: ExternalLink[] = [
 ];
 
 const footerLinks: TooltipLink[] = [
-	{ text: 'Vite', link: 'https://vitejs.dev/', img: 'vite.png' },
-	{ text: 'React', link: 'https://react.dev/', img: 'react.webp' },
-	{
-		text: 'TypeScript',
-		link: 'https://www.typescriptlang.org/',
-		img: 'ts.png',
-	},
-	{ text: 'Material UI', link: 'https://mui.com/', img: 'mui.png' },
-	{ text: 'GitHub Pages', link: 'https://pages.github.com/', img: 'gh.png' },
+	{ text: 'Vite', link: 'https://vitejs.dev/', img: ImgPaths.logo.vite },
+	{ text: 'React', link: 'https://react.dev/', img: ImgPaths.logo.react },
+	{ text: 'TypeScript', link: 'https://www.typescriptlang.org/', img: ImgPaths.logo.ts },
+	{ text: 'Material UI', link: 'https://mui.com/', img: ImgPaths.logo.mui },
+	{ text: 'GitHub Pages', link: 'https://pages.github.com/', img: ImgPaths.logo.gh },
 ];
 
 export {
 	externalLinks,
 	footerLinks,
+	formatLink,
 	gapYah2Link,
 	gapYahLink,
 	kotlinLink,
 	linkedinProfileLink,
 	litterAppLink,
+	projectsLink,
 	recylotronLink,
 	sdlcLink,
 	vb6Link,
