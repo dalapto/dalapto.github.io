@@ -43,9 +43,9 @@ function TooltipLink({
 			}}
 			title={<img width={25} height={25} src={imgSrc} />}
 		>
-			<SmartLink href={href}>
-				<span>{text}</span>
-			</SmartLink>
+			<span>
+				<SmartLink href={href}>{text}</SmartLink>
+			</span>
 		</Tooltip>
 	);
 }

@@ -35,6 +35,7 @@ function AppBackground() {
 						alt={bg.image.alt}
 						style={{
 							...style,
+							objectFit: bg.imageFit ?? 'cover',
 							objectPosition: bg.imagePosition ?? 'center top',
 							filter: (bg.blur ?? 0) > 0 ? `blur(${bg.blur}px)` : undefined,
 						}}

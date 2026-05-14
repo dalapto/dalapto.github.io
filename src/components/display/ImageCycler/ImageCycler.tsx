@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Image } from '../../../types/basic.types';
+import { Lightbox } from '../Lightbox/Lightbox';
 import './ImageCycler.css';
 
 interface ImageCyclerProps {
@@ -21,6 +22,38 @@ interface ImageCyclerProps {
 	showArrows?: boolean;
 	/** Minimum height of the image area. Accepts any CSS length (e.g. '400px', '50vh'). Defaults to '400px'. */
 	minHeight?: string;
+	/** When true, clicking the image opens a fullscreen lightbox. Defaults to false. */
+	lightbox?: boolean;
+}
+
+interface CyclerArrowsProps {
+	onPrev: () => void;
+	onNext: () => void;
+}
+
+function CyclerArrows({ onPrev, onNext }: CyclerArrowsProps) {
+	return (
+		<>
+			<button
+				className='image-cycler-arrow image-cycler-arrow--prev'
+				onClick={(e) => { e.stopPropagation(); onPrev(); }}
+				aria-label='Previous image'
+			>
+				<svg viewBox='0 0 24 24' width='1.4em' height='1.4em' fill='none' stroke='currentColor' strokeWidth='2.5' strokeLinecap='round' strokeLinejoin='round'>
+					<polyline points='15 18 9 12 15 6' />
+				</svg>
+			</button>
+			<button
+				className='image-cycler-arrow image-cycler-arrow--next'
+				onClick={(e) => { e.stopPropagation(); onNext(); }}
+				aria-label='Next image'
+			>
+				<svg viewBox='0 0 24 24' width='1.4em' height='1.4em' fill='none' stroke='currentColor' strokeWidth='2.5' strokeLinecap='round' strokeLinejoin='round'>
+					<polyline points='9 18 15 12 9 6' />
+				</svg>
+			</button>
+		</>
+	);
 }
 
 function ImageCycler({
@@ -32,8 +65,10 @@ function ImageCycler({
 	showDots = true,
 	showArrows = true,
 	minHeight = '400px',
+	lightbox = false,
 }: ImageCyclerProps) {
 	const [index, setIndex] = useState(0);
+	const [lightboxOpen, setLightboxOpen] = useState(false);
 	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const hoveredRef = useRef(false);
 
@@ -84,49 +119,35 @@ function ImageCycler({
 	const activeCaption = images[index].caption;
 
 	return (
+		<>
 		<div
 			className='image-cycler'
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
 		>
-			<div className='image-cycler-media' style={{ minHeight }}>
-				{images.map((img, i) => (
-					<img
-						key={img.src}
-						src={img.src}
-						alt={img.alt}
-						className='image-cycler-img'
-						style={{
-							opacity: i === index ? 1 : 0,
-							transition: `opacity ${fade}ms ease-in-out`,
-							objectFit,
-							objectPosition,
-						}}
-					/>
-				))}
-				{showArrows && images.length > 1 && (
-					<>
-						<button
-							className='image-cycler-arrow image-cycler-arrow--prev'
-							onClick={goPrev}
-							aria-label='Previous image'
-						>
-							<svg viewBox='0 0 24 24' width='1.4em' height='1.4em' fill='none' stroke='currentColor' strokeWidth='2.5' strokeLinecap='round' strokeLinejoin='round'>
-								<polyline points='15 18 9 12 15 6' />
-							</svg>
-						</button>
-						<button
-							className='image-cycler-arrow image-cycler-arrow--next'
-							onClick={goNext}
-							aria-label='Next image'
-						>
-							<svg viewBox='0 0 24 24' width='1.4em' height='1.4em' fill='none' stroke='currentColor' strokeWidth='2.5' strokeLinecap='round' strokeLinejoin='round'>
-								<polyline points='9 18 15 12 9 6' />
-							</svg>
-						</button>
-					</>
-				)}
-			</div>
+		<div
+			className='image-cycler-media'
+			style={{ minHeight, cursor: lightbox ? 'zoom-in' : undefined }}
+			onClick={lightbox ? () => setLightboxOpen(true) : undefined}
+		>
+			{images.map((img, i) => (
+				<img
+					key={img.src}
+					src={img.src}
+					alt={img.alt}
+					className='image-cycler-img'
+					style={{
+						opacity: i === index ? 1 : 0,
+						transition: `opacity ${fade}ms ease-in-out`,
+						objectFit,
+						objectPosition,
+					}}
+				/>
+			))}
+		{showArrows && images.length > 1 && (
+			<CyclerArrows onPrev={goPrev} onNext={goNext} />
+		)}
+		</div>
 			<div className='image-cycler-footer'>
 				{activeCaption && (
 					<span key={index} className='image-cycler-caption'>
@@ -148,7 +169,19 @@ function ImageCycler({
 				)}
 			</div>
 		</div>
+		{lightbox && (
+			<Lightbox open={lightboxOpen} onClose={() => setLightboxOpen(false)}>
+				<ImageCycler
+					images={images}
+					interval={0}
+					objectFit='contain'
+					minHeight='75vh'
+				/>
+			</Lightbox>
+		)}
+		</>
 	);
 }
 
 export { ImageCycler };
+export type { ImageCyclerProps };

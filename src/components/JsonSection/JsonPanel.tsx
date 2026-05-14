@@ -32,6 +32,7 @@ function resolveImageSlot(slot: JsonSectionImageSlot): {
 					images={slot.images}
 					interval={slot.cyclerInterval ?? 4000}
 					minHeight={slot.cyclerMinHeight}
+					lightbox
 				/>
 			),
 		};

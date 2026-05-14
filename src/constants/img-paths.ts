@@ -22,6 +22,11 @@ export const ImgPaths = {
 		ts: `${IMG_ROOT}/logo/ts.png`,
 		mui: `${IMG_ROOT}/logo/mui.png`,
 		gh: `${IMG_ROOT}/logo/gh.png`,
+		pokemon: `${IMG_ROOT}/logo/pokeball.svg`,
+		geocaching: `${IMG_ROOT}/logo/geocaching.png`,
+		java: `${IMG_ROOT}/logo/java.png`,
+		figma: `${IMG_ROOT}/logo/figma.svg`,
+		firebase: `${IMG_ROOT}/logo/fs.png`,
 	},
 
 	pages: {
@@ -45,6 +50,15 @@ export const ImgPaths = {
 		},
 
 		litter: {
+			ilp: {
+				map: `${IMG_ROOT}/pages/litter/ilp/map/map1.png`,
+				class: `${IMG_ROOT}/pages/litter/ilp/diagrams/class.png`,
+				flow: `${IMG_ROOT}/pages/litter/ilp/diagrams/flow.png`,
+			},
+			data: {
+				userDetails: `${IMG_ROOT}/pages/litter/data/user_details.png`,
+				cfMessages: `${IMG_ROOT}/pages/litter/data/cf_messages.png`,
+			},
 			app: {
 				background: `${IMG_ROOT}/pages/litter/app/background.png`,
 				logo: `${IMG_ROOT}/pages/litter/app/logo.png`,
@@ -63,6 +77,9 @@ export const ImgPaths = {
 				editMessageFrag: `${IMG_ROOT}/pages/litter/smaller/editmessage_frag.png`,
 				mapFrag: `${IMG_ROOT}/pages/litter/smaller/map_frag.png`,
 				messagesFrag: `${IMG_ROOT}/pages/litter/smaller/messages_frag.png`,
+			},
+			phone: {
+				view_messages: `${IMG_ROOT}/pages/litter/phone/view_messages.png`,
 			},
 		},
 

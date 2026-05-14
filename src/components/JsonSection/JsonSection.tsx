@@ -10,6 +10,8 @@ interface JsonSectionBackground {
 	image: Image;
 	/** CSS object-position for the parallax background. Defaults to 'center top'. */
 	imagePosition?: string;
+	/** CSS object-fit for the background image. Defaults to 'cover'. */
+	imageFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
 	/** Blur applied to the background image. Defaults to 0. */
 	blur?: number;
 }
@@ -88,6 +90,7 @@ function JsonSection({ background, items, className, gap }: JsonSectionProps) {
 		<ParallaxCanvas
 			image={background.image}
 			imagePosition={background.imagePosition}
+			imageFit={background.imageFit}
 			blur={background.blur}
 			className={className}
 			gap={gap}

@@ -1,5 +1,6 @@
 import { About } from './pages/About/About';
 import { Home } from './pages/Home/Home';
+import { LitterApp } from './pages/Projects/LitterApp/LitterApp';
 import { Medieval2TotalWar } from './pages/Projects/m2tw/m2tw';
 import { Projects } from './pages/Projects/Projects';
 import { RiseOfNations } from './pages/Projects/RON/Ron';
@@ -25,7 +26,7 @@ interface NavRoute {
 const projectsRoutes: NavRoute[] = [
 	{ label: 'Cover Letter Generator', route: '/cover-letter-generator' },
 	{ label: 'Clipboard', route: '/clipboard' },
-	{ label: 'LitterApp', route: '/litterapp' },
+	{ label: 'LitterApp', route: '/litterapp', component: LitterApp },
 	{ label: 'Reyclotron', route: '/recyclotron' },
 	{
 		label: 'Medieval 2: Total War',

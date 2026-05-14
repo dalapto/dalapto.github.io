@@ -4,6 +4,8 @@ import { Image } from '../types/basic.types';
 interface BackgroundConfig {
 	image: Image;
 	imagePosition?: string;
+	/** CSS object-fit for the background image. Defaults to 'cover'. */
+	imageFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
 	blur?: number;
 	/** Fade transition duration in ms. Defaults to 400. */
 	transitionDuration?: number;
