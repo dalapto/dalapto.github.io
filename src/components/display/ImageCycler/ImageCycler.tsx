@@ -24,6 +24,8 @@ interface ImageCyclerProps {
 	minHeight?: string;
 	/** When true, clicking the image opens a fullscreen lightbox. Defaults to false. */
 	lightbox?: boolean;
+	/** Starting index. Defaults to 0. */
+	initialIndex?: number;
 }
 
 interface CyclerArrowsProps {
@@ -66,8 +68,9 @@ function ImageCycler({
 	showArrows = true,
 	minHeight = '400px',
 	lightbox = false,
+	initialIndex = 0,
 }: ImageCyclerProps) {
-	const [index, setIndex] = useState(0);
+	const [index, setIndex] = useState(initialIndex);
 	const [lightboxOpen, setLightboxOpen] = useState(false);
 	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const hoveredRef = useRef(false);
@@ -169,16 +172,17 @@ function ImageCycler({
 				)}
 			</div>
 		</div>
-		{lightbox && (
-			<Lightbox open={lightboxOpen} onClose={() => setLightboxOpen(false)}>
-				<ImageCycler
-					images={images}
-					interval={0}
-					objectFit='contain'
-					minHeight='75vh'
-				/>
-			</Lightbox>
-		)}
+	{lightbox && (
+	<Lightbox open={lightboxOpen} onClose={() => setLightboxOpen(false)}>
+		<ImageCycler
+			images={images}
+			interval={0}
+			objectFit='contain'
+			minHeight='75vh'
+			initialIndex={index}
+		/>
+	</Lightbox>
+	)}
 		</>
 	);
 }

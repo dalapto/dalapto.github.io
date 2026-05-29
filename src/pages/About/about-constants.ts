@@ -67,17 +67,17 @@ const litterTileImage: Image = {
 
 const litterImages: Image[] = [
 	{
-		src: ImgPaths.pages.litter.smaller.markerNew,
+		src: ImgPaths.pages.litter.phone.far,
 		alt: 'Screenshot of user being too far away to read a message on map.',
 		caption: 'Messages are geo-tagged to a location.',
 	},
 	{
-		src: ImgPaths.pages.litter.figma.mapMockup,
+		src: ImgPaths.pages.litter.mockups.map,
 		alt: 'Mockup in Figma showing decoding mechanic',
 		caption: 'Mockup in Figma showing decoding mechanic.',
 	},
 	{
-		src: ImgPaths.pages.litter.smaller.editMessageFrag,
+		src: ImgPaths.pages.litter.phone.create,
 		alt: 'Screenshot of message UI.',
 		caption: 'Users could post, update, like and comment messages.',
 	},

@@ -15,6 +15,10 @@ interface ParallaxCanvasProps {
 	className?: string;
 	/** Gap between direct children of the content column. */
 	gap?: string;
+	/** Padding before the first child. Defaults to '8rem'. */
+	paddingTop?: string;
+	/** Padding after the last child. Defaults to '8rem'. */
+	paddingBottom?: string;
 	children: ReactNode;
 }
 
@@ -25,6 +29,8 @@ function ParallaxCanvas({
 	blur = 0,
 	className,
 	gap,
+	paddingTop = '8rem',
+	paddingBottom = '8rem',
 	children,
 }: ParallaxCanvasProps) {
 	const { registerScrollElement, unregisterScrollElement } = useBackground();
@@ -40,7 +46,7 @@ function ParallaxCanvas({
 
 	return (
 		<div ref={canvasRef} className='parallax-canvas'>
-			<div className={['parallax-canvas-content', className].filter(Boolean).join(' ')} style={{ gap }}>{children}</div>
+			<div className={['parallax-canvas-content', className].filter(Boolean).join(' ')} style={{ gap, paddingTop, paddingBottom }}>{children}</div>
 		</div>
 	);
 }

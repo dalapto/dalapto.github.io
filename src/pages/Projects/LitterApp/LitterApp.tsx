@@ -6,9 +6,55 @@ import type {
 import { JsonSection } from '../../../components/JsonSection/JsonSection';
 import { colors } from '../../../constants/colors';
 import { ImgPaths } from '../../../constants/img-paths';
-import { formatLink, kotlinLink } from '../../../constants/link-constants';
+import {
+	androidLink,
+	androidStudioLink,
+	apiLink,
+	aStarLink,
+	cloudFirestoreLink,
+	compilerLink,
+	crudLink,
+	emulatorLink,
+	figmaLink,
+	formatLink,
+	geocachingLink,
+	googleMapsSDKLink,
+	javaLink,
+	javascriptLink,
+	jvmLink,
+	kotlinLink,
+	litterAppGithubLink,
+	noSqlLink,
+	pokemonLink,
+	powergrabLink,
+	sqlLink,
+	typescriptLink,
+	userJourneyLink,
+} from '../../../constants/link-constants';
+import { firebaseImages, precursorImages, premiseImages, testingImages, uiImages } from './litterapp-constants';
 
+const android = formatLink(androidLink);
+const androidStudio = formatLink(androidStudioLink);
+const compiler = formatLink(compilerLink);
+const emulator = formatLink(emulatorLink);
+const java = formatLink(javaLink);
+const javascript = formatLink(javascriptLink);
+const jvm = formatLink(jvmLink);
 const kotlin = formatLink(kotlinLink);
+const powergrab = formatLink(powergrabLink);
+const typescript = formatLink(typescriptLink);
+const aStar = formatLink(aStarLink);
+const pokemonGo = formatLink(pokemonLink);
+const geocaching = formatLink(geocachingLink);
+const googleMapsSDK = formatLink(googleMapsSDKLink);
+const figma = formatLink(figmaLink);
+const cloudFirestore = formatLink(cloudFirestoreLink);
+const sql = formatLink(sqlLink);
+const noSql = formatLink(noSqlLink);
+const crud = formatLink(crudLink);
+const api = formatLink(apiLink);
+const userJourney = formatLink(userJourneyLink);
+const litterAppGithub = formatLink(litterAppGithubLink);
 
 const headerPanel: JsonImageTextPanel = {
 	kind: 'image-text',
@@ -18,25 +64,6 @@ const headerPanel: JsonImageTextPanel = {
 	},
 	content: [],
 };
-
-const javaLink = {
-	text: 'Java',
-	link: 'https://www.java.com/en/download/help/whatis_java.html',
-	img: ImgPaths.logo.java,
-};
-const java = formatLink(javaLink);
-
-const powergrabLink = {
-	text: 'here',
-	link: 'https://github.com/dalapto/uni-powergrab',
-};
-const powergrab = formatLink(powergrabLink);
-
-const aStarLink = {
-	text: 'A* search algorithm',
-	link: 'https://en.wikipedia.org/wiki/A*_search_algorithm',
-};
-const aStar = formatLink(aStarLink);
 
 const precursorPanel: JsonImageTextPanel = {
 	kind: 'image-text',
@@ -54,74 +81,19 @@ const precursorPanel: JsonImageTextPanel = {
 		'...a <?Location-based Social Media Android App?>.',
 		'',
 	],
-	imageSlot: {
-		images: [
-			{
-				src: ImgPaths.pages.litter.ilp.map,
-				alt: 'Screenshot of the precursor map in LitterApp.',
-				caption: 'Render of the map with a route.',
-			},
-			{
-				src: ImgPaths.pages.litter.ilp.class,
-				alt: 'Screenshot of the precursor class diagram in LitterApp.',
-				caption: 'Class diagram of the powergrab project.',
-			},
-			{
-				src: ImgPaths.pages.litter.ilp.flow,
-				alt: 'Screenshot of the precursor flow diagram in LitterApp.',
-				caption: 'Flow diagram of the pathfinding algorithm.',
-			},
-		],
-		cyclerInterval: 10000,
-	},
+	imageSlot: precursorImages,
 	contentBackground: colors.primary,
 	maxWidth: '60%',
 };
 
-const pokemonLink = {
-	text: 'Pokémon Go',
-	link: 'https://pokemongo.com/en/map',
-	img: ImgPaths.logo.pokemon,
-};
-const pokemonGo = formatLink(pokemonLink);
-
-const geocachingLink = {
-	text: 'Geocaching',
-	link: 'https://www.geocaching.com/sites/education/en/frequently-asked-questions/',
-	img: ImgPaths.logo.geocaching,
-};
-const geocaching = formatLink(geocachingLink);
-
-const figmaLink = {
-	text: 'Figma',
-	link: 'https://www.figma.com/',
-	img: ImgPaths.logo.figma,
-};
-const figma = formatLink(figmaLink);
-
 const premisePanel: JsonImageTextPanel = {
 	kind: 'image-text',
 	header: {
-		titleText: '"Location-based"?',
+		titleText: '"Location-Based"?',
 	},
-	imageSlot: {
-		images: [
-			{
-				src: ImgPaths.pages.litter.figma.createMockup,
-				alt: 'Screenshot of create mockup in Figma.',
-				caption: 'Create mockup in Figma.',
-			},
-			{
-				src: ImgPaths.pages.litter.figma.mapMockup,
-				alt: 'Screenshot of map mockup in Figma.',
-				caption: 'Map mockup in Figma.',
-			},
-		],
-		cyclerInterval: 6000,
-	},
+	imageSlot: premiseImages,
 	reverseColumns: true,
 	imageMaxWidth: '35%',
-	minHeight: '60vh',
 	content: [
 		'I wanted a practical project, so I chose one on making an Android app.',
 		'',
@@ -142,86 +114,10 @@ const premisePanel: JsonImageTextPanel = {
 	contentBackground: colors.primary,
 };
 
-const cloudFirestoreLink = {
-	text: 'Cloud Firestore',
-	link: 'https://firebase.google.com/docs/firestore',
-	img: ImgPaths.logo.firebase,
-};
-const cloudFirestore = formatLink(cloudFirestoreLink);
-
-const sqlLink = {
-	text: 'SQL',
-	link: 'https://en.wikipedia.org/wiki/SQL',
-};
-const sql = formatLink(sqlLink);
-
-const noSqlLink = {
-	text: 'NoSQL',
-	link: 'https://en.wikipedia.org/wiki/NoSQL',
-};
-const noSql = formatLink(noSqlLink);
-
-const crudLink = {
-	text: 'CRUD',
-	link: 'https://en.wikipedia.org/wiki/Create,_read,_update_and_delete',
-};
-const crud = formatLink(crudLink);
-
-const apiLink = {
-	text: 'API',
-	link: 'https://en.wikipedia.org/wiki/API',
-};
-const api = formatLink(apiLink);
-
 const firebasePanel: JsonImageTextPanel = {
-	header: {
-		titleText: '"Social Media"?',
-	},
-	imageSlot: {
-		images: [
-			{
-				src: ImgPaths.pages.litter.data.userDetails,
-				alt: 'Screenshot of user details in LitterApp.',
-				caption: 'User details in LitterApp.',
-			},
-			{
-				src: ImgPaths.pages.litter.data.cfMessages,
-				alt: 'Screenshot of Firestore messages in LitterApp.',
-				caption: 'Firestore messages in LitterApp.',
-			},
-			{
-				src: ImgPaths.pages.litter.figma.createMockup,
-				alt: 'Screenshot of create mockup in Figma.',
-				caption: 'Create mockup in Figma.',
-			},
-			{
-				src: ImgPaths.pages.litter.figma.mapMockup,
-				alt: 'Screenshot of map mockup in Figma.',
-				caption: 'Map mockup in Figma.',
-			},
-			{
-				src: ImgPaths.pages.litter.figma.messageMockup,
-				alt: 'Screenshot of message mockup in Figma.',
-				caption: 'Message mockup in Figma.',
-			},
-			{
-				src: ImgPaths.pages.litter.figma.messagesMockup,
-				alt: 'Screenshot of messages mockup in Figma.',
-				caption: 'Messages mockup in Figma.',
-			},
-			{
-				src: ImgPaths.pages.litter.figma.oldMessageMockup,
-				alt: 'Screenshot of old message mockup in Figma.',
-				caption: 'Old message mockup in Figma.',
-			},
-		],
-		cyclerInterval: 6000,
-	},
+	imageSlot: firebaseImages,
 	kind: 'image-text',
 	content: [
-		'',
-		'The map acts as the public space, where users post messages for others to find.',
-		"Once a user discovers a message they can 'like' and comment on it.",
 		'',
 		'Real social medias store and serve thousands of users and messages.',
 		'How do you scale that?',
@@ -236,79 +132,71 @@ const firebasePanel: JsonImageTextPanel = {
 	contentBackground: colors.primary,
 	imageMaxWidth: '45%',
 	maxWidth: '100%',
-	minHeight: '60vh',
 };
 
 const kotlinPanel: JsonImageTextPanel = {
 	kind: 'image-text',
-	header: {
-		titleText: '"Android App"?',
-	},
-	imageSlot: {
-		images: [
-			{
-				src: ImgPaths.pages.litter.app.logo,
-				alt: 'Screenshot of LitterApp logo.',
-				caption: 'LitterApp logo.',
-			},
-		],
-		cyclerInterval: 5000,
-	},
-	imageMaxWidth: '30%',
-	minHeight: '60vh',
+	header: { titleText: 'Android Development' },
 	content: [
 		'',
-		'I used Google Maps SDK to handle user and message location logic.',
-		`The app was built natively for Android using ${kotlin}.`,
+		`I'd never made an ${android} app before, and had to teach myself.`,
 		'',
-		`${kotlin} is a modern, concise language that runs on the JVM.`,
-		'It was a natural fit for Android development.',
+		`Thankfully Android development is very developer-friendly with ${androidStudio}.`,
+		`As I don't have an Android phone, the built-in ${emulator} meant I could debug on my laptop.`,
 		'',
+		`${kotlin} was really smooth to code in. Kotlin is to ${java}, what ${typescript} is to ${javascript}.`,
+		'',
+		`The ${jvm} makes me wonder if LitterApp ${compiler} and run in a web browser...`,
 		'',
 	],
 	contentBackground: colors.primary,
 };
 
-const markersPanel: JsonImageTextPanel = {
+const uiPanel: JsonImageTextPanel = {
 	kind: 'image-text',
-	imageSlot: {
-		images: [
-			{
-				src: ImgPaths.pages.litter.smaller.markerNew,
-				alt: 'Screenshot of new marker in LitterApp.',
-				caption: 'New marker in LitterApp.',
-			},
-			{
-				src: ImgPaths.pages.litter.smaller.markerOld,
-				alt: 'Screenshot of old marker in LitterApp.',
-				caption: 'Old marker in LitterApp.',
-			},
-		],
-		cyclerInterval: 4000,
-	},
-	reverseColumns: true,
-	imageMaxWidth: '25%',
+	imageSlot: uiImages,
+	stackImage: true,
+	stackImageMaxWidth: '70%',
 	content: [
 		'',
-		'Map markers evolved over the course of the project.',
+		`${googleMapsSDK} was the obvious choice for map functionality.`,
 		'',
-		'Early markers were plain pins.',
-		'Later iterations used custom icons with the LitterApp logo to give the map a distinct identity.',
+		'The map acts as the public space, where users post messages for others to find.',
+		'Once a user discovers a message they can interact with it normally.',
+		'',
+		`Users can also 'keep' a message for later and comment on it.`,
+		'',
 		'',
 	],
 	contentBackground: colors.primary,
 };
 
-const testingPanel: JsonTextPanelData = {
+const testingPanel: JsonImageTextPanel = {
+	kind: 'image-text',
+	imageSlot: testingImages,
+	content: [
+		'',
+		'I gathered feedback for the app user testing.',
+		'',
+		'As this was over lockdown, I screen-shared a fresh version of the app.',
+		"I gave them various goals to do, like 'view a message' or 'make a post'.",
+		'',
+		`I directed them as little as possible, so I could observe their ${userJourney} more naturally.`,
+		'I then asked them questions based on the goals, on a scale of 1 to 5.',
+		'',
+	],
+	contentBackground: colors.primary,
+	maxWidth: '60%',
+};
+
+const finalPanel: JsonTextPanelData = {
 	kind: 'text',
 	content: [
 		'',
-		'Testing was split across unit and integration layers.',
+		'My work was evaluated through presentations and a project report.',
+		'I scored highly and ended up getting a First-class degree!',
 		'',
-		'Unit tests covered the core decoding logic — the algorithm that reveals messages as you approach.',
-		'Integration tests covered the Firestore read/write paths.',
-		'',
-		'The project was assessed and awarded a First Class grade.',
+		`You can view both code and report ${litterAppGithub}.`,
 		'',
 	],
 	contentBackground: colors.primary,
@@ -335,9 +223,9 @@ function LitterApp() {
 				},
 				{
 					kind: 'group',
-					panels: [firebasePanel, kotlinPanel, markersPanel],
+					panels: [firebasePanel, kotlinPanel, uiPanel, testingPanel],
 				},
-				testingPanel,
+				finalPanel,
 			]}
 		/>
 	);

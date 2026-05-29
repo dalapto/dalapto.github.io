@@ -27,6 +27,7 @@ export const ImgPaths = {
 		java: `${IMG_ROOT}/logo/java.png`,
 		figma: `${IMG_ROOT}/logo/figma.svg`,
 		firebase: `${IMG_ROOT}/logo/fs.png`,
+		android: `${IMG_ROOT}/logo/android.ico`,
 	},
 
 	pages: {
@@ -50,36 +51,47 @@ export const ImgPaths = {
 		},
 
 		litter: {
-			ilp: {
-				map: `${IMG_ROOT}/pages/litter/ilp/map/map1.png`,
-				class: `${IMG_ROOT}/pages/litter/ilp/diagrams/class.png`,
-				flow: `${IMG_ROOT}/pages/litter/ilp/diagrams/flow.png`,
-			},
-			data: {
-				userDetails: `${IMG_ROOT}/pages/litter/data/user_details.png`,
-				cfMessages: `${IMG_ROOT}/pages/litter/data/cf_messages.png`,
-			},
 			app: {
 				background: `${IMG_ROOT}/pages/litter/app/background.png`,
 				logo: `${IMG_ROOT}/pages/litter/app/logo.png`,
 				msgBackground: `${IMG_ROOT}/pages/litter/app/msgbackground.png`,
 			},
-			figma: {
-				createMockup: `${IMG_ROOT}/pages/litter/figma/create_mockup.png`,
-				mapMockup: `${IMG_ROOT}/pages/litter/figma/map_mockup.png`,
-				messageMockup: `${IMG_ROOT}/pages/litter/figma/message_mockup.png`,
-				messagesMockup: `${IMG_ROOT}/pages/litter/figma/messages_mockup.png`,
-				oldMessageMockup: `${IMG_ROOT}/pages/litter/figma/old_message_mockup.png`,
+			data: {
+				emails: `${IMG_ROOT}/pages/litter/data/emails.png`,
+				messages: `${IMG_ROOT}/pages/litter/data/messages.png`,
+				users: `${IMG_ROOT}/pages/litter/data/users.png`,
 			},
-			smaller: {
-				markerNew: `${IMG_ROOT}/pages/litter/smaller/marker_new.png`,
-				markerOld: `${IMG_ROOT}/pages/litter/smaller/marker_old.png`,
-				editMessageFrag: `${IMG_ROOT}/pages/litter/smaller/editmessage_frag.png`,
-				mapFrag: `${IMG_ROOT}/pages/litter/smaller/map_frag.png`,
-				messagesFrag: `${IMG_ROOT}/pages/litter/smaller/messages_frag.png`,
+			ilp: {
+				class: `${IMG_ROOT}/pages/litter/ilp/class.png`,
+				flow: `${IMG_ROOT}/pages/litter/ilp/flow.png`,
+				map: `${IMG_ROOT}/pages/litter/ilp/map.png`,
+			},
+			mockups: {
+				list: `${IMG_ROOT}/pages/litter/mockups/list.png`,
+				map: `${IMG_ROOT}/pages/litter/mockups/map.png`,
+				message: `${IMG_ROOT}/pages/litter/mockups/message.png`,
 			},
 			phone: {
-				view_messages: `${IMG_ROOT}/pages/litter/phone/view_messages.png`,
+				create: `${IMG_ROOT}/pages/litter/phone/create.png`,
+				far: `${IMG_ROOT}/pages/litter/phone/far.png`,
+			},
+			testing: {
+				feedback: `${IMG_ROOT}/pages/litter/testing/feedback.png`,
+				qs: `${IMG_ROOT}/pages/litter/testing/qs.png`,
+				zoom: `${IMG_ROOT}/pages/litter/testing/zoom.jpg`,
+			},
+			ui: {
+				auth: `${IMG_ROOT}/pages/litter/ui/auth.png`,
+				comments: `${IMG_ROOT}/pages/litter/ui/comments.png`,
+				create: `${IMG_ROOT}/pages/litter/ui/create.png`,
+				explore: `${IMG_ROOT}/pages/litter/ui/explore.png`,
+				filters: `${IMG_ROOT}/pages/litter/ui/filters.png`,
+				keep: `${IMG_ROOT}/pages/litter/ui/keep.png`,
+				list: `${IMG_ROOT}/pages/litter/ui/list.png`,
+				markers: `${IMG_ROOT}/pages/litter/ui/markers.png`,
+				review: `${IMG_ROOT}/pages/litter/ui/review.png`,
+				tabs: `${IMG_ROOT}/pages/litter/ui/tabs.png`,
+				view: `${IMG_ROOT}/pages/litter/ui/view.png`,
 			},
 		},
 

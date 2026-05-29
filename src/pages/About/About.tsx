@@ -90,7 +90,6 @@ const uniPanel: JsonImageTextPanel = {
 	imageMinWidth: '30%',
 	imageMaxWidth: '35%',
 	textMinWidth: '50%',
-	minHeight: '60vh',
 	content: [
 		'',
 		"It wasn't until third year, I started enjoying uni.",
@@ -142,7 +141,6 @@ const litterPanel: JsonImageTextPanel = {
 		cyclerInterval: 10000,
 	},
 	imageMaxWidth: '30%',
-	minHeight: '80vh',
 	reverseColumns: true,
 	content: [
 		'',
