@@ -10,4 +10,27 @@ function Recyclotron() {
 	);
 }
 
+// hardware
+// - lego, chamber, trapdoor, arduino
+// - rails, bins
+// - touchscreen
+// - sensors, camera, sound
+// - rasp pi
+
+// software
+// ML model KNN, resnet
+// classification, resnet, trashee, literati
+// purity, metrics
+
+//org
+// budget
+// team
+
+// docs
+// reports
+// presentations
+// user guide
+// video
+//
+
 export { Recyclotron };

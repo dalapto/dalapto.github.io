@@ -19,6 +19,7 @@ import {
 	vb6Link,
 } from '../../constants/link-constants';
 import { BackgroundConfig } from '../../context/BackgroundContext';
+import { LITTER_APP_PATH, RECYCLOTRON_PATH } from '../../constants/route-paths';
 import type { Image } from '../../types/basic.types';
 import {
 	litterImages,
@@ -128,10 +129,7 @@ const recyclotronPanel: JsonImageTextPanel = {
 		'',
 	],
 	contentBackground: colors.primary,
-	contentChildren: projectTile(
-		{ label: 'Recylotron', route: '/recyclotron' },
-		recyclotronTileImage,
-	),
+	contentChildren: projectTile({ label: 'Recyclotron', route: RECYCLOTRON_PATH }, recyclotronTileImage),
 };
 
 const litterPanel: JsonImageTextPanel = {
@@ -153,10 +151,7 @@ const litterPanel: JsonImageTextPanel = {
 		'',
 	],
 	contentBackground: colors.primary,
-	contentChildren: projectTile(
-		{ label: 'LitterApp', route: '/litterapp' },
-		litterTileImage,
-	),
+	contentChildren: projectTile({ label: 'LitterApp', route: LITTER_APP_PATH }, litterTileImage),
 };
 
 const projectsBackground: BackgroundConfig = {

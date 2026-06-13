@@ -1,5 +1,6 @@
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import { LITTER_APP_PATH, RECYCLOTRON_PATH } from './route-paths';
 import { ExternalLink, TooltipLink } from '../types/basic.types';
 import { ImgPaths } from './img-paths';
 
@@ -39,13 +40,13 @@ const gapYah2Link = {
 
 const recylotronLink = {
 	text: 'Recyclotron',
-	link: '/recyclotron',
+	link: RECYCLOTRON_PATH,
 	img: ImgPaths.pages.recylotron.models.icon,
 };
 
 const litterAppLink = {
 	text: 'LitterApp',
-	link: '/litterapp',
+	link: LITTER_APP_PATH,
 	img: ImgPaths.pages.litter.app.logo,
 };
 

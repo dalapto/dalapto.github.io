@@ -51,27 +51,36 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 
 	const toolbarItems = useMemo(() => {
 		return navRoutes
-			.filter((r) => r.label)
-			.map((r) => ({
-				label: r.label!,
-				route: r.children ? undefined : r.route,
-				isActive: r.route === currentPage,
-				onMouseEnter: r.children
-					? (e) => openMenu(e, r.children!)
-					: r.onMouseEnter,
-				onClick: r.children ? (e) => openMenu(e, r.children!) : r.onClick,
-				onKeyDown: r.children ? (e) => openMenu(e, r.children!) : r.onKeyDown,
-				ariaHasPopup: r.children ? true : undefined,
-				ariaExpanded: r.children ? Boolean(menuAnchor) : undefined,
-			}));
+			.filter((r) => r.label && !r.hide)
+			.map((r) => {
+				const visibleChildren = r.children?.filter((c) => !c.hide);
+				return {
+					label: r.label!,
+					route: visibleChildren?.length ? undefined : r.route,
+					isActive: r.route === currentPage,
+					onMouseEnter: visibleChildren?.length
+						? (e) => openMenu(e, visibleChildren)
+						: r.onMouseEnter,
+					onClick: visibleChildren?.length
+						? (e) => openMenu(e, visibleChildren)
+						: r.onClick,
+					onKeyDown: visibleChildren?.length
+						? (e) => openMenu(e, visibleChildren)
+						: r.onKeyDown,
+					ariaHasPopup: visibleChildren?.length ? true : undefined,
+					ariaExpanded: visibleChildren?.length ? Boolean(menuAnchor) : undefined,
+				};
+			});
 	}, [currentPage, menuAnchor, navRoutes, openMenu]) as NavRoute[];
 
 	const hamburgerItems = useMemo(() => {
-		return navRoutes.map((r) => ({
-			label: r.label! ?? 'Home',
-			route: r.route,
-			isActive: r.route === currentPage,
-		}));
+		return navRoutes
+			.filter((r) => !r.hide)
+			.map((r) => ({
+				label: r.label! ?? 'Home',
+				route: r.route,
+				isActive: r.route === currentPage,
+			}));
 	}, [currentPage, navRoutes]) as NavRoute[];
 
 	return (
