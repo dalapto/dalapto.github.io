@@ -2,6 +2,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
+import { SxProps, Theme, useTheme } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
@@ -21,7 +22,14 @@ interface NavBarProps {
 	navRoutes: NavRoute[];
 }
 
+const sx = {
+	homeIconGroup: { display: 'flex', mr: 3 },
+	spacer: { flexGrow: 0.75 },
+	externalLinksGroup: { display: { xs: 'none', md: 'flex' }, gap: 1, ml: 2, mr: 1 },
+} satisfies Record<string, SxProps<Theme>>;
+
 function NavBar({ currentPage, navRoutes }: NavBarProps) {
+	const theme = useTheme();
 	const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 	const [menuAnchor, setMenuAnchor] = React.useState<HTMLElement | null>(null);
 	const [menuItems, setMenuItems] = React.useState<NavRoute[]>([]);
@@ -88,18 +96,18 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 			<Container maxWidth={false}>
 				<Toolbar disableGutters>
 					<Box id='navbar'>
-						<Box sx={{ display: 'flex', mr: 3 }}>
+						<Box sx={sx.homeIconGroup}>
 							<IconButtonLink
 								to='/'
 								icon={HomeIcon}
 								ariaLabel='Home'
-								style={{ marginBlock: '8px', color: 'white' }}
+								style={{ marginBlock: theme.spacing(1), color: theme.colours.text }}
 							/>
 						</Box>
 					</Box>
 
 					{/* Used for empty space on bar */}
-					<Box sx={{ flexGrow: 0.75 }}> </Box>
+					<Box sx={sx.spacer}> </Box>
 
 					<ToolbarItemList items={toolbarItems} />
 
@@ -111,24 +119,17 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 						/>
 					)}
 
+				<Box sx={sx.externalLinksGroup}>
 					{externalLinks.map((link, index) => (
-						<Box
+						<IconButtonLink
 							key={index}
-							sx={{
-								flexGrow: 0,
-								display: 'flex',
-								mr: index === 0 ? 2 : 1,
-								justifyContent: '',
-							}}
-						>
-							<IconButtonLink
-								href={link.href}
-								icon={link.icon}
-								ariaLabel={link.label}
-								style={{ color: 'white' }}
-							/>
-						</Box>
+							href={link.href}
+							icon={link.icon}
+							ariaLabel={link.label}
+							style={{ color: theme.colours.text }}
+						/>
 					))}
+				</Box>
 
 					<HamburgerMenu handleOpenMenu={(e) => openMenu(e, hamburgerItems)} />
 				</Toolbar>

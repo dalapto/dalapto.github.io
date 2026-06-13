@@ -1,24 +1,16 @@
-:root {
-	/* Color Palette */
-	--color-primary: #282c34;
-	--color-secondary: #ffa865;
-	--color-text: #ecf0f1;
-	--color-text-secondary: rgba(255, 255, 255, 0.87);
-	--color-background: #242424;
-	/* TO DO change link colour */
-	/* --color-link: #646cff; */
-	--color-link: #ffa865;
-	--color-link-hover: #ffa865;
-	--color-underline: #646cff;
-
-	/* Panel / section accent colours */
-	--color-panel-rust: rgba(130, 60, 55, 0.95);
-	--color-panel-teal: rgba(62, 171, 164, 0.95);
-
-	/* Layout */
-	--navbar-height: 64px;
-
-	/* Transitions */
-	--transition-standard: 0.5s;
-	--transition-fast: 0.2s;
-}
+/*
+ * Design tokens (colours, spacing scale, layout, transitions) are the single
+ * source of truth in src/styles/tokens.ts and are injected onto :root as CSS
+ * custom properties at startup by src/styles/applyTokens.ts.
+ *
+ * Available variables for use in .css files:
+ *   Colours:     --color-primary, --color-secondary, --color-text,
+ *                --color-text-secondary, --color-background, --color-link,
+ *                --color-link-hover, --color-underline,
+ *                --color-panel-rust, --color-panel-teal
+ *   Spacing:     --space-0 .. --space-8  (8px increments)
+ *   Layout:      --navbar-height
+ *   Transitions: --transition-standard, --transition-fast
+ *
+ * Do not redefine these here — edit tokens.ts instead.
+ */
