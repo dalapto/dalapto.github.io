@@ -1,4 +1,5 @@
 import React from 'react';
+import projectsPanel from '../../../components/content/projectsPanel';
 import type {
 	JsonImageTextPanel,
 	JsonTextPanelData,
@@ -31,7 +32,13 @@ import {
 	typescriptLink,
 	userJourneyLink,
 } from '../../../constants/link-constants';
-import { firebaseImages, precursorImages, premiseImages, testingImages, uiImages } from './litterapp-constants';
+import {
+	firebaseImages,
+	precursorImages,
+	premiseImages,
+	testingImages,
+	uiImages,
+} from './litterapp-constants';
 
 const android = formatLink(androidLink);
 const androidStudio = formatLink(androidStudioLink);
@@ -226,6 +233,7 @@ function LitterApp() {
 					panels: [firebasePanel, kotlinPanel, uiPanel, testingPanel],
 				},
 				finalPanel,
+				projectsPanel,
 			]}
 		/>
 	);

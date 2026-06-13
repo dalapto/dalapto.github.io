@@ -1,8 +1,5 @@
 import React from 'react';
-import type {
-	JsonImageTextPanel,
-	JsonTextPanelData,
-} from '../../components/JsonSection/JsonPanel';
+import type { JsonImageTextPanel } from '../../components/JsonSection/JsonPanel';
 import { JsonSection } from '../../components/JsonSection/JsonSection';
 import { PageTile } from '../../components/layout/ResponsiveTile/PageTile';
 import { colors } from '../../constants/colors';
@@ -11,13 +8,13 @@ import {
 	gapYah2Link,
 	gapYahLink,
 	kotlinLink,
-	linkedinProfileLink,
 	litterAppLink,
 	projectsLink,
 	recylotronLink,
 	sdlcLink,
 	vb6Link,
 } from '../../constants/link-constants';
+import projectsPanel from '../../components/content/projectsPanel';
 import { BackgroundConfig } from '../../context/BackgroundContext';
 import { LITTER_APP_PATH, RECYCLOTRON_PATH } from '../../constants/route-paths';
 import type { Image } from '../../types/basic.types';
@@ -40,7 +37,6 @@ const gapYah2 = formatLink(gapYah2Link);
 const recylotron = formatLink(recylotronLink);
 const litterApp = formatLink(litterAppLink);
 const kotlin = formatLink(kotlinLink);
-const linkedin = formatLink(linkedinProfileLink);
 
 function projectTile(page: { label: string; route: string }, image: Image) {
 	return (
@@ -158,24 +154,6 @@ const projectsBackground: BackgroundConfig = {
 	image: { src: projectsLink.img, alt: projectsLink.text },
 	imagePosition: 'center 40%',
 	blur: 3,
-};
-
-const projectsPanel: JsonTextPanelData = {
-	kind: 'text',
-	content: [
-		'',
-		`You can visit my ${linkedin} page for info on my career projects.`,
-		'',
-		'But for projects where I scratch my creative itch...',
-		`...you can explore my ${formatLink(projectsLink)} page.`,
-		'',
-	],
-	contentBackground: colors.primary,
-	contentChildren: projectTile(
-		{ label: projectsLink.text, route: projectsLink.link },
-		{ src: projectsLink.img, alt: projectsLink.text },
-	),
-	maxWidth: '50%',
 };
 
 function About() {
