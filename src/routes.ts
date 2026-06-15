@@ -1,9 +1,8 @@
-import { About } from './pages/About/About';
 import { LITTER_APP_PATH, RECYCLOTRON_PATH } from './constants/route-paths';
+import { About } from './pages/About/About';
 import { Home } from './pages/Home/Home';
 import { LitterApp } from './pages/Projects/LitterApp/LitterApp';
 import { Medieval2TotalWar } from './pages/Projects/m2tw/m2tw';
-import { Projects } from './pages/Projects/Projects';
 import { Recyclotron } from './pages/Projects/Recylotron/recylotron';
 import { RiseOfNations } from './pages/Projects/RON/Ron';
 import { YouthWork } from './pages/YouthWork/YouthWork';
@@ -32,15 +31,28 @@ const projectsRoutes: NavRoute[] = [
 ];
 
 const moddingRoutes: NavRoute[] = [
-	{ label: 'Medieval 2: Total War', route: '/m2tw', component: Medieval2TotalWar },
+	{
+		label: 'Medieval 2: Total War',
+		route: '/m2tw',
+		component: Medieval2TotalWar,
+	},
 	{ label: 'Rise of Nations', route: '/ron', component: RiseOfNations },
 ];
 
-const litterAppRoute: NavRoute = { label: 'LitterApp', route: LITTER_APP_PATH, component: LitterApp, hide: true };
-const recyclotronRoute: NavRoute = { label: 'Recyclotron', route: RECYCLOTRON_PATH, component: Recyclotron, hide: true };
+const litterAppRoute: NavRoute = {
+	label: 'LitterApp',
+	route: LITTER_APP_PATH,
+	component: LitterApp,
+	hide: true,
+};
+const recyclotronRoute: NavRoute = {
+	label: 'Recyclotron',
+	route: RECYCLOTRON_PATH,
+	component: Recyclotron,
+	hide: true,
+};
 
 const aboutRoutes: NavRoute[] = [litterAppRoute, recyclotronRoute];
-
 
 const navRoutes: NavRoute[] = [
 	{ route: '/', component: Home, hide: true },
@@ -55,7 +67,7 @@ const navRoutes: NavRoute[] = [
 		label: 'Projects',
 		route: '/projects',
 		tileImg: 'm2',
-		component: Projects,
+		// component: Projects,
 		children: [...projectsRoutes, ...moddingRoutes],
 	},
 	{
@@ -67,5 +79,4 @@ const navRoutes: NavRoute[] = [
 	{ label: 'Writing', route: '/writing' },
 ];
 
-
-export { NavRoute, navRoutes, litterAppRoute, recyclotronRoute };
+export { litterAppRoute, NavRoute, navRoutes, recyclotronRoute };
