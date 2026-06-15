@@ -1,5 +1,5 @@
 import { animated, useTransition } from '@react-spring/web';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Route, Routes, useLocation } from 'react-router';
 import './App.css';
 import { PageInConstruction } from './components/display/PageInConstruction/PageInConstruction';
@@ -35,6 +35,7 @@ function AppBackground() {
 						alt={bg.image.alt}
 						style={{
 							...style,
+							objectFit: bg.imageFit ?? 'cover',
 							objectPosition: bg.imagePosition ?? 'center top',
 							filter: (bg.blur ?? 0) > 0 ? `blur(${bg.blur}px)` : undefined,
 						}}
@@ -50,6 +51,10 @@ function AppInner() {
 	const currentPage = location.pathname;
 	const currentPageSlice = currentPage.slice(1);
 	const { setBackground } = useBackground();
+	// Track the previous pathname so we can tell the difference between the
+	// initial load (previousPage === null) and a real navigation (previousPage !== null).
+	// Using a ref so it survives StrictMode double-invoke without being reset.
+	const previousPage = useRef<string | null>(null);
 
 	useEffect(() => {
 		document.title = `${
@@ -60,9 +65,13 @@ function AppInner() {
 	}, [currentPageSlice]);
 
 	useEffect(() => {
-		// Clear any scroll-observer-driven background immediately on navigation so
-		// the outgoing page's observers cannot win the background on the new page.
-		setBackground(null);
+		// Only freeze scroll observers when navigating away from a previous page.
+		// On the initial load (previousPage === null) there is no outgoing page, so
+		// we must NOT freeze — otherwise the IntersectionObserver callbacks that
+		// fire shortly after mount would be blocked and the background would never appear.
+		const isNavigation = previousPage.current !== null && previousPage.current !== currentPage;
+		previousPage.current = currentPage;
+		setBackground(null, { freezeObservers: isNavigation });
 		window.scrollTo(0, 0);
 	}, [currentPage, setBackground]);
 

@@ -39,22 +39,22 @@ const vb6IdeImage: Image = {
 
 const recyclotronTileImage: Image = {
 	alt: '3D Concept Art of Recyclotron',
-	src: ImgPaths.pages.recylotron.models.onBins,
+	src: ImgPaths.pages.recylotron.background,
 };
 
 const recyclotronImages: Image[] = [
 	{
-		src: ImgPaths.pages.recylotron.art.concept1,
+		src: ImgPaths.pages.recylotron.plan.trapdoor,
 		alt: 'Early concept art of the bin chamber.',
 		caption: 'Early concept art for the bin chamber.',
 	},
 	{
-		src: ImgPaths.pages.recylotron.models.icon,
+		src: ImgPaths.pages.recylotron.other.model1,
 		alt: '3D model of the final prototype.',
 		caption: 'Model of the final prototype.',
 	},
 	{
-		src: ImgPaths.pages.recylotron.photos.railsSide,
+		src: ImgPaths.pages.recylotron.other.rails,
 		alt: 'Photo of a lego box mounted on two rails.',
 		caption: 'The lego chamber mounted on the bin rails.',
 	},
@@ -67,17 +67,17 @@ const litterTileImage: Image = {
 
 const litterImages: Image[] = [
 	{
-		src: ImgPaths.pages.litter.smaller.markerNew,
+		src: ImgPaths.pages.litter.phone.far,
 		alt: 'Screenshot of user being too far away to read a message on map.',
 		caption: 'Messages are geo-tagged to a location.',
 	},
 	{
-		src: ImgPaths.pages.litter.figma.mapMockup,
+		src: ImgPaths.pages.litter.mockups.map,
 		alt: 'Mockup in Figma showing decoding mechanic',
 		caption: 'Mockup in Figma showing decoding mechanic.',
 	},
 	{
-		src: ImgPaths.pages.litter.smaller.editMessageFrag,
+		src: ImgPaths.pages.litter.phone.create,
 		alt: 'Screenshot of message UI.',
 		caption: 'Users could post, update, like and comment messages.',
 	},

@@ -14,7 +14,7 @@ function PageInConstruction() {
 
 	useEffect(() => {
 		setBackground({ image: placeholderImg, imagePosition: 'center 100%' });
-		return () => setBackground(null);
+		return () => setBackground(null, { freezeObservers: false });
 	}, [setBackground]);
 
 	return (
@@ -23,13 +23,10 @@ function PageInConstruction() {
 				display: 'flex',
 				alignItems: 'center',
 				justifyContent: 'center',
-				minHeight: '70vh',
+				minHeight: '90vh',
 			}}
 		>
-			<Alert severity='info'>
-				Not much to see here yet.. sorry! This page is still under construction,
-				mind your head...
-			</Alert>
+			<Alert severity='info'>Not much to see here yet.. sorry!</Alert>
 		</div>
 	);
 }

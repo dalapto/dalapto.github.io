@@ -15,7 +15,7 @@ const tileBgPositions: Record<string, string> = {
 };
 
 function Home() {
-	const pages = navRoutes.filter((r) => r.tileImg && r.label);
+	const pages = navRoutes.filter((r) => r.tileImg && r.label && !r.hide);
 
 	const pageTiles = pages.map((page) => (
 		<PageTile

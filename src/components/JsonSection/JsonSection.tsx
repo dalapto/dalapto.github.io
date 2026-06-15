@@ -10,6 +10,8 @@ interface JsonSectionBackground {
 	image: Image;
 	/** CSS object-position for the parallax background. Defaults to 'center top'. */
 	imagePosition?: string;
+	/** CSS object-fit for the background image. Defaults to 'cover'. */
+	imageFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
 	/** Blur applied to the background image. Defaults to 0. */
 	blur?: number;
 }
@@ -32,6 +34,10 @@ interface JsonSectionProps {
 	className?: string;
 	/** Gap between top-level items. Accepts any CSS length (e.g. '2rem', '40px'). */
 	gap?: string;
+	/** Padding before the first item. Defaults to '8rem'. */
+	paddingTop?: string;
+	/** Padding after the last item. Defaults to '8rem'. */
+	paddingBottom?: string;
 }
 
 function isGroup(item: JsonSectionChild): item is JsonSectionGroup {
@@ -66,7 +72,7 @@ function ScrollGroup({
 	);
 }
 
-function JsonSection({ background, items, className, gap }: JsonSectionProps) {
+function JsonSection({ background, items, className, gap, paddingTop, paddingBottom }: JsonSectionProps) {
 	const content = items.map((item, i) => {
 		if (isGroup(item) && item.scrollBackground) {
 			return (
@@ -77,7 +83,7 @@ function JsonSection({ background, items, className, gap }: JsonSectionProps) {
 				/>
 			);
 		}
-		return <JsonSectionItem key={i} item={item} />;
+		return <JsonSectionItem key={i} item={item} gap={gap} />;
 	});
 
 	if (!background) {
@@ -88,9 +94,12 @@ function JsonSection({ background, items, className, gap }: JsonSectionProps) {
 		<ParallaxCanvas
 			image={background.image}
 			imagePosition={background.imagePosition}
+			imageFit={background.imageFit}
 			blur={background.blur}
 			className={className}
 			gap={gap}
+		paddingTop={paddingTop}
+		paddingBottom={paddingBottom}
 		>
 			{content}
 		</ParallaxCanvas>

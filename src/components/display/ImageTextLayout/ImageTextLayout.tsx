@@ -1,5 +1,6 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { Image } from '../../../types/basic.types';
+import { Lightbox } from '../Lightbox/Lightbox';
 import './ImageTextLayout.css';
 
 type ImageTextLayoutProps = {
@@ -23,6 +24,8 @@ type ImageTextLayoutProps = {
 	reverseColumns?: boolean;
 	/** Override stacking order on mobile. 'image-first' always puts the image on top; 'text-first' always puts text on top. Defaults to following the desktop order. */
 	mobileOrder?: 'image-first' | 'text-first';
+	/** When true and an image is provided, clicking the image opens it full-size in a lightbox. */
+	zoomable?: boolean;
 } & (
 	| { image: Image; imageSlot?: never }
 	| { image?: never; imageSlot: ReactNode }
@@ -48,8 +51,39 @@ function ImageTextLayout({
 	imageCaption,
 	reverseColumns = false,
 	mobileOrder,
+	zoomable = false,
 }: ImageTextLayoutProps) {
+	const [lightboxOpen, setLightboxOpen] = useState(false);
 	const mobileClass = mobileOrder ? `mobile-${mobileOrder}` : '';
+
+	const imageEl = image
+		? zoomable
+			? (
+				<>
+					<img
+						src={image.src}
+						alt={image.alt}
+						className='zoomable-image'
+						style={{ cursor: 'zoom-in' }}
+						onClick={() => setLightboxOpen(true)}
+					/>
+					<Lightbox open={lightboxOpen} onClose={() => setLightboxOpen(false)}>
+						<div className='zoomable-image-lightbox-content'>
+							<img
+								src={image.src}
+								alt={image.alt}
+								className='zoomable-image-lightbox-img'
+							/>
+							{image.caption && (
+								<p className='zoomable-image-lightbox-caption'>{image.caption}</p>
+							)}
+						</div>
+					</Lightbox>
+				</>
+			)
+			: <img src={image.src} alt={image.alt} />
+		: null;
+
 	return (
 		<figure
 			className={`image-text-layout ${mobileClass} ${className}`.trim()}
@@ -74,22 +108,22 @@ function ImageTextLayout({
 							)}
 						</figcaption>
 					</div>
-					<div className='image-column'>
-						{imageSlot ?? <img src={image!.src} alt={image!.alt} />}
-						{imageCaption && (
-							<figcaption className='image-caption'>{imageCaption}</figcaption>
-						)}
-					</div>
-				</>
-			) : (
+				<div className='image-column'>
+					{imageSlot ?? imageEl}
+					{imageCaption && (
+						<figcaption className='image-caption'>{imageCaption}</figcaption>
+					)}
+				</div>
+			</>
+		) : (
 				<>
-					<div className='image-column'>
-						{imageSlot ?? <img src={image!.src} alt={image!.alt} />}
-						{imageCaption && (
-							<figcaption className='image-caption'>{imageCaption}</figcaption>
-						)}
-					</div>
-					<div className='text-column'>
+				<div className='image-column'>
+					{imageSlot ?? imageEl}
+					{imageCaption && (
+						<figcaption className='image-caption'>{imageCaption}</figcaption>
+					)}
+				</div>
+				<div className='text-column'>
 						<figcaption>
 							{children}
 							{additionalContent && (

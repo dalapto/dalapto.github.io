@@ -24,7 +24,7 @@ function useHoverBackground({ config, clearOptions }: UseHoverBackgroundOptions)
 	}, [config, setBackground]);
 
 	const onMouseLeave = useCallback(() => {
-		setBackground(null, clearOptions ?? { clearDelay: 100 });
+		setBackground(null, clearOptions ?? { clearDelay: 100, freezeObservers: false });
 	}, [clearOptions, setBackground]);
 
 	return { onMouseEnter, onMouseLeave };

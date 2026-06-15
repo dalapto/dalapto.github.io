@@ -56,6 +56,35 @@
 	margin-block-start: 8px;
 }
 
+.zoomable-image {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	object-position: center;
+}
+
+.zoomable-image-lightbox-content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 1rem;
+}
+
+.zoomable-image-lightbox-img {
+	max-width: 100%;
+	max-height: 80vh;
+	object-fit: contain;
+	display: block;
+}
+
+.zoomable-image-lightbox-caption {
+	margin-top: 0.75rem;
+	font-size: 0.85rem;
+	color: rgba(255, 255, 255, 0.8);
+	text-align: center;
+}
+
 @media (max-width: 600px) {
 	.image-text-layout {
 		flex-direction: column;

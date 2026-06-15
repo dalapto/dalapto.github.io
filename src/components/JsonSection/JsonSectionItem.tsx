@@ -2,7 +2,7 @@ import React from 'react';
 import type { JsonSectionChild, JsonSectionEntry } from './JsonSection.tsx';
 import { JsonPanel } from './JsonPanel';
 
-function JsonSectionItem({ item }: { item: JsonSectionChild }) {
+function JsonSectionItem({ item, gap }: { item: JsonSectionChild; gap?: string }) {
 	if (React.isValidElement(item)) {
 		return item;
 	}
@@ -13,13 +13,13 @@ function JsonSectionItem({ item }: { item: JsonSectionChild }) {
 		return (
 			<>
 				{entry.panels.map((panel, j) => (
-					<JsonSectionItem key={j} item={panel} />
+					<JsonSectionItem key={j} item={panel} gap={gap} />
 				))}
 			</>
 		);
 	}
 
-	return <JsonPanel {...entry} />;
+	return <JsonPanel {...entry} gap={gap} />;
 }
 
 export { JsonSectionItem };

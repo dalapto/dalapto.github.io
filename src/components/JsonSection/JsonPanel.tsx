@@ -32,6 +32,7 @@ function resolveImageSlot(slot: JsonSectionImageSlot): {
 					images={slot.images}
 					interval={slot.cyclerInterval ?? 4000}
 					minHeight={slot.cyclerMinHeight}
+					lightbox
 				/>
 			),
 		};
@@ -60,9 +61,7 @@ interface JsonPanelBase {
 	contentBackground?: string;
 	/** Min width of the text column. Defaults to '50%'. */
 	textMinWidth?: string;
-	/** Minimum height of the whole row. */
-	minHeight?: string;
-	/** Max width of the panel (only used when there is no visual slot). */
+	/** Max width of the panel content (text-only panels). */
 	maxWidth?: string;
 	/** Renders the text column first and the visual slot second. */
 	reverseColumns?: boolean;
@@ -74,6 +73,10 @@ interface JsonImageTextPanel extends JsonPanelBase {
 	kind: 'image-text';
 	/** The image or cycling gallery shown beside the text. */
 	imageSlot?: JsonSectionImageSlot;
+	/** When true, renders the image slot full-width above the text instead of side-by-side. */
+	stackImage?: boolean;
+	/** Max width of the stacked image container. Defaults to '600px'. */
+	stackImageMaxWidth?: string;
 	/** Min width of the image column. Defaults to '30%'. */
 	imageMinWidth?: string;
 	/** Max width of the image column. Defaults to '35%'. */
@@ -181,14 +184,19 @@ function resolveJsonSlot(props: JsonPanelData): JsonSlotResult | null {
 // JsonPanel — single component for all three panel kinds
 // ---------------------------------------------------------------------------
 
-function JsonPanel(props: JsonPanelData) {
+/** Passed down from JsonSection so internal panel spacing matches the section gap. */
+interface JsonPanelRenderProps {
+	gap?: string;
+}
+
+function JsonPanel(props: JsonPanelData & JsonPanelRenderProps) {
 	const {
 		header,
+		gap = '2rem',
 		content,
 		contentChildren,
 		contentBackground,
 		textMinWidth = '50%',
-		minHeight,
 		maxWidth,
 		reverseColumns,
 		mobileOrder,
@@ -203,18 +211,31 @@ function JsonPanel(props: JsonPanelData) {
 	);
 
 	const slot = resolveJsonSlot(props);
+	const stackImage = props.kind === 'image-text' && props.stackImage;
+	const stackImageMaxWidth =
+		props.kind === 'image-text' ? (props.stackImageMaxWidth ?? '600px') : '600px';
 
 	return (
-		<>
-			{header && <JsonHeader {...header} />}
-			{slot ? (
+		<div style={{ display: 'flex', flexDirection: 'column' }}>
+			{header && (
+				<div style={{ marginBottom: gap }}>
+					<JsonHeader {...header} />
+				</div>
+			)}
+			{slot && stackImage ? (
+				<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap }}>
+					<div style={{ width: '100%', maxWidth: stackImageMaxWidth }}>
+						{slot.node}
+					</div>
+					<div style={{ maxWidth, minWidth: 'fit-content' }}>{textContent}</div>
+				</div>
+			) : slot ? (
 				<ImageTextLayout
 					imageSlot={slot.node}
 					imageMinWidth={slot.minWidth}
 					imageMaxWidth={slot.maxWidth}
 					imageCaption={slot.caption}
 					textMinWidth={textMinWidth}
-					minHeight={minHeight}
 					reverseColumns={reverseColumns}
 					mobileOrder={mobileOrder}
 				>
@@ -226,15 +247,12 @@ function JsonPanel(props: JsonPanelData) {
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'center',
-						minHeight,
-						padding:
-							props.kind === 'text' ? props.padding ?? '2rem 1rem' : undefined,
 					}}
 				>
-					<div style={{ maxWidth }}>{textContent}</div>
+					<div style={{ maxWidth, minWidth: 'fit-content' }}>{textContent}</div>
 				</div>
 			)}
-		</>
+		</div>
 	);
 }
 
@@ -242,6 +260,7 @@ export { JsonPanel };
 export type {
 	JsonImageTextPanel,
 	JsonPanelData,
+	JsonPanelRenderProps,
 	JsonSectionImageSlot,
 	JsonTextPanelData,
 	JsonTilePanelData,

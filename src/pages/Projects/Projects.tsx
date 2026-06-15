@@ -32,7 +32,9 @@ const projectSection: JsonImageTextPanel = {
 function Projects() {
 	const { setBackground } = useBackground();
 	useEffect(() => {
-		setBackground(null);
+		// Clear any hover-driven background without freezing scroll observers —
+		// freezing is App.tsx's responsibility on navigation.
+		setBackground(null, { freezeObservers: false });
 	}, [setBackground]);
 
 	return <JsonSection items={[projectSection]} />;

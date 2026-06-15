@@ -4,6 +4,8 @@ import { Image } from '../types/basic.types';
 interface BackgroundConfig {
 	image: Image;
 	imagePosition?: string;
+	/** CSS object-fit for the background image. Defaults to 'cover'. */
+	imageFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
 	blur?: number;
 	/** Fade transition duration in ms. Defaults to 400. */
 	transitionDuration?: number;
@@ -12,6 +14,13 @@ interface BackgroundConfig {
 interface SetBackgroundOptions {
 	/** Delay in ms before clearing the background when passing null. Ignored for non-null configs. */
 	clearDelay?: number;
+	/**
+	 * When true, freeze the scroll observers after this call so that
+	 * in-flight IntersectionObserver callbacks (e.g. from an outgoing page's
+	 * scroll-to-top) cannot override it. Pass false on initial mount clears
+	 * where no outgoing page exists. Defaults to true.
+	 */
+	freezeObservers?: boolean;
 }
 
 interface ScrollObserverOptions {
@@ -61,8 +70,13 @@ function BackgroundProvider({ children }: { children: ReactNode }) {
 			}
 			// Freeze scroll observers so that the outgoing page's IntersectionObserver
 			// callbacks (triggered by scroll-to-top) cannot override this direct call.
-			observersFrozen.current = true;
-			intersectingMap.current.clear();
+			// Pass freezeObservers: false to skip freezing (e.g. on initial page load
+			// where there is no outgoing page).
+			const shouldFreeze = opts?.freezeObservers !== false;
+			if (shouldFreeze) {
+				observersFrozen.current = true;
+				intersectingMap.current.clear();
+			}
 			if (config === null && opts?.clearDelay) {
 				clearTimer.current = setTimeout(() => {
 					setBackgroundState(null);
