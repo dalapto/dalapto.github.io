@@ -1,8 +1,8 @@
 # dalapto.github.io
 
-This is the repository for my personal portfolio website.
+This is the repository for my personal portfolio website [dalapto.github.io](https://dalapto.github.io)
 
-## Here be dragons 🐉
+### Here be dragons 🐉
 
 This is still very much in progress...
 
@@ -52,21 +52,29 @@ public/
 
 ### Content
 
-- [ ] Flesh out **About** page
-- [ ] Flesh out **Recyclotron** project
-- [ ] Flesh out **Litter** project
-- [ ] Flesh out **M2TW** page
-- [ ] Flesh out **RON** page
-- [ ] Flesh out **Youth Work** page
-- [ ] Flesh out **Blog** page
+- [x] **About** page
+- [x] **Recyclotron** project
+- [x] **Litter** project
+
+- [ ] **Projects** page
+- [ ] **M2TW / RTW** page
+- [ ] **RON** page
+
+- [ ] **Youth Work** page
+
+- [ ] **Writing** page
+- [ ] **PI** page
+- [ ] **Analog** page
+- [ ] **Kinsfolk** page
 
 ### Projects
 
-- [ ] Design **Cover Letter Generator** project
-- [ ] Design **Clipboard** project
+- [ ] **Clipboard** project (using Pastebin)?
+- [ ] **Cover Letter Generator** project
+- [ ] **Munro Bagger** project
 
 ### Tech Debt
 
-- [ ] Implement image storage (Firebase?)
-- [ ] Write unit tests in **Jest**
-- [ ] Write integration tests in **Playwright**
+- [ ] Image storage (Firebase / own api?)
+- [ ] Unit tests in **Jest**
+- [ ] Integration tests in **Playwright** and **MSW**
