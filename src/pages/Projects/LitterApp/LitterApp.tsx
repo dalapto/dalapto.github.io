@@ -1,9 +1,6 @@
 import React from 'react';
 import projectsPanel from '../../../components/content/projectsPanel';
-import type {
-	JsonImageTextPanel,
-	JsonTextPanelData,
-} from '../../../components/JsonSection/JsonPanel';
+import type { JsonImageTextPanel } from '../../../components/JsonSection/JsonPanel';
 import { JsonSection } from '../../../components/JsonSection/JsonSection';
 import { colors } from '../../../constants/colors';
 import { ImgPaths } from '../../../constants/img-paths';
@@ -173,7 +170,6 @@ const uiPanel: JsonImageTextPanel = {
 		'',
 		`Users can also 'keep' a message for later and comment on it.`,
 		'',
-		'',
 	],
 	contentBackground: colors.primary,
 };
@@ -190,15 +186,6 @@ const testingPanel: JsonImageTextPanel = {
 		'',
 		`I directed them as little as possible, so I could observe their ${userJourney} more naturally.`,
 		'I then asked them questions based on the goals, on a scale of 1 to 5.',
-		'',
-	],
-	contentBackground: colors.primary,
-	maxWidth: '60%',
-};
-
-const finalPanel: JsonTextPanelData = {
-	kind: 'text',
-	content: [
 		'',
 		'My work was evaluated through presentations and a project report.',
 		'I scored highly and ended up getting a First-class degree!',
@@ -232,7 +219,6 @@ function LitterApp() {
 					kind: 'group',
 					panels: [firebasePanel, kotlinPanel, uiPanel, testingPanel],
 				},
-				finalPanel,
 				projectsPanel,
 			]}
 		/>

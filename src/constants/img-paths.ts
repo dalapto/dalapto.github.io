@@ -96,27 +96,35 @@ export const ImgPaths = {
 		},
 
 		recylotron: {
-			models: {
-				onBins: `${IMG_ROOT}/pages/recylotron/3dmodels/onbins.png`,
-				icon: `${IMG_ROOT}/pages/recylotron/3dmodels/icon.png`,
-				frontView: `${IMG_ROOT}/pages/recylotron/3dmodels/frontview1.png`,
-				backView: `${IMG_ROOT}/pages/recylotron/3dmodels/backview2.png`,
-				closeup: `${IMG_ROOT}/pages/recylotron/3dmodels/closeup.png`,
-				model3: `${IMG_ROOT}/pages/recylotron/3dmodels/model3.png`,
+			background: `${IMG_ROOT}/pages/recylotron/background.png`,
+			icon: `${IMG_ROOT}/pages/recylotron/icon.png`,
+			logo: `${IMG_ROOT}/pages/recylotron/logo.png`,
+			graphs: {
+				cmatrix: `${IMG_ROOT}/pages/recylotron/graphs/cmatrix.png`,
+				knn: `${IMG_ROOT}/pages/recylotron/graphs/knn.png`,
+				metrics: `${IMG_ROOT}/pages/recylotron/graphs/metrics.png`,
+				purity: `${IMG_ROOT}/pages/recylotron/graphs/purity.png`,
+				resnet: `${IMG_ROOT}/pages/recylotron/graphs/resnet.png`,
+				sortingPerformance: `${IMG_ROOT}/pages/recylotron/graphs/sortingperformance.png`,
 			},
-			art: {
-				concept1: `${IMG_ROOT}/pages/recylotron/art/concept1.jpg`,
-				concept2: `${IMG_ROOT}/pages/recylotron/art/concept2.png`,
-				highlight1: `${IMG_ROOT}/pages/recylotron/art/highlight1.png`,
+			hw: {
+				back: `${IMG_ROOT}/pages/recylotron/hw/back.png`,
+				front: `${IMG_ROOT}/pages/recylotron/hw/front.png`,
+				lego1: `${IMG_ROOT}/pages/recylotron/hw/lego1.jpg`,
+				lego2: `${IMG_ROOT}/pages/recylotron/hw/lego2.jpg`,
 			},
-			photos: {
-				entireSystem: `${IMG_ROOT}/pages/recylotron/photos/enitre system.jpg`,
-				feedbackScreen: `${IMG_ROOT}/pages/recylotron/photos/feedback screen.jpg`,
-				legoBody1: `${IMG_ROOT}/pages/recylotron/photos/legobody1.jpg`,
-				legoBody2: `${IMG_ROOT}/pages/recylotron/photos/legobody2.jpg`,
-				onBins: `${IMG_ROOT}/pages/recylotron/photos/on_bins.jpg`,
-				rails: `${IMG_ROOT}/pages/recylotron/photos/rails.jpg`,
-				railsSide: `${IMG_ROOT}/pages/recylotron/photos/rails_side.jpg`,
+			plan: {
+				gant: `${IMG_ROOT}/pages/recylotron/plan/gant.png`,
+				rails: `${IMG_ROOT}/pages/recylotron/plan/rails.png`,
+				trapdoor: `${IMG_ROOT}/pages/recylotron/plan/trapdoor.jpg`,
+			},
+			use: {
+				flow: `${IMG_ROOT}/pages/recylotron/use/flow.png`,
+				step1: `${IMG_ROOT}/pages/recylotron/use/step1.png`,
+			},
+			other: {
+				model1: `${IMG_ROOT}/pages/recylotron/other/model1.png`,
+				rails: `${IMG_ROOT}/pages/recylotron/other/rails.jpg`,
 			},
 		},
 

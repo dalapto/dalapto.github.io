@@ -41,7 +41,7 @@ const gapYah2Link = {
 const recylotronLink = {
 	text: 'Recyclotron',
 	link: RECYCLOTRON_PATH,
-	img: ImgPaths.pages.recylotron.models.icon,
+	img: ImgPaths.pages.recylotron.icon,
 };
 
 const litterAppLink = {
@@ -168,6 +168,31 @@ const androidLink = {
 	img: ImgPaths.logo.android,
 };
 
+const raspberryPiLink = {
+	text: 'Raspberry Pi',
+	link: 'https://www.raspberrypi.com/',
+};
+
+const machineLearningLink = {
+	text: 'Machine Learning (ML)',
+	link: 'https://en.wikipedia.org/wiki/Machine_learning',
+};
+
+const knnLink = {
+	text: 'K-Nearest Neighbours (KNN)',
+	link: 'https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm',
+};
+
+const resNetLink = {
+	text: 'Residual Neural Network (ResNet)',
+	link: 'https://en.wikipedia.org/wiki/Residual_neural_network',
+};
+
+const mApLink = {
+	text: 'Mean Average Precision (mAP)',
+	link: 'https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#Mean_average_precision',
+};
+
 const linkedinProfileLink = {
 	text: 'LinkedIn',
 	link: 'https://www.linkedin.com/in/david-mcalister/details/experience/',
@@ -192,6 +217,31 @@ const externalLinks: ExternalLink[] = [
 	},
 ];
 
+const recyclingPollsLink = {
+	text: 'US polls',
+	link: 'https://www.ipsos.com/sites/default/files/news_and_polls/2011-07/5285.pdf',
+};
+
+const recyclotronDocsLink = {
+	text: 'git repo',
+	link: 'https://github.com/dalapto/sdp-docs/tree/main',
+};
+
+const recyclotronProjectPlanLink = {
+	text: 'here',
+	link: 'https://github.com/dalapto/sdp-docs/blob/main/docs/group-8-projectplan.pdf',
+};
+
+const recyclotronUserGuideLink = {
+	text: 'here',
+	link: 'https://github.com/dalapto/sdp-docs/blob/main/docs/group-8-userguide.pdf',
+};
+
+const soundsnapLink = {
+	text: 'soundsnap.com',
+	link: 'https://www.soundsnap.com/',
+};
+
 const footerLinks: TooltipLink[] = [
 	{ text: 'Vite', link: 'https://vitejs.dev/', img: ImgPaths.logo.vite },
 	{ text: 'React', link: 'https://react.dev/', img: ImgPaths.logo.react },
@@ -210,6 +260,11 @@ const footerLinks: TooltipLink[] = [
 
 export {
 	androidLink,
+	knnLink,
+	mApLink,
+	machineLearningLink,
+	raspberryPiLink,
+	resNetLink,
 	androidStudioLink,
 	apiLink,
 	aStarLink,
@@ -237,7 +292,12 @@ export {
 	powergrabLink,
 	projectsLink,
 	recylotronLink,
+	recyclingPollsLink,
+	recyclotronDocsLink,
+	recyclotronProjectPlanLink,
+	recyclotronUserGuideLink,
 	sdlcLink,
+	soundsnapLink,
 	sqlLink,
 	typescriptLink,
 	userJourneyLink,
