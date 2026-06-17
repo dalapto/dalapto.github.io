@@ -7,6 +7,7 @@ import { FooterBar } from './components/layout/FooterBar/FooterBar';
 import { NavBar } from './components/layout/NavBar/NavBar';
 import { BackgroundProvider, useBackground } from './context/BackgroundContext';
 import { NavRoute, navRoutes } from './routes';
+import { getRouteData } from './routes-data';
 
 function flattenRoutes(routes: NavRoute[]): NavRoute[] {
 	return routes.flatMap((r) => [r, ...flattenRoutes(r.children ?? [])]);
@@ -57,12 +58,11 @@ function AppInner() {
 	const previousPage = useRef<string | null>(null);
 
 	useEffect(() => {
-		document.title = `${
-			currentPageSlice == ''
-				? 'dalapto | Welcome'
-				: `${currentPageSlice} | dalapto.github.io`
-		}`;
-	}, [currentPageSlice]);
+		const routeData = getRouteData(currentPage);
+		document.title =
+			routeData?.ogTitle ??
+			(currentPageSlice === '' ? 'dalapto | Welcome' : `${currentPageSlice} | dalapto.github.io`);
+	}, [currentPage, currentPageSlice]);
 
 	useEffect(() => {
 		// Only freeze scroll observers when navigating away from a previous page.

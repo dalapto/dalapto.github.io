@@ -76,7 +76,8 @@ export const routesData: RouteData[] = [
 	},
 ];
 
-/** Look up route data by path. */
+/** Look up route data by path. Strips trailing slashes so /uni/recyclotron/ matches /uni/recyclotron. */
 export function getRouteData(path: string): RouteData | undefined {
-	return routesData.find((r) => r.path === path);
+	const normalised = path.endsWith('/') && path.length > 1 ? path.slice(0, -1) : path;
+	return routesData.find((r) => r.path === normalised);
 }
