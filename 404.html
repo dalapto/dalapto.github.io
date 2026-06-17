@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Redirecting...</title>
+		<script>
+			var path = window.location.pathname;
+			try {
+				sessionStorage.setItem('redirect', path);
+				window.location.replace('/');
+			} catch (e) {
+				// sessionStorage unavailable (private mode, storage blocked, etc.)
+				// Fall back to encoding the path in the query string
+				window.location.replace('/?/' + path.slice(1));
+			}
+		</script>
+	</head>
+	<body></body>
+</html>
