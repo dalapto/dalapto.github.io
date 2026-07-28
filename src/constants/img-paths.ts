@@ -126,6 +126,7 @@ export const ImgPaths = {
 				model1: `${IMG_ROOT}/pages/recylotron/other/model1.png`,
 				rails: `${IMG_ROOT}/pages/recylotron/other/rails.jpg`,
 				photo2: `${IMG_ROOT}/pages/recylotron/other/photo2.jpg`,
+				feedback: `${IMG_ROOT}/pages/recylotron/other/feedback.jpg`,
 			},
 		},
 

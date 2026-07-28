@@ -46,24 +46,23 @@ const headerPanel: JsonImageTextPanel = {
 	},
 
 	content: [
-		'Our challenge was to find a problem, design a robot to solve it and then build a prototype to prove our solution.',
-		'We chose to make an auto-sorting recycling bin, called Recyclotron.',
+		'For our Robot group project we made an auto-sorting recycling bin, called Recyclotron.',
 		'',
-		'Recycling is a choice, and only about 50% of the UK chooses to.',
-		`${recyclingPolls} show that consumers find the process inconvenient and time-consuming.`,
+		'Only about 50% of the population chooses to recycle every day, as they find it inconvenient and time-consuming.',
+		`${recyclingPolls}`,
 		'',
 	],
+	headerBackground: colors.background,
 	contentBackground: colors.primary,
 };
 
 const briefPanel: JsonImageTextPanel = {
 	kind: 'image-text',
 	content: [
+		"Users don't need to choose now - throw it into Recylotron and it recycles for you.",
+		'The instant rubbish lands in the bin, Recyclotron categorises and sorts it.',
 		'',
-		'Recylotron automates the process the second rubbish lands in the bin.',
-		'All the user needs to do is put the rubbish in the bin, and it would be sorted automatically.',
-		'',
-		'Users could adjust number of categories and train Recyclotron themselves.',
+		'Businesses could give it whatever categories they want and even train it using their own rubbish.',
 		'',
 		`You can view the full project plan ${projectPlan}.`,
 	],
@@ -75,9 +74,12 @@ const briefPanel: JsonImageTextPanel = {
 const howItWorksPanel: JsonImageTextPanel = {
 	kind: 'image-text',
 	content: [
-		'We made good progress, but had to pause work due to COVID lockdowns.',
+		'Our prototype worked like a train that lives on top of multiple bins.',
+		"Drop rubbish into a box, it's analysed, then the box then moves over and drops rubbish into the correct bin.",
 		'',
-		`Sadly the code is lost to time, but you can view documentation in this ${docs}.`,
+		'Despite COVID lockdowns, we finished a working prototype.',
+		'',
+		`The code is lost to time, but you can view documentation in this ${docs}.`,
 	],
 	imageSlot: useImages,
 	stackImage: true,
@@ -92,16 +94,16 @@ const hardwarePanel: JsonImageTextPanel = {
 	},
 	content: [
 		'',
-		'Recylotron is essentially a train that lives on top of a bin.',
-		'The box is where users drop rubbish in.',
+		'Our first prototype box users drop rubbish into was made out of lego.',
+		'That ran on two rails along the bins, using Arduino motors to move back and forth.',
 		'',
-		'Inside 2 simple webcams and an IR sensor collect data for classification.',
+		'Inside the box 2 simple webcams and an IR sensor collect data to analyse the rubbish.',
 		'Once users close the lid, electromagnets lock it while sorting takes place.',
-		`All these sensor values are fed into a ${raspberryPi}, which offloads classification to server.`,
-		'Cloud computing then suggests a category for the rubbish.',
+		`All these sensor values are fed into a ${raspberryPi}, which connects to a computer server.`,
+		'This server then analyses and suggests most likely category for the rubbish.',
 		'',
-		'Ultrasound sensors detect which bin the chamber is over, and calculates where to move.',
-		'Once over the correct bin, a trapdoor is opened and the rubbish falls in.',
+		'Ultrasound sensors detect which bin the box is over, so it can work out if it needs to move.',
+		'Once over the correct bin, a trapdoor opens to drop the rubbish in.',
 		'',
 		`You can view more details in the full user guide ${userGuide}.`,
 		'',
@@ -140,12 +142,12 @@ const classificationPanel2: JsonImageTextPanel = {
 	imageSlot: glassImages,
 	content: [
 		'',
-		'Plastic packaging is incredibly varied, was constantly mistaken for glass or paper.',
-		'Another camera angle, recorded audio and IR luminosity gave us more properties to work with.',
+		'Plastic packaging is incredibly varied, and was constantly mistaken for glass or paper.',
+		'Another camera angle, recorded audio and IR luminosity boosted performance a lot.',
 		'',
 		'If you close your eyes, hold the rubbish in your hand and clench your fist, what does it sound like?',
 		'Crisp packets or chocolate wrappers make a special scrunch, glass bottles clunk and metal cans clang.',
-		`We used audio from ${soundsnap} to train and test Recylotron.`,
+		`We also used audio from ${soundsnap} to train and test Recylotron to use that data too.`,
 		'',
 	],
 	contentBackground: colors.primary,
@@ -187,10 +189,10 @@ function Recyclotron() {
 			gap='8rem'
 			background={{
 				image: {
-					src: ImgPaths.pages.recylotron.background,
+					src: ImgPaths.pages.recylotron.other.feedback,
 					alt: 'LitterApp background image.',
 				},
-				imagePosition: 'center center',
+				imagePosition: 'center 100%',
 				imageFit: 'cover',
 			}}
 			items={[

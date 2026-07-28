@@ -53,6 +53,8 @@ function resolveImageSlot(slot: JsonSectionImageSlot): {
 interface JsonPanelBase {
 	/** Optional image-header rendered above the panel. */
 	header?: JsonHeaderProps;
+	/** Background colour applied to the header. */
+	headerBackground?: string;
 	/** Lines of text rendered in the text column. Empty strings become spacers. */
 	content: string[];
 	/** Extra React content rendered inside the content box, below the text. */
@@ -198,6 +200,7 @@ function JsonPanel(props: JsonPanelData & JsonPanelRenderProps) {
 		contentBackground,
 		textMinWidth = '50%',
 		maxWidth,
+		headerBackground,
 		reverseColumns,
 		mobileOrder,
 	} = props;
@@ -217,11 +220,32 @@ function JsonPanel(props: JsonPanelData & JsonPanelRenderProps) {
 
 	return (
 		<div style={{ display: 'flex', flexDirection: 'column' }}>
-			{header && (
-				<div style={{ marginBottom: gap }}>
-					<JsonHeader {...header} />
-				</div>
-			)}
+			{header &&
+				(headerBackground ? (
+					<div
+						style={{
+							marginBottom: gap,
+							display: 'flex',
+							justifyContent: 'center',
+						}}
+					>
+						<div
+							style={{
+								backgroundColor: headerBackground,
+								padding: '1rem',
+								borderRadius: '0.5rem',
+								maxWidth,
+								minWidth: 'fit-content',
+							}}
+						>
+							<JsonHeader {...header} />
+						</div>
+					</div>
+				) : (
+					<div style={{ marginBottom: gap }}>
+						<JsonHeader {...header} />
+					</div>
+				))}
 			{slot && stackImage ? (
 				<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap }}>
 					<div style={{ width: '100%', maxWidth: stackImageMaxWidth }}>

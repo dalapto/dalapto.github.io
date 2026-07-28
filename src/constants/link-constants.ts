@@ -218,7 +218,7 @@ const externalLinks: ExternalLink[] = [
 ];
 
 const recyclingPollsLink = {
-	text: 'US polls',
+	text: '[Ipsos 2011, Nine in Ten Adults Recycle, but Only Half Do So Daily]',
 	link: 'https://www.ipsos.com/sites/default/files/news_and_polls/2011-07/5285.pdf',
 };
 

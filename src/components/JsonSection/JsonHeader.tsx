@@ -28,6 +28,7 @@ interface JsonHeaderProps {
 	mobileWidth?: string;
 	/** imagePosition override for the mobile variant. Defaults to 'center 10%'. */
 	mobileImagePosition?: string;
+	
 }
 
 function JsonHeader({
