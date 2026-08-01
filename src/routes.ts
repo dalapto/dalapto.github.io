@@ -1,9 +1,10 @@
 import { LITTER_APP_PATH, RECYCLOTRON_PATH } from './constants/route-paths';
 import { About } from './pages/About/About';
 import { Home } from './pages/Home/Home';
+import { Clipboard } from './pages/Projects/Clipboard/Clipboard';
 import { LitterApp } from './pages/Projects/LitterApp/LitterApp';
 import { Medieval2TotalWar } from './pages/Projects/m2tw/m2tw';
-import { Recyclotron } from './pages/Projects/Recylotron/recylotron';
+import { Recyclotron } from './pages/Projects/Recylotron/Recylotron';
 import { RiseOfNations } from './pages/Projects/RON/Ron';
 import { YouthWork } from './pages/YouthWork/YouthWork';
 import { getRouteData } from './routes-data';
@@ -38,7 +39,7 @@ function og(path: string): Pick<NavRoute, 'ogTitle' | 'ogDescription' | 'ogImage
 
 const projectsRoutes: NavRoute[] = [
 	{ label: 'Cover Letter Generator', route: '/cover-letter-generator' },
-	{ label: 'Clipboard', route: '/clipboard' },
+	{ label: 'Clipboard', route: '/clipboard', component: Clipboard },
 ];
 
 const moddingRoutes: NavRoute[] = [

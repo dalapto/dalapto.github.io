@@ -24,4 +24,11 @@ interface ProjectPanel {
 	content: string[];
 }
 
-export { ExternalLink, Image, ProjectPanel, TooltipLink };
+type JsonTab = {
+	id: string;
+	label: string;
+	content: React.ReactNode;
+	icon?: string | React.ReactElement;
+};
+
+export { ExternalLink, Image, ProjectPanel, TooltipLink, type JsonTab };

@@ -1,4 +1,4 @@
-import type { JsonSectionImageSlot } from '../../../components/JsonSection/JsonPanel';
+import type { JsonSectionImageSlot } from '../../../components/Json/JsonSection/JsonPanel';
 import { ImgPaths } from '../../../constants/img-paths';
 
 const precursorImages: JsonSectionImageSlot = {
@@ -126,7 +126,8 @@ const testingImages: JsonSectionImageSlot = {
 		{
 			src: ImgPaths.pages.litter.testing.feedback,
 			alt: 'Screenshot of comments UI before and after feedback on colour contrast.',
-			caption: 'I got helpful bits of feedback like poor colour contrast for comments text.',
+			caption:
+				'I got helpful bits of feedback like poor colour contrast for comments text.',
 		},
 		{
 			src: ImgPaths.pages.litter.testing.zoom,
@@ -136,4 +137,10 @@ const testingImages: JsonSectionImageSlot = {
 	],
 };
 
-export { firebaseImages, precursorImages, premiseImages, testingImages, uiImages };
+export {
+	firebaseImages,
+	precursorImages,
+	premiseImages,
+	testingImages,
+	uiImages,
+};

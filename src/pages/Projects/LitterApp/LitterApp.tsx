@@ -1,8 +1,8 @@
 import React from 'react';
 import projectsPanel from '../../../components/content/projectsPanel';
-import type { JsonImageTextPanel } from '../../../components/JsonSection/JsonPanel';
-import { JsonSection } from '../../../components/JsonSection/JsonSection';
-import { colors } from '../../../constants/colors';
+import type { JsonImageTextPanel } from '../../../components/Json/JsonSection/JsonPanel';
+import { JsonSection } from '../../../components/Json/JsonSection/JsonSection';
+import { colours } from '../../../constants/colours';
 import { ImgPaths } from '../../../constants/img-paths';
 import {
 	androidLink,
@@ -86,7 +86,7 @@ const precursorPanel: JsonImageTextPanel = {
 		'',
 	],
 	imageSlot: precursorImages,
-	contentBackground: colors.primary,
+	contentBackground: colours.primary,
 	maxWidth: '60%',
 };
 
@@ -115,7 +115,7 @@ const premisePanel: JsonImageTextPanel = {
 		'Now I started thinking of <!<?how?>!> to do it...',
 		'',
 	],
-	contentBackground: colors.primary,
+	contentBackground: colours.primary,
 };
 
 const firebasePanel: JsonImageTextPanel = {
@@ -133,7 +133,7 @@ const firebasePanel: JsonImageTextPanel = {
 		`And as ${noSql} is so flexible, I could easily extend the schema.`,
 		'',
 	],
-	contentBackground: colors.primary,
+	contentBackground: colours.primary,
 	imageMaxWidth: '45%',
 	maxWidth: '100%',
 };
@@ -153,7 +153,7 @@ const kotlinPanel: JsonImageTextPanel = {
 		`The ${jvm} makes me wonder if LitterApp ${compiler} and run in a web browser...`,
 		'',
 	],
-	contentBackground: colors.primary,
+	contentBackground: colours.primary,
 };
 
 const uiPanel: JsonImageTextPanel = {
@@ -171,7 +171,7 @@ const uiPanel: JsonImageTextPanel = {
 		`Users can also 'keep' a message for later and comment on it.`,
 		'',
 	],
-	contentBackground: colors.primary,
+	contentBackground: colours.primary,
 };
 
 const testingPanel: JsonImageTextPanel = {
@@ -193,7 +193,7 @@ const testingPanel: JsonImageTextPanel = {
 		`You can view both code and report ${litterAppGithub}.`,
 		'',
 	],
-	contentBackground: colors.primary,
+	contentBackground: colours.primary,
 	maxWidth: '60%',
 };
 

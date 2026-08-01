@@ -1,11 +1,11 @@
 import React from 'react';
 import { PageInConstruction } from '../../components/display/PageInConstruction/PageInConstruction';
 
-function Blog() {
+function Writing() {
 	return (
-		<div className="App">
+		<div className="Writing">
 			<PageInConstruction></PageInConstruction>
 		</div>
 	);
 }
-export { Blog };
+export { Writing };

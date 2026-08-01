@@ -1,8 +1,9 @@
 import React from 'react';
-import type { JsonImageTextPanel } from '../../components/JsonSection/JsonPanel';
-import { JsonSection } from '../../components/JsonSection/JsonSection';
+import projectsPanel from '../../components/content/projectsPanel';
+import type { JsonImageTextPanel } from '../../components/Json/JsonSection/JsonPanel';
+import { JsonSection } from '../../components/Json/JsonSection/JsonSection';
 import { PageTile } from '../../components/layout/ResponsiveTile/PageTile';
-import { colors } from '../../constants/colors';
+import { colours } from '../../constants/colours';
 import {
 	formatLink,
 	gapYah2Link,
@@ -14,9 +15,8 @@ import {
 	sdlcLink,
 	vb6Link,
 } from '../../constants/link-constants';
-import projectsPanel from '../../components/content/projectsPanel';
-import { BackgroundConfig } from '../../context/BackgroundContext';
 import { LITTER_APP_PATH, RECYCLOTRON_PATH } from '../../constants/route-paths';
+import { BackgroundConfig } from '../../context/BackgroundContext';
 import type { Image } from '../../types/basic.types';
 import {
 	litterImages,
@@ -71,7 +71,7 @@ const blurbPanel: JsonImageTextPanel = {
 		'',
 		`...so my ${gapYah} ${gapYah2} was spent learning 📐 trigonometry...!`,
 	],
-	contentBackground: colors.primary,
+	contentBackground: colours.primary,
 };
 
 const uniPanel: JsonImageTextPanel = {
@@ -101,7 +101,7 @@ const uniPanel: JsonImageTextPanel = {
 		'Besides, the Informatics department was (mostly) well equipped to virtually assess.',
 		'',
 	],
-	contentBackground: colors.primary,
+	contentBackground: colours.primary,
 };
 
 const recyclotronPanel: JsonImageTextPanel = {
@@ -124,8 +124,11 @@ const recyclotronPanel: JsonImageTextPanel = {
 		`You can learn more on ${recylotron} project page.`,
 		'',
 	],
-	contentBackground: colors.primary,
-	contentChildren: projectTile({ label: 'Recyclotron', route: RECYCLOTRON_PATH }, recyclotronTileImage),
+	contentBackground: colours.primary,
+	contentChildren: projectTile(
+		{ label: 'Recyclotron', route: RECYCLOTRON_PATH },
+		recyclotronTileImage,
+	),
 };
 
 const litterPanel: JsonImageTextPanel = {
@@ -146,8 +149,11 @@ const litterPanel: JsonImageTextPanel = {
 		`You can learn more on the ${litterApp} project page.`,
 		'',
 	],
-	contentBackground: colors.primary,
-	contentChildren: projectTile({ label: 'LitterApp', route: LITTER_APP_PATH }, litterTileImage),
+	contentBackground: colours.primary,
+	contentChildren: projectTile(
+		{ label: 'LitterApp', route: LITTER_APP_PATH },
+		litterTileImage,
+	),
 };
 
 const projectsBackground: BackgroundConfig = {

@@ -2,7 +2,7 @@
  * Shared colour palette for inline JS/TSX styles.
  * Solid equivalents are available as CSS custom properties in src/styles/variables.css.
  */
-export const colors = {
+export const colours = {
 	primary: '#282c34',
 	secondary: '#ffa865',
 	text: '#ecf0f1',

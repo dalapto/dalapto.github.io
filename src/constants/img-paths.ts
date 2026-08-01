@@ -50,6 +50,12 @@ export const ImgPaths = {
 			archStill: `${IMG_ROOT}/pages/about/arch-still.jpeg`,
 		},
 
+		clipboard: {
+			graffiti: `${IMG_ROOT}/pages/clipboard/graffiti.JPEG`,
+			floorplan: `${IMG_ROOT}/pages/clipboard/floorplan.jpg`,
+			windowapple: `${IMG_ROOT}/pages/clipboard/windowapple.JPEG`,
+		},
+
 		litter: {
 			app: {
 				background: `${IMG_ROOT}/pages/litter/app/background.png`,

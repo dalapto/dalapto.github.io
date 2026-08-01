@@ -1,8 +1,8 @@
 import React from 'react';
 import projectsPanel from '../../../components/content/projectsPanel';
-import type { JsonImageTextPanel } from '../../../components/JsonSection/JsonPanel';
-import { JsonSection } from '../../../components/JsonSection/JsonSection';
-import { colors } from '../../../constants/colors';
+import type { JsonImageTextPanel } from '../../../components/Json/JsonSection/JsonPanel';
+import { JsonSection } from '../../../components/Json/JsonSection/JsonSection';
+import { colours } from '../../../constants/colours';
 import { ImgPaths } from '../../../constants/img-paths';
 import {
 	formatLink,
@@ -14,6 +14,7 @@ import {
 	recyclotronDocsLink,
 	recyclotronProjectPlanLink,
 	recyclotronUserGuideLink,
+	recycylotronYoutubeLink,
 	resNetLink,
 	soundsnapLink,
 } from '../../../constants/link-constants';
@@ -37,6 +38,7 @@ const docs = formatLink(recyclotronDocsLink);
 const projectPlan = formatLink(recyclotronProjectPlanLink);
 const userGuide = formatLink(recyclotronUserGuideLink);
 const soundsnap = formatLink(soundsnapLink);
+const recycylotronVideo = formatLink(recycylotronYoutubeLink);
 
 const headerPanel: JsonImageTextPanel = {
 	kind: 'image-text',
@@ -46,14 +48,14 @@ const headerPanel: JsonImageTextPanel = {
 	},
 
 	content: [
-		'For our Robot group project we made an auto-sorting recycling bin, called Recyclotron.',
+		`For our Robot group project we made an auto-sorting recycling bin, called Recyclotron. ${recycylotronVideo}`,
 		'',
 		'Only about 50% of the population chooses to recycle every day, as they find it inconvenient and time-consuming.',
 		`${recyclingPolls}`,
 		'',
 	],
-	headerBackground: colors.background,
-	contentBackground: colors.primary,
+	headerBackground: colours.background,
+	contentBackground: colours.primary,
 };
 
 const briefPanel: JsonImageTextPanel = {
@@ -67,7 +69,7 @@ const briefPanel: JsonImageTextPanel = {
 		`You can view the full project plan ${projectPlan}.`,
 	],
 	imageSlot: planImages,
-	contentBackground: colors.primary,
+	contentBackground: colours.primary,
 	maxWidth: '65%',
 };
 
@@ -83,7 +85,7 @@ const howItWorksPanel: JsonImageTextPanel = {
 	],
 	imageSlot: useImages,
 	stackImage: true,
-	contentBackground: colors.primary,
+	contentBackground: colours.primary,
 	maxWidth: '50%',
 };
 
@@ -109,7 +111,7 @@ const hardwarePanel: JsonImageTextPanel = {
 		'',
 	],
 	imageSlot: hwImages,
-	contentBackground: colors.primary,
+	contentBackground: colours.primary,
 };
 
 const classificationPanel: JsonImageTextPanel = {
@@ -133,7 +135,7 @@ const classificationPanel: JsonImageTextPanel = {
 		'',
 	],
 	imageSlot: knnImages,
-	contentBackground: colors.primary,
+	contentBackground: colours.primary,
 };
 
 const classificationPanel2: JsonImageTextPanel = {
@@ -150,7 +152,7 @@ const classificationPanel2: JsonImageTextPanel = {
 		`We also used audio from ${soundsnap} to train and test Recylotron to use that data too.`,
 		'',
 	],
-	contentBackground: colors.primary,
+	contentBackground: colours.primary,
 };
 
 const classificationPanel3: JsonImageTextPanel = {
@@ -164,7 +166,7 @@ const classificationPanel3: JsonImageTextPanel = {
 		'',
 	],
 	imageSlot: resnetImages,
-	contentBackground: colors.primary,
+	contentBackground: colours.primary,
 };
 
 const classificationPanel4: JsonImageTextPanel = {
@@ -180,7 +182,7 @@ const classificationPanel4: JsonImageTextPanel = {
 		'',
 	],
 	imageSlot: metricsImages,
-	contentBackground: colors.primary,
+	contentBackground: colours.primary,
 };
 
 function Recyclotron() {

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Image } from '../../types/basic.types.ts';
-import '../layout/ImageHeader/ImageHeader.css';
-import { ImageHeader } from '../layout/ImageHeader/ImageHeader.tsx';
+import { Image } from '../../../types/basic.types.ts';
+import '../../layout/ImageHeader/ImageHeader.css';
+import { ImageHeader } from '../../layout/ImageHeader/ImageHeader.tsx';
 
 interface JsonHeaderProps {
 	/** When omitted, a plain text header is rendered instead of an image header. */
@@ -28,7 +28,6 @@ interface JsonHeaderProps {
 	mobileWidth?: string;
 	/** imagePosition override for the mobile variant. Defaults to 'center 10%'. */
 	mobileImagePosition?: string;
-	
 }
 
 function JsonHeader({

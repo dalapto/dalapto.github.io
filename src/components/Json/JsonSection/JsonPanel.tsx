@@ -1,9 +1,11 @@
 import React, { ReactNode } from 'react';
-import type { Image } from '../../types/basic.types';
-import { ImageCycler } from '../display/ImageCycler/ImageCycler';
-import { ImageTextLayout } from '../display/ImageTextLayout/ImageTextLayout';
-import { TextList } from '../display/TextList/TextList';
-import { PageTile } from '../layout/ResponsiveTile/PageTile';
+import type { Image } from '../../../types/basic.types';
+import type { TabbedPanelProps } from '../JsonTabs/TabbedPanel';
+import { TabbedPanel } from '../JsonTabs/TabbedPanel';
+import { ImageCycler } from '../../display/ImageCycler/ImageCycler';
+import { ImageTextLayout } from '../../display/ImageTextLayout/ImageTextLayout';
+import { TextList } from '../../display/TextList/TextList';
+import { PageTile } from '../../layout/ResponsiveTile/PageTile';
 import { JsonHeader, type JsonHeaderProps } from './JsonHeader';
 
 // ---------------------------------------------------------------------------
@@ -103,7 +105,15 @@ interface JsonTilePanelData extends JsonPanelBase {
 	tileMaxWidth?: string;
 }
 
-type JsonPanelData = JsonImageTextPanel | JsonTextPanelData | JsonTilePanelData;
+interface JsonTabsPanelData extends TabbedPanelProps {
+	kind: 'tabs';
+}
+
+type JsonPanelData =
+	| JsonImageTextPanel
+	| JsonTextPanelData
+	| JsonTilePanelData
+	| JsonTabsPanelData;
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -192,6 +202,11 @@ interface JsonPanelRenderProps {
 }
 
 function JsonPanel(props: JsonPanelData & JsonPanelRenderProps) {
+	if (props.kind === 'tabs') {
+		const { kind: _kind, gap: _gap, ...tabbedProps } = props;
+		return <TabbedPanel {...tabbedProps} />;
+	}
+
 	const {
 		header,
 		gap = '2rem',
@@ -216,7 +231,7 @@ function JsonPanel(props: JsonPanelData & JsonPanelRenderProps) {
 	const slot = resolveJsonSlot(props);
 	const stackImage = props.kind === 'image-text' && props.stackImage;
 	const stackImageMaxWidth =
-		props.kind === 'image-text' ? (props.stackImageMaxWidth ?? '600px') : '600px';
+		props.kind === 'image-text' ? props.stackImageMaxWidth ?? '600px' : '600px';
 
 	return (
 		<div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -247,7 +262,14 @@ function JsonPanel(props: JsonPanelData & JsonPanelRenderProps) {
 					</div>
 				))}
 			{slot && stackImage ? (
-				<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap }}>
+				<div
+					style={{
+						display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'center',
+						gap,
+					}}
+				>
 					<div style={{ width: '100%', maxWidth: stackImageMaxWidth }}>
 						{slot.node}
 					</div>
@@ -286,6 +308,7 @@ export type {
 	JsonPanelData,
 	JsonPanelRenderProps,
 	JsonSectionImageSlot,
+	JsonTabsPanelData,
 	JsonTextPanelData,
 	JsonTilePanelData,
 };

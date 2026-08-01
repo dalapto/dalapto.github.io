@@ -1,4 +1,4 @@
-import type { JsonSectionImageSlot } from '../../../components/JsonSection/JsonPanel';
+import type { JsonSectionImageSlot } from '../../../components/Json/JsonSection/JsonPanel';
 import { ImgPaths } from '../../../constants/img-paths';
 
 const r = ImgPaths.pages.recylotron;
@@ -69,19 +69,19 @@ const hwImages: JsonSectionImageSlot = {
 const glassImages: JsonSectionImageSlot = {
 	images: [
 		{
-		src: r.graphs.cmatrix,
-		alt: 'Confusion matrix for the KNN model.',
-		caption:
-			'KNN confusion matrix showing how well the model predicted each category.',
-	},
-	{
-		src: r.graphs.purity,
-		alt: 'Graph showing purity of Recyclotron compared to French Recycling Centre standards.',
-		caption:
-			'Graph showing purity of Recyclotron compared to French Recycling Centre standards.',
-	},
-	]
-}
+			src: r.graphs.cmatrix,
+			alt: 'Confusion matrix for the KNN model.',
+			caption:
+				'KNN confusion matrix showing how well the model predicted each category.',
+		},
+		{
+			src: r.graphs.purity,
+			alt: 'Graph showing purity of Recyclotron compared to French Recycling Centre standards.',
+			caption:
+				'Graph showing purity of Recyclotron compared to French Recycling Centre standards.',
+		},
+	],
+};
 
 const knnImages: JsonSectionImageSlot = {
 	images: [
@@ -123,11 +123,11 @@ const metricsImages: JsonSectionImageSlot = {
 };
 
 export {
+	glassImages,
 	hwImages,
 	knnImages,
 	metricsImages,
 	planImages,
 	resnetImages,
 	useImages,
-	glassImages,
 };
