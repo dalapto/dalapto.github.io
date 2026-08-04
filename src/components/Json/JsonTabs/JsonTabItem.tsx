@@ -16,6 +16,9 @@ function JsonTabItem({ label, id, icon, ...rest }: JsonTabItemProps) {
 			id={`tab-${id}`}
 			aria-controls={`tabpanel-${id}`}
 			icon={icon}
+			sx={{
+				fontWeight: 'bold',
+			}}
 			{...rest}
 		/>
 	);

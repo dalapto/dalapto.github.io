@@ -1,7 +1,7 @@
 import { LITTER_APP_PATH, RECYCLOTRON_PATH } from './constants/route-paths';
 import { About } from './pages/About/About';
 import { Home } from './pages/Home/Home';
-import { Clipboard } from './pages/Projects/Clipboard/Clipboard';
+import { Clipboard } from './pages/Projects/Clipboard/ClipboardPage';
 import { LitterApp } from './pages/Projects/LitterApp/LitterApp';
 import { Medieval2TotalWar } from './pages/Projects/m2tw/m2tw';
 import { Recyclotron } from './pages/Projects/Recylotron/Recylotron';

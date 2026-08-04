@@ -6,6 +6,8 @@ import { PageInConstruction } from './components/display/PageInConstruction/Page
 import { FooterBar } from './components/layout/FooterBar/FooterBar';
 import { NavBar } from './components/layout/NavBar/NavBar';
 import { BackgroundProvider, useBackground } from './context/BackgroundContext';
+import { SupabaseProvider } from './context/SupabaseContext';
+import { ToastProvider } from './context/ToastProvider';
 import { NavRoute, navRoutes } from './routes';
 import { getRouteData } from './routes-data';
 
@@ -116,7 +118,11 @@ function AppInner() {
 function App() {
 	return (
 		<BackgroundProvider>
-			<AppInner />
+			<SupabaseProvider>
+				<ToastProvider>
+					<AppInner />
+				</ToastProvider>
+			</SupabaseProvider>
 		</BackgroundProvider>
 	);
 }

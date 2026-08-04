@@ -10,6 +10,7 @@ interface TabbedPanelProps {
 	ariaLabel?: string;
 	orientation?: 'horizontal' | 'vertical';
 	initialTabId?: string;
+	tabSize?: 'medium' | 'large';
 }
 
 function TabbedPanel({
@@ -17,6 +18,7 @@ function TabbedPanel({
 	ariaLabel = 'page tabs',
 	orientation,
 	initialTabId,
+	tabSize,
 }: TabbedPanelProps) {
 	const { currentTab, handleChange } = useTabState(tabs, initialTabId);
 
@@ -28,6 +30,7 @@ function TabbedPanel({
 				currentTab={currentTab}
 				handleChange={handleChange}
 				orientation={orientation}
+				tabSize={tabSize}
 			/>
 			<div
 				style={{

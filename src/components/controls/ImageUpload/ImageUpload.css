@@ -1,9 +1,32 @@
+.upload-placeholder {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 2rem;
+	flex: 1;
+	border: 2px dashed var(--color-text);
+	border-radius: 0.5rem;
+	color: var(--color-text);
+	user-select: none;
+	cursor: pointer;
+	transition: border-color 0.15s ease, color 0.15s ease;
+	box-sizing: border-box;
+}
+
+.upload-placeholder:hover {
+	border-color: var(--color-secondary);
+	color: var(--color-secondary);
+}
+
 .image-upload-previews {
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
 	margin-top: 12px;
-	min-width: min(80vw, 900px);
+	width: 100%;
+	box-sizing: border-box;
 }
 
 .image-upload-preview {

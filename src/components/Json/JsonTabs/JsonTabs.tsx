@@ -4,12 +4,25 @@ import { colours } from '../../../constants/colours';
 import type { JsonTab } from '../../../types/basic.types';
 import { JsonTabItem } from './JsonTabItem';
 
+const largeTabStyles = {
+	paddingTop: '1rem',
+	'& .MuiTabs-flexContainer': {
+		gap: '0.75rem',
+	},
+	'& .MuiTab-root': {
+		fontSize: '1.125rem',
+		minHeight: 56,
+		padding: '12px 32px',
+	},
+};
+
 interface JsonTabsProps {
 	tabItemData: JsonTab[];
 	ariaLabel: string;
 	handleChange: (event: React.SyntheticEvent, value: string) => void;
 	currentTab: string;
 	orientation?: 'horizontal' | 'vertical';
+	tabSize?: 'medium' | 'large';
 }
 
 function JsonTabs({
@@ -18,6 +31,7 @@ function JsonTabs({
 	handleChange,
 	currentTab,
 	orientation,
+	tabSize = 'medium',
 }: JsonTabsProps) {
 	const tabItems = tabItemData.map((item) => (
 		<JsonTabItem
@@ -47,7 +61,9 @@ function JsonTabs({
 				},
 				'& .MuiTabs-indicator': {
 					backgroundColor: colours.secondary,
+					...(tabSize === 'large' ? { height: 3 } : {}),
 				},
+				...(tabSize === 'large' ? largeTabStyles : {}),
 			}}
 		>
 			{tabItems}

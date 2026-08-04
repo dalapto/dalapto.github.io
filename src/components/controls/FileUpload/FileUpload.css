@@ -1,15 +1,40 @@
+.upload-placeholder {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 2rem;
+	flex: 1;
+	border: 2px dashed var(--color-secondary);
+	border-radius: 0.5rem;
+	color: var(--color-secondary);
+	user-select: none;
+	cursor: pointer;
+	transition: border-color 0.15s ease, color 0.15s ease;
+	box-sizing: border-box;
+}
+
+.upload-placeholder:hover {
+	border-color: var(--color-text);
+	color: var(--color-text);
+}
+
 .file-upload-previews {
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
 	margin-top: 12px;
+	width: 100%;
+	box-sizing: border-box;
 }
 
 .file-upload-item {
 	border: 1px solid #ccc;
 	border-radius: 4px;
 	overflow: hidden;
-	min-width: min(80vw, 900px);
+	width: 100%;
+	box-sizing: border-box;
 }
 
 .file-upload-item-header {
