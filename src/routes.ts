@@ -39,7 +39,7 @@ function og(path: string): Pick<NavRoute, 'ogTitle' | 'ogDescription' | 'ogImage
 
 const projectsRoutes: NavRoute[] = [
 	{ label: 'Cover Letter Generator', route: '/cover-letter-generator' },
-	{ label: 'Clipboard', route: '/clipboard', component: Clipboard },
+	{ label: 'Clipboard', route: '/clipboard', component: Clipboard, ...og('/clipboard') },
 ];
 
 const moddingRoutes: NavRoute[] = [

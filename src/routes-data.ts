@@ -10,7 +10,7 @@
  * in routes.ts.
  */
 
-import { ImgPaths } from "./constants/img-paths";
+import { ImgPaths } from './constants/img-paths';
 
 export const BASE_URL = 'https://dalapto.github.io';
 
@@ -27,7 +27,8 @@ export const routesData: RouteData[] = [
 		path: '/',
 		label: 'Home',
 		ogTitle: 'dalapto | Welcome',
-		ogDescription: 'Personal website — projects, modding, youth work, and more.',
+		ogDescription:
+			'Personal website — projects, modding, youth work, and more.',
 	},
 	{
 		path: '/about/me',
@@ -74,10 +75,18 @@ export const routesData: RouteData[] = [
 		ogDescription: 'Auto-recyling Bin',
 		ogImage: ImgPaths.pages.recylotron.other.photo2,
 	},
+	{
+		path: '/clipboard',
+		label: 'Clipboard',
+		ogTitle: 'Clipboard | dalapto.github.io',
+		ogDescription: 'Clipboard for saving and sharing text, images, and files.',
+		ogImage: ImgPaths.pages.clipboard.windowapple,
+	},
 ];
 
 /** Look up route data by path. Strips trailing slashes so /uni/recyclotron/ matches /uni/recyclotron. */
 export function getRouteData(path: string): RouteData | undefined {
-	const normalised = path.endsWith('/') && path.length > 1 ? path.slice(0, -1) : path;
+	const normalised =
+		path.endsWith('/') && path.length > 1 ? path.slice(0, -1) : path;
 	return routesData.find((r) => r.path === normalised);
 }
