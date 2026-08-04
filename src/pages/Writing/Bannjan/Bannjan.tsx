@@ -1,11 +1,11 @@
 import React from 'react';
 import { PageInConstruction } from '../../../components/display/PageInConstruction/PageInConstruction';
 
-function Transgression() {
+function Bannjan() {
 	return (
-		<div className="Transgression">
+		<div className='Bannjan'>
 			<PageInConstruction></PageInConstruction>
 		</div>
 	);
 }
-export { Transgression };
+export { Bannjan };
