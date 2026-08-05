@@ -1,10 +1,11 @@
-import { Dialog, DialogContent, DialogTitle, TextField } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { colours } from '../../constants/colours';
 import { useSupabase } from '../../context/SupabaseContext';
 import { useToast } from '../../context/ToastProvider';
 import { getErrorMessage } from '../../utils/getErrorMessage';
 import { StandardButton } from '../controls/StandardButton/StandardButton';
+import { StandardTextField } from '../controls/StandardTextField/StandardTextField';
 
 interface AuthModalProps {
 	open: boolean;
@@ -85,13 +86,6 @@ function AuthModal({ open, onClose, onAuthenticated }: AuthModalProps) {
 				sx: {
 					bgcolor: colours.primary,
 					color: colours.text,
-					'& .MuiInputLabel-root': { color: colours.textSecondary },
-					'& .MuiOutlinedInput-root': {
-						color: colours.text,
-						'& fieldset': { borderColor: colours.textSecondary },
-						'&:hover fieldset': { borderColor: colours.secondary },
-						'&.Mui-focused fieldset': { borderColor: colours.secondary },
-					},
 				},
 			}}
 		>
@@ -139,11 +133,11 @@ function AuthModal({ open, onClose, onAuthenticated }: AuthModalProps) {
 						style={{
 							display: 'flex',
 							flexDirection: 'column',
-							gap: '1rem',
-							paddingTop: '0.25rem',
+							gap: '1.5rem',
+							paddingTop: '1rem',
 						}}
 					>
-						<TextField
+						<StandardTextField
 							type='email'
 							required
 							autoFocus
@@ -152,7 +146,7 @@ function AuthModal({ open, onClose, onAuthenticated }: AuthModalProps) {
 							onChange={(e) => setEmail(e.target.value)}
 							fullWidth
 						/>
-						<TextField
+						<StandardTextField
 							type='password'
 							required
 							label='Password'

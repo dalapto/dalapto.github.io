@@ -4,9 +4,11 @@ import type {
 	StoredFile,
 } from '../../../components/controls/FileUpload/FileUpload';
 import { FileUpload } from '../../../components/controls/FileUpload/FileUpload';
-import { StandardButton } from '../../../components/controls/StandardButton/StandardButton';
 import { ActionsPanel } from '../../../components/layout/ActionsPanel/ActionsPanel';
-import { useSaving } from '../../../context/SavingContext';
+import {
+	ClipboardTabActions,
+	ClipboardUploadButton,
+} from './ClipboardButtons';
 import { ClipboardContentMeta } from './ClipboardContentMeta';
 
 interface FileTabPanelProps {
@@ -32,37 +34,21 @@ function FileTabPanel({
 	onSave,
 	onRefresh,
 }: FileTabPanelProps) {
-	const { saving } = useSaving();
 	return (
 		<ActionsPanel
 			onRefresh={onRefresh}
 			leadingActions={
-				<StandardButton
-					variant='contained'
+				<ClipboardUploadButton
 					onClick={() => fileUploadRef.current?.trigger()}
-				>
-					Upload
-				</StandardButton>
+				/>
 			}
 			actions={
-				<>
-					{hasContent && (
-						<StandardButton
-							variant='outlined'
-							disabled={saving}
-							onClick={onClear}
-						>
-							Clear
-						</StandardButton>
-					)}
-					<StandardButton
-						variant='contained'
-						disabled={hasNoFileChanges || saving}
-						onClick={onSave}
-					>
-						Save
-					</StandardButton>
-				</>
+				<ClipboardTabActions
+					hasContent={hasContent}
+					hasNoChanges={hasNoFileChanges}
+					onClear={onClear}
+					onSave={onSave}
+				/>
 			}
 		>
 			<FileUpload

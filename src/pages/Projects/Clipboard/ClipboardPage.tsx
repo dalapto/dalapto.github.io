@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 import { AuthIconButton } from '../../../components/auth/AuthIconButton';
 import { AuthModal } from '../../../components/auth/AuthModal';
 import type { FileUploadHandle } from '../../../components/controls/FileUpload/FileUpload';
@@ -7,6 +8,7 @@ import { LoadingOverlay } from '../../../components/display/LoadingOverlay/Loadi
 import { JsonSection } from '../../../components/Json/JsonSection/JsonSection';
 import { TabbedPanel } from '../../../components/Json/JsonTabs/TabbedPanel';
 import { ImgPaths } from '../../../constants/img-paths';
+import { useClipboardAuth } from '../../../context/ClipboardAuthContext';
 import { LoadingProvider, useLoading } from '../../../context/LoadingContext';
 import { SavingProvider, useSaving } from '../../../context/SavingContext';
 import { useSupabase } from '../../../context/SupabaseContext';
@@ -21,10 +23,19 @@ import { useClipboard } from './useClipboard';
 // redo resets content back
 
 function ClipboardContent() {
+	const theme = useTheme();
+	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 	const { loading } = useLoading();
 	const { saving } = useSaving();
 	const { user, authLoading } = useSupabase();
+	const { requestAuth, registerAuthRequestHandler } = useClipboardAuth();
 	const [authModalOpen, setAuthModalOpen] = useState(false);
+
+	useEffect(() => {
+		registerAuthRequestHandler(() => setAuthModalOpen(true));
+		return () => registerAuthRequestHandler(null);
+	}, [registerAuthRequestHandler]);
+
 	const {
 		fileUploadRef,
 		hasFileContent,
@@ -53,7 +64,7 @@ function ClipboardContent() {
 		saveImage,
 		saveText,
 		setTextContent,
-	} = useClipboard(() => setAuthModalOpen(true));
+	} = useClipboard(requestAuth);
 
 	function handleAuthCancel() {
 		setAuthModalOpen(false);
@@ -125,26 +136,39 @@ function ClipboardContent() {
 	];
 
 	const clipboardPanel = (
-		<div
+		<Box
 			key='clipboard-panel'
-			style={{
-				position: 'relative',
-				width: 'fit-content',
-				margin: '0 auto',
+			sx={{
+				position: { sm: 'relative' },
+				width: { xs: '100%', sm: 'fit-content' },
+				maxWidth: '100%',
+				mx: 'auto',
 			}}
 		>
-			<AuthIconButton
-				user={user}
-				authLoading={authLoading}
-				onClick={() => setAuthModalOpen(true)}
-			/>
+			{!isMobile && (
+				<Box
+					sx={{
+						position: 'absolute',
+						top: 8,
+						right: 12,
+						zIndex: 10,
+					}}
+				>
+					<AuthIconButton
+						inline
+						user={user}
+						authLoading={authLoading}
+						onClick={() => setAuthModalOpen(true)}
+					/>
+				</Box>
+			)}
 			<TabbedPanel
 				tabs={tabs}
 				ariaLabel='Clipboard tabs'
 				initialTabId={lastTab}
 				tabSize='large'
 			/>
-		</div>
+		</Box>
 	);
 
 	return (
@@ -162,7 +186,7 @@ function ClipboardContent() {
 			<JsonSection
 				items={[clipboardPanel]}
 				gap='8rem'
-				paddingTop='1rem'
+				paddingTop={isMobile ? '0.25rem' : '1rem'}
 				paddingBottom='2rem'
 				background={{
 					image: {

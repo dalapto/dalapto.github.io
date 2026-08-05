@@ -2,17 +2,23 @@ import HomeIcon from '@mui/icons-material/Home';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
+import { useMediaQuery } from '@mui/material';
 import { SxProps, Theme, useTheme } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
+import { AuthIconButton } from '../../auth/AuthIconButton';
 import { externalLinks } from '../../../constants/link-constants';
+import { useClipboardAuth } from '../../../context/ClipboardAuthContext';
+import { useSupabase } from '../../../context/SupabaseContext';
 import { NavRoute } from '../../../routes';
 import { HamburgerMenu } from '../../controls/HamburgerMenu/HamburgerMenu';
 import { IconButtonLink } from '../../controls/IconButton/IconButtonLink';
 import { MenuPopper } from '../../display/MenuPopper/MenuPopper';
 import { ToolbarItemList } from '../../display/ToolbarList/ToolbarList';
 import './NavBar.css';
+import { colours } from '../../../constants/colours';
+import AssignmentOutlined from '@mui/icons-material/AssignmentOutlined';
 interface NavItem {
 	name: string;
 	route: string;
@@ -26,10 +32,15 @@ const sx = {
 	homeIconGroup: { display: 'flex', mr: 3 },
 	spacer: { flexGrow: 0.75 },
 	externalLinksGroup: { display: { xs: 'none', md: 'flex' }, gap: 1, ml: 2, mr: 1 },
+	mobileAuthGroup: { display: { xs: 'flex', sm: 'none' }, ml: 'auto', mr: 0.5 },
 } satisfies Record<string, SxProps<Theme>>;
 
 function NavBar({ currentPage, navRoutes }: NavBarProps) {
 	const theme = useTheme();
+	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+	const { user, authLoading } = useSupabase();
+	const { requestAuth } = useClipboardAuth();
+	const isClipboardPage = currentPage === '/clipboard';
 	const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 	const [menuAnchor, setMenuAnchor] = React.useState<HTMLElement | null>(null);
 	const [menuItems, setMenuItems] = React.useState<NavRoute[]>([]);
@@ -101,7 +112,15 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 								to='/'
 								icon={HomeIcon}
 								ariaLabel='Home'
-								style={{ marginBlock: theme.spacing(1), color: theme.colours.text }}
+								style={{ marginBlock: theme.spacing(1), color: colours.text }}
+							/>
+						</Box>
+						<Box sx={sx.homeIconGroup}>
+							<IconButtonLink
+								to='/clipboard'
+								icon={AssignmentOutlined}
+								ariaLabel='Clipboard'
+								style={{ marginBlock: theme.spacing(1), color: colours.text }}
 							/>
 						</Box>
 					</Box>
@@ -126,10 +145,21 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 							href={link.href}
 							icon={link.icon}
 							ariaLabel={link.label}
-							style={{ color: theme.colours.text }}
+							style={{ color: colours.text }}
 						/>
 					))}
 				</Box>
+
+					{isMobile && isClipboardPage && (
+						<Box sx={sx.mobileAuthGroup}>
+							<AuthIconButton
+								inline
+								user={user}
+								authLoading={authLoading}
+								onClick={requestAuth}
+							/>
+						</Box>
+					)}
 
 					<HamburgerMenu handleOpenMenu={(e) => openMenu(e, hamburgerItems)} />
 				</Toolbar>

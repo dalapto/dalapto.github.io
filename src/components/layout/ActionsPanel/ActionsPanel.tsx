@@ -1,6 +1,7 @@
-import { Paper } from '@mui/material';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { Box, Paper } from '@mui/material';
 import React from 'react';
-import { StandardButton } from '../../controls/StandardButton/StandardButton';
+import { ActionButton } from '../../controls/ActionButton/ActionButton';
 
 interface ActionsPanelProps {
 	onRefresh: () => void;
@@ -9,43 +10,78 @@ interface ActionsPanelProps {
 	children: React.ReactNode;
 }
 
-function ActionsPanel({ onRefresh, leadingActions, actions, children }: ActionsPanelProps) {
+function ActionsPanel({
+	onRefresh,
+	leadingActions,
+	actions,
+	children,
+}: ActionsPanelProps) {
 	return (
 		<Paper
 			elevation={0}
 			sx={{
 				minWidth: { xs: '80vw', sm: '50vw' },
 				maxWidth: { xs: '80vw', sm: '50vw' },
-				minHeight: '60vh',
 				p: 2,
 				display: 'flex',
 				flexDirection: 'column',
 				gap: 2,
 				backgroundColor: 'transparent',
 				color: 'inherit',
-				overflow: 'hidden',
 			}}
 		>
-			<div
-				style={{
+			<Box
+				sx={{
 					display: 'flex',
+					flexWrap: { xs: 'nowrap', sm: 'wrap' },
 					justifyContent: 'space-between',
 					alignItems: 'center',
+					gap: { xs: 0.5, sm: 1 },
+					'& .MuiButton-root': {
+						fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+						px: { xs: 1.5, sm: 2 },
+						py: { xs: 1, sm: 1 },
+						minWidth: { xs: 'unset', sm: 64 },
+						flexShrink: 0,
+					},
+					'& .MuiButton-startIcon': {
+						marginRight: { xs: 0.5, sm: 1 },
+						'& > svg': { fontSize: { xs: '1.125rem', sm: '1.25rem' } },
+					},
 				}}
 			>
-				<div style={{ display: 'flex', gap: '0.5rem' }}>
-					<StandardButton variant='outlined' onClick={onRefresh}>
-						Refresh
-					</StandardButton>
+				<Box
+					sx={{
+						display: 'flex',
+						flexWrap: { xs: 'nowrap', sm: 'wrap' },
+						gap: { xs: 0.5, sm: 1 },
+						minWidth: 0,
+					}}
+				>
+					<ActionButton
+						label='Refresh'
+						icon={<RefreshIcon />}
+						variant='outlined'
+						onClick={onRefresh}
+					/>
 					{leadingActions}
-				</div>
+				</Box>
 				{actions && (
-					<div style={{ display: 'flex', gap: '0.5rem' }}>{actions}</div>
+					<Box
+						sx={{
+							display: 'flex',
+							flexWrap: { xs: 'nowrap', sm: 'wrap' },
+							gap: { xs: 0.5, sm: 1 },
+							flexShrink: 0,
+						}}
+					>
+						{actions}
+					</Box>
 				)}
-			</div>
-			<div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+			</Box>
+			<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
 				{children}
-			</div>
+			</Box>
 		</Paper>
 	);
 }

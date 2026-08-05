@@ -11,6 +11,7 @@ import type { Image } from '../../../types/basic.types';
 import { ImageCycler } from '../../display/ImageCycler/ImageCycler';
 import { Lightbox } from '../../display/Lightbox/Lightbox';
 import './ImageUpload.css';
+import type { StorageSaveItem } from '../../../supabase/supabase-utils';
 
 type ImagePreviewItem = {
 	src: string;
@@ -31,7 +32,7 @@ interface ImageUploadProps {
 interface ImageUploadHandle {
 	trigger: () => void;
 	getPreviews: () => string[];
-	getSaveItems: () => ImagePreviewItem[];
+	getSaveItems: () => StorageSaveItem[];
 	commitSavedFilenames: (filenames: string[]) => void;
 	reset: () => void;
 }
@@ -122,7 +123,7 @@ const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
 		};
 
 		return (
-			<div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+			<div style={{ display: 'flex', flexDirection: 'column' }}>
 				<input
 					ref={fileInputRef}
 					type='file'
@@ -151,30 +152,32 @@ const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
 									alt={`preview-${i}`}
 									onClick={() => openLightbox(i)}
 								/>
-								<button
-									onClick={(e) => {
-										e.stopPropagation();
-										removePreview(i);
-									}}
-									className='remove-btn'
-									style={{
-										position: 'absolute',
-										top: 4,
-										right: 4,
-										background: 'rgba(0,0,0,0.5)',
-										border: 'none',
-										borderRadius: '50%',
-										cursor: 'pointer',
-										display: 'flex',
-										alignItems: 'center',
-										justifyContent: 'center',
-										padding: 2,
-										color: 'white',
-									}}
-									aria-label='Remove Image'
-								>
-									<CloseIcon fontSize='small' />
-								</button>
+								{!lightboxOpen && (
+									<button
+										onClick={(e) => {
+											e.stopPropagation();
+											removePreview(i);
+										}}
+										className='remove-btn'
+										style={{
+											position: 'absolute',
+											top: 4,
+											right: 4,
+											background: 'rgba(0,0,0,0.5)',
+											border: 'none',
+											borderRadius: '50%',
+											cursor: 'pointer',
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'center',
+											padding: 2,
+											color: 'white',
+										}}
+										aria-label='Remove Image'
+									>
+										<CloseIcon fontSize='small' />
+									</button>
+								)}
 							</div>
 						))}
 					</div>

@@ -1,18 +1,32 @@
-import { Tabs } from '@mui/material';
+import { Tabs, useMediaQuery, useTheme } from '@mui/material';
 import * as React from 'react';
 import { colours } from '../../../constants/colours';
 import type { JsonTab } from '../../../types/basic.types';
 import { JsonTabItem } from './JsonTabItem';
 
 const largeTabStyles = {
-	paddingTop: '1rem',
+	paddingTop: { xs: '0.75rem', sm: '0.25rem' },
+	width: { xs: '100%', sm: 'auto' },
 	'& .MuiTabs-flexContainer': {
-		gap: '0.75rem',
+		justifyContent: { xs: 'space-around', sm: 'center' },
+		width: '100%',
+		gap: { xs: 0, sm: '0.375rem' },
+		alignItems: 'stretch',
 	},
 	'& .MuiTab-root': {
-		fontSize: '1.125rem',
-		minHeight: 56,
-		padding: '12px 32px',
+		fontSize: { xs: '0.8125rem', sm: '1.125rem' },
+		minHeight: { xs: 44, sm: 48 },
+		padding: { xs: '12px 10px', sm: '8px 32px' },
+		minWidth: { xs: 0, sm: 90 },
+		flex: { xs: 1, sm: 'none' },
+		maxWidth: { xs: 'none', sm: 'unset' },
+		lineHeight: 1.2,
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		textAlign: 'center',
+		textTransform: 'uppercase',
+		boxSizing: 'border-box',
 	},
 };
 
@@ -33,6 +47,9 @@ function JsonTabs({
 	orientation,
 	tabSize = 'medium',
 }: JsonTabsProps) {
+	const theme = useTheme();
+	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
 	const tabItems = tabItemData.map((item) => (
 		<JsonTabItem
 			label={item.label}
@@ -49,7 +66,8 @@ function JsonTabs({
 			value={currentTab}
 			onChange={handleChange}
 			orientation={orientation}
-			centered
+			variant={isMobile && tabSize === 'large' ? 'fullWidth' : 'standard'}
+			centered={!isMobile}
 			sx={{
 				backgroundColor: colours.primary,
 				'& .MuiTab-root': {
@@ -61,7 +79,11 @@ function JsonTabs({
 				},
 				'& .MuiTabs-indicator': {
 					backgroundColor: colours.secondary,
+					bottom: 0,
 					...(tabSize === 'large' ? { height: 3 } : {}),
+				},
+				'& .MuiTabs-scroller': {
+					minHeight: { xs: tabSize === 'large' ? 44 : undefined, sm: 'auto' },
 				},
 				...(tabSize === 'large' ? largeTabStyles : {}),
 			}}
@@ -73,3 +95,4 @@ function JsonTabs({
 
 export { JsonTabs };
 export type { JsonTabsProps };
+

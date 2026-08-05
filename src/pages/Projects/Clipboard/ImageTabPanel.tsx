@@ -4,9 +4,11 @@ import type {
 	StoredImage,
 } from '../../../components/controls/ImageUpload/ImageUpload';
 import { ImageUpload } from '../../../components/controls/ImageUpload/ImageUpload';
-import { StandardButton } from '../../../components/controls/StandardButton/StandardButton';
 import { ActionsPanel } from '../../../components/layout/ActionsPanel/ActionsPanel';
-import { useSaving } from '../../../context/SavingContext';
+import {
+	ClipboardTabActions,
+	ClipboardUploadButton,
+} from './ClipboardButtons';
 import { ClipboardContentMeta } from './ClipboardContentMeta';
 
 interface ImageTabPanelProps {
@@ -32,37 +34,21 @@ function ImageTabPanel({
 	onSave,
 	onRefresh,
 }: ImageTabPanelProps) {
-	const { saving } = useSaving();
 	return (
 		<ActionsPanel
 			onRefresh={onRefresh}
 			leadingActions={
-				<StandardButton
-					variant='contained'
+				<ClipboardUploadButton
 					onClick={() => imageUploadRef.current?.trigger()}
-				>
-					Upload
-				</StandardButton>
+				/>
 			}
 			actions={
-				<>
-					{hasContent && (
-						<StandardButton
-							variant='outlined'
-							disabled={saving}
-							onClick={onClear}
-						>
-							Clear
-						</StandardButton>
-					)}
-					<StandardButton
-						variant='contained'
-						disabled={hasNoImageChanges || saving}
-						onClick={onSave}
-					>
-						Save
-					</StandardButton>
-				</>
+				<ClipboardTabActions
+					hasContent={hasContent}
+					hasNoChanges={hasNoImageChanges}
+					onClear={onClear}
+					onSave={onSave}
+				/>
 			}
 		>
 			<ImageUpload

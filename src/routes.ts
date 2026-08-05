@@ -32,14 +32,24 @@ interface NavRoute {
 }
 
 /** Spread OG metadata from routes-data.ts onto a NavRoute. */
-function og(path: string): Pick<NavRoute, 'ogTitle' | 'ogDescription' | 'ogImage'> {
+function og(
+	path: string,
+): Pick<NavRoute, 'ogTitle' | 'ogDescription' | 'ogImage'> {
 	const d = getRouteData(path);
-	return d ? { ogTitle: d.ogTitle, ogDescription: d.ogDescription, ogImage: d.ogImage } : {};
+	return d
+		? { ogTitle: d.ogTitle, ogDescription: d.ogDescription, ogImage: d.ogImage }
+		: {};
 }
 
 const projectsRoutes: NavRoute[] = [
 	{ label: 'Cover Letter Generator', route: '/cover-letter-generator' },
-	{ label: 'Clipboard', route: '/clipboard', component: Clipboard, ...og('/clipboard') },
+	{
+		label: 'Clipboard',
+		route: '/clipboard',
+		component: Clipboard,
+		...og('/clipboard'),
+		hide: true,
+	},
 ];
 
 const moddingRoutes: NavRoute[] = [
@@ -49,7 +59,12 @@ const moddingRoutes: NavRoute[] = [
 		component: Medieval2TotalWar,
 		...og('/m2tw'),
 	},
-	{ label: 'Rise of Nations', route: '/ron', component: RiseOfNations, ...og('/ron') },
+	{
+		label: 'Rise of Nations',
+		route: '/ron',
+		component: RiseOfNations,
+		...og('/ron'),
+	},
 ];
 
 const litterAppRoute: NavRoute = {

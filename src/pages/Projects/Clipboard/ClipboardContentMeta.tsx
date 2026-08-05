@@ -31,7 +31,7 @@ function ClipboardContentMeta({
 			}}
 		>
 			{lastUpdatedLabel}
-			{hasContent && <ExpiryTimer expiresAt={expiresAt} />}
+			{hasSavedContent && hasContent && <ExpiryTimer expiresAt={expiresAt} />}
 		</div>
 	);
 }

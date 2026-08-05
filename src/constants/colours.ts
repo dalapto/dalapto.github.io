@@ -14,4 +14,7 @@ export const colours = {
 	underline: '#646cff',
 	rust: 'rgba(130, 60, 55, 0.95)',
 	teal: 'rgba(62, 171, 164, 0.95)',
+	success: '#4caf50',
+	warning: '#ffc107',
+	danger: '#ff5252',
 } as const;

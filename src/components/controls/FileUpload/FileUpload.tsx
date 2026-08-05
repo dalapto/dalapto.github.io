@@ -8,6 +8,7 @@ import React, {
 	useState,
 } from 'react';
 import './FileUpload.css';
+import type { StorageSaveItem } from '../../../supabase/supabase-utils';
 
 type FilePreview = {
 	name: string;
@@ -26,7 +27,7 @@ interface StoredFile {
 interface FileUploadHandle {
 	trigger: () => void;
 	getPreviews: () => FilePreview[];
-	getSaveItems: () => FilePreview[];
+	getSaveItems: () => StorageSaveItem[];
 	commitSavedFilenames: (filenames: string[]) => void;
 	reset: () => void;
 }
@@ -182,7 +183,7 @@ const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(
 		};
 
 		return (
-			<div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+			<div style={{ display: 'flex', flexDirection: 'column' }}>
 				<input
 					ref={fileInputRef}
 					type='file'

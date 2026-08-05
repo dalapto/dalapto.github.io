@@ -7,6 +7,7 @@ import { FooterBar } from './components/layout/FooterBar/FooterBar';
 import { NavBar } from './components/layout/NavBar/NavBar';
 import { BackgroundProvider, useBackground } from './context/BackgroundContext';
 import { SupabaseProvider } from './context/SupabaseContext';
+import { ClipboardAuthProvider } from './context/ClipboardAuthContext';
 import { ToastProvider } from './context/ToastProvider';
 import { NavRoute, navRoutes } from './routes';
 import { getRouteData } from './routes-data';
@@ -119,9 +120,11 @@ function App() {
 	return (
 		<BackgroundProvider>
 			<SupabaseProvider>
-				<ToastProvider>
-					<AppInner />
-				</ToastProvider>
+				<ClipboardAuthProvider>
+					<ToastProvider>
+						<AppInner />
+					</ToastProvider>
+				</ClipboardAuthProvider>
 			</SupabaseProvider>
 		</BackgroundProvider>
 	);

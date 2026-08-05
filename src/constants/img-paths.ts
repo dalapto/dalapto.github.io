@@ -51,9 +51,9 @@ export const ImgPaths = {
 		},
 
 		clipboard: {
-			graffiti: `${IMG_ROOT}/pages/clipboard/graffiti.JPEG`,
+			graffiti: `${IMG_ROOT}/pages/clipboard/graffiti.jpeg`,
 			floorplan: `${IMG_ROOT}/pages/clipboard/floorplan.jpg`,
-			windowapple: `${IMG_ROOT}/pages/clipboard/windowapple.JPEG`,
+			windowapple: `${IMG_ROOT}/pages/clipboard/windowapple.jpeg`,
 		},
 
 		litter: {

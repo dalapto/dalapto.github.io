@@ -23,7 +23,7 @@ function TabbedPanel({
 	const { currentTab, handleChange } = useTabState(tabs, initialTabId);
 
 	return (
-		<div style={{ width: 'fit-content', margin: '0 auto' }}>
+		<div style={{ width: '100%', maxWidth: 'fit-content', margin: '0 auto' }}>
 			<JsonTabs
 				tabItemData={tabs}
 				ariaLabel={ariaLabel}

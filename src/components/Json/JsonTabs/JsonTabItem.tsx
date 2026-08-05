@@ -18,6 +18,10 @@ function JsonTabItem({ label, id, icon, ...rest }: JsonTabItemProps) {
 			icon={icon}
 			sx={{
 				fontWeight: 'bold',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+				textAlign: 'center',
 			}}
 			{...rest}
 		/>
