@@ -31,9 +31,12 @@ function Home() {
 				<Box marginTop={'5%'}>
 					<Typography
 						variant='h2'
-						fontFamily={'monospace'}
-						letterSpacing={5}
+						fontFamily='monospace'
 						aria-label='Welcome'
+						sx={{
+							fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3.75rem' },
+							letterSpacing: { xs: 2, sm: 3, md: 5 },
+						}}
 					>
 						<SwapText string_list={welcomes} />
 					</Typography>

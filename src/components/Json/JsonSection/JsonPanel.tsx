@@ -7,6 +7,7 @@ import { ImageTextLayout } from '../../display/ImageTextLayout/ImageTextLayout';
 import { TextList } from '../../display/TextList/TextList';
 import { PageTile } from '../../layout/ResponsiveTile/PageTile';
 import { JsonHeader, type JsonHeaderProps } from './JsonHeader';
+import './JsonPanel.css';
 
 // ---------------------------------------------------------------------------
 // Image slot (used by 'image-text' panels)
@@ -127,6 +128,7 @@ function TextContent({
 	if (contentBackground) {
 		return (
 			<div
+				className='json-panel-content-bg'
 				style={{
 					backgroundColor: contentBackground,
 					padding: '1rem',
@@ -143,6 +145,27 @@ function TextContent({
 			<TextList strings={content} />
 			{contentChildren}
 		</>
+	);
+}
+
+function wrapFitContentPanel(
+	content: ReactNode,
+	maxWidth?: string,
+	shrinkToContent = false,
+) {
+	return (
+		<div className='json-panel-fit-content-outer'>
+			<div
+				className={`json-panel-fit-content-inner${shrinkToContent ? ' json-panel-fit-content-inner--shrink' : ''}`}
+				style={
+					{
+						'--json-panel-max-width': maxWidth ?? '100%',
+					} as React.CSSProperties
+				}
+			>
+				{content}
+			</div>
+		</div>
 	);
 }
 
@@ -234,7 +257,7 @@ function JsonPanel(props: JsonPanelData & JsonPanelRenderProps) {
 		props.kind === 'image-text' ? props.stackImageMaxWidth ?? '600px' : '600px';
 
 	return (
-		<div style={{ display: 'flex', flexDirection: 'column' }}>
+		<div className='json-panel' style={{ display: 'flex', flexDirection: 'column' }}>
 			{header &&
 				(headerBackground ? (
 					<div
@@ -268,12 +291,13 @@ function JsonPanel(props: JsonPanelData & JsonPanelRenderProps) {
 						flexDirection: 'column',
 						alignItems: 'center',
 						gap,
+						width: '100%',
 					}}
 				>
 					<div style={{ width: '100%', maxWidth: stackImageMaxWidth }}>
 						{slot.node}
 					</div>
-					<div style={{ maxWidth, minWidth: 'fit-content' }}>{textContent}</div>
+					{wrapFitContentPanel(textContent, maxWidth, !!contentChildren)}
 				</div>
 			) : slot ? (
 				<ImageTextLayout
@@ -285,7 +309,9 @@ function JsonPanel(props: JsonPanelData & JsonPanelRenderProps) {
 					reverseColumns={reverseColumns}
 					mobileOrder={mobileOrder}
 				>
-					{textContent}
+					{contentBackground || contentChildren
+						? wrapFitContentPanel(textContent, maxWidth, !!contentChildren)
+						: textContent}
 				</ImageTextLayout>
 			) : (
 				<div
@@ -293,9 +319,10 @@ function JsonPanel(props: JsonPanelData & JsonPanelRenderProps) {
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'center',
+						width: '100%',
 					}}
 				>
-					<div style={{ maxWidth, minWidth: 'fit-content' }}>{textContent}</div>
+					{wrapFitContentPanel(textContent, maxWidth, true)}
 				</div>
 			)}
 		</div>
