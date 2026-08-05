@@ -1,4 +1,10 @@
-import { Dialog, DialogContent, DialogTitle } from '@mui/material';
+import {
+	Dialog,
+	DialogContent,
+	DialogTitle,
+	useMediaQuery,
+	useTheme,
+} from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { colours } from '../../constants/colours';
 import { useSupabase } from '../../context/SupabaseContext';
@@ -14,6 +20,8 @@ interface AuthModalProps {
 }
 
 function AuthModal({ open, onClose, onAuthenticated }: AuthModalProps) {
+	const theme = useTheme();
+	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 	const { user, authLoading, signInWithPassword, signOut } = useSupabase();
 	const { showToast } = useToast();
 	const [email, setEmail] = useState('');
@@ -82,6 +90,7 @@ function AuthModal({ open, onClose, onAuthenticated }: AuthModalProps) {
 			onClose={onClose}
 			maxWidth='xs'
 			fullWidth
+			fullScreen={isMobile}
 			PaperProps={{
 				sx: {
 					bgcolor: colours.primary,
