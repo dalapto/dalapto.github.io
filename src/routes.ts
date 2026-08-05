@@ -20,6 +20,8 @@ interface NavRoute {
 	component?: () => React.ReactNode;
 	children?: NavRoute[];
 	onMouseEnter?: (_event: React.MouseEvent<HTMLElement>) => void;
+	onFocus?: (_event: React.FocusEvent<HTMLElement>) => void;
+	onBlur?: (_event: React.FocusEvent<HTMLElement>) => void;
 	onClick?: (_event: React.MouseEvent<HTMLElement>) => void;
 	onKeyDown?: (_event: React.KeyboardEvent<HTMLElement>) => void;
 	isActive?: boolean;
