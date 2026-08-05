@@ -14,7 +14,7 @@ import { useSupabase } from '../../../context/SupabaseContext';
 import { NavRoute } from '../../../routes';
 import { HamburgerMenu } from '../../controls/HamburgerMenu/HamburgerMenu';
 import { IconButtonLink } from '../../controls/IconButton/IconButtonLink';
-import { MenuPopper } from '../../display/MenuPopper/MenuPopper';
+import { MenuPopper, MenuPopperHandle } from '../../display/MenuPopper/MenuPopper';
 import { ToolbarItemList } from '../../display/ToolbarList/ToolbarList';
 import './NavBar.css';
 import { colours } from '../../../constants/colours';
@@ -44,26 +44,135 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 	const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 	const [menuAnchor, setMenuAnchor] = React.useState<HTMLElement | null>(null);
 	const [menuItems, setMenuItems] = React.useState<NavRoute[]>([]);
+	const [openMenuRoute, setOpenMenuRoute] = React.useState<string | null>(null);
+	const menuPopperRef = React.useRef<MenuPopperHandle>(null);
+	const pendingFocusFirst = React.useRef(false);
+	const ignoreNextFocusOpen = React.useRef(false);
 
-	const closeMenu = () => {
+	const closeMenu = useCallback(() => {
 		setIsMenuOpen(false);
 		setMenuAnchor(null);
-	};
+		setOpenMenuRoute(null);
+	}, []);
+
+	const closeMenuSilently = useCallback(() => {
+		ignoreNextFocusOpen.current = true;
+		closeMenu();
+	}, [closeMenu]);
+
+	const handleCloseAndReturnFocus = useCallback(() => {
+		closeMenuSilently();
+		menuAnchor?.focus();
+	}, [closeMenuSilently, menuAnchor]);
+
+	React.useEffect(() => {
+		closeMenu();
+	}, [currentPage, closeMenu]);
+
+	const openDropdownMenu = useCallback(
+		(
+			anchor: HTMLElement,
+			children: NavRoute[],
+			parentRoute: string,
+		) => {
+			setMenuAnchor(anchor);
+			setMenuItems(children);
+			setOpenMenuRoute(parentRoute);
+			setIsMenuOpen(true);
+		},
+		[],
+	);
+
+	const handleDropdownMouseEnter = useCallback(
+		(
+			event: React.MouseEvent<HTMLElement>,
+			children: NavRoute[],
+			parentRoute: string,
+		) => {
+			openDropdownMenu(event.currentTarget, children, parentRoute);
+		},
+		[openDropdownMenu],
+	);
+
+	const handleDropdownFocus = useCallback(
+		(
+			event: React.FocusEvent<HTMLElement>,
+			children: NavRoute[],
+			parentRoute: string,
+		) => {
+			if (ignoreNextFocusOpen.current) {
+				ignoreNextFocusOpen.current = false;
+				return;
+			}
+			openDropdownMenu(event.currentTarget, children, parentRoute);
+		},
+		[openDropdownMenu],
+	);
+
+	const handleDropdownBlur = useCallback(
+		(event: React.FocusEvent<HTMLElement>) => {
+			const relatedTarget = event.relatedTarget as HTMLElement | null;
+			if (relatedTarget?.closest('[role="menu"]')) {
+				return;
+			}
+			closeMenu();
+		},
+		[closeMenu],
+	);
+
+	const handleDropdownClick = useCallback(() => {
+		closeMenu();
+	}, [closeMenu]);
+
+	const handleDropdownKeyDown = useCallback(
+		(
+			event: React.KeyboardEvent<HTMLElement>,
+			children: NavRoute[],
+			parentRoute: string,
+		) => {
+			if (event.key === 'Escape') {
+				event.preventDefault();
+				closeMenu();
+				return;
+			}
+
+			if (event.key === 'Enter') {
+				closeMenu();
+				return;
+			}
+
+			if (event.key !== 'ArrowDown') {
+				return;
+			}
+
+			event.preventDefault();
+			const anchor = event.currentTarget;
+
+			if (!isMenuOpen || menuAnchor !== anchor) {
+				pendingFocusFirst.current = true;
+				openDropdownMenu(anchor, children, parentRoute);
+			} else {
+				menuPopperRef.current?.focusFirstItem();
+			}
+		},
+		[closeMenu, isMenuOpen, menuAnchor, openDropdownMenu],
+	);
+
+	React.useEffect(() => {
+		if (isMenuOpen && pendingFocusFirst.current) {
+			pendingFocusFirst.current = false;
+			menuPopperRef.current?.focusFirstItem();
+		}
+	}, [isMenuOpen, menuItems]);
 
 	const openMenu = useCallback(
 		(
 			event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>,
 			children: NavRoute[],
 		) => {
-			const isKeyboardEvent = 'key' in event;
-			const spaceOrEnterKey =
-				isKeyboardEvent && (event.key === ' ' || event.key === 'Enter');
-
-			if (!isKeyboardEvent || spaceOrEnterKey) {
-				setMenuAnchor(event.currentTarget as HTMLElement);
-				setMenuItems(children);
-				setIsMenuOpen(true);
-			}
+			setMenuAnchor(event.currentTarget as HTMLElement);
+			setMenuItems(children);
+			setIsMenuOpen(true);
 		},
 		[],
 	);
@@ -75,22 +184,35 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 				const visibleChildren = r.children?.filter((c) => !c.hide);
 				return {
 					label: r.label!,
-					route: visibleChildren?.length ? undefined : r.route,
+					route: r.route,
 					isActive: r.route === currentPage,
 					onMouseEnter: visibleChildren?.length
-						? (e) => openMenu(e, visibleChildren)
+						? (e) => handleDropdownMouseEnter(e, visibleChildren, r.route)
 						: r.onMouseEnter,
-					onClick: visibleChildren?.length
-						? (e) => openMenu(e, visibleChildren)
-						: r.onClick,
+					onFocus: visibleChildren?.length
+						? (e) => handleDropdownFocus(e, visibleChildren, r.route)
+						: undefined,
+					onBlur: visibleChildren?.length ? handleDropdownBlur : undefined,
+					onClick: visibleChildren?.length ? handleDropdownClick : undefined,
 					onKeyDown: visibleChildren?.length
-						? (e) => openMenu(e, visibleChildren)
+						? (e) => handleDropdownKeyDown(e, visibleChildren, r.route)
 						: r.onKeyDown,
 					ariaHasPopup: visibleChildren?.length ? true : undefined,
-					ariaExpanded: visibleChildren?.length ? Boolean(menuAnchor) : undefined,
+					ariaExpanded: visibleChildren?.length
+						? openMenuRoute === r.route
+						: undefined,
 				};
 			});
-	}, [currentPage, menuAnchor, navRoutes, openMenu]) as NavRoute[];
+	}, [
+		currentPage,
+		handleDropdownBlur,
+		handleDropdownClick,
+		handleDropdownFocus,
+		handleDropdownKeyDown,
+		handleDropdownMouseEnter,
+		openMenuRoute,
+		navRoutes,
+	]) as NavRoute[];
 
 	const hamburgerItems = useMemo(() => {
 		return navRoutes
@@ -132,8 +254,10 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 
 					{menuItems.length > 0 && isMenuOpen && (
 						<MenuPopper
+							ref={menuPopperRef}
 							anchorElement={menuAnchor!}
 							handleCloseMenu={closeMenu}
+							handleCloseAndReturnFocus={handleCloseAndReturnFocus}
 							menuItems={menuItems}
 						/>
 					)}

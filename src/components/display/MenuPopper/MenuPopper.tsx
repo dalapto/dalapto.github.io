@@ -9,14 +9,24 @@ import '../../layout/NavBar/NavBar.css';
 interface MenuPopperProps {
 	anchorElement: Element | HTMLElement;
 	handleCloseMenu: () => void;
+	handleCloseAndReturnFocus: () => void;
 	menuItems: NavRoute[];
 }
 
-function MenuPopper({
-	anchorElement,
-	handleCloseMenu,
-	menuItems,
-}: MenuPopperProps) {
+interface MenuPopperHandle {
+	focusFirstItem: () => void;
+}
+
+const MenuPopper = React.forwardRef<MenuPopperHandle, MenuPopperProps>(
+	function MenuPopper(
+		{
+			anchorElement,
+			handleCloseMenu,
+			handleCloseAndReturnFocus,
+			menuItems,
+		},
+		ref,
+	) {
 	const isOpen = Boolean(anchorElement);
 	const menuRef = React.useRef<HTMLDivElement>(null);
 	const anchorRef = React.useRef<Element>(anchorElement);
@@ -24,23 +34,27 @@ function MenuPopper({
 	const itemRefs = React.useRef<(HTMLElement | null)[]>([]);
 	const navigate = useNavigate();
 
-	// Focus the first menu item when menu opens
-	React.useEffect(() => {
-		if (isOpen) {
-			// Wait for Fade transition to mount the items
-			const frame = requestAnimationFrame(() => {
+	React.useImperativeHandle(ref, () => ({
+		focusFirstItem: () => {
+			requestAnimationFrame(() => {
 				itemRefs.current[0]?.focus();
 			});
-			return () => cancelAnimationFrame(frame);
-		}
-	}, [isOpen]);
+		},
+	}));
 
 	useClickOutside(isOpen, [menuRef, anchorRef], handleCloseMenu);
 
-	const closeAndReturnFocus = React.useCallback(() => {
+	const handleMenuBlur = (event: React.FocusEvent) => {
+		const relatedTarget = event.relatedTarget as HTMLElement | null;
+		if (
+			relatedTarget &&
+			(relatedTarget === anchorElement ||
+				menuRef.current?.contains(relatedTarget))
+		) {
+			return;
+		}
 		handleCloseMenu();
-		(anchorElement as HTMLElement).focus();
-	}, [handleCloseMenu, anchorElement]);
+	};
 
 	const handleMenuKeyDown = (
 		e: React.KeyboardEvent,
@@ -50,22 +64,11 @@ function MenuPopper({
 		switch (e.key) {
 			case 'Escape':
 				e.preventDefault();
-				closeAndReturnFocus();
+				handleCloseAndReturnFocus();
 				break;
 			case 'Tab':
-				if (!e.shiftKey) {
-					if (index === menuItems.length - 1) {
-						// Last item: close menu and let Tab continue naturally
-						e.preventDefault();
-						closeAndReturnFocus();
-					}
-					// else let Tab move to next item naturally (browser handles it within the menu)
-				} else {
-					if (index === 0) {
-						// First item + Shift+Tab: close and return focus
-						e.preventDefault();
-						closeAndReturnFocus();
-					}
+				if (!e.shiftKey && index === menuItems.length - 1) {
+					handleCloseMenu();
 				}
 				break;
 			case 'ArrowDown':
@@ -82,7 +85,7 @@ function MenuPopper({
 			case 'Enter':
 				e.preventDefault();
 				navigate(route);
-				closeAndReturnFocus();
+				handleCloseMenu();
 				break;
 		}
 	};
@@ -131,7 +134,12 @@ function MenuPopper({
 		>
 			{({ TransitionProps }) => (
 				<Fade {...TransitionProps} timeout={300}>
-					<Box ref={menuRef} role='menu' aria-label='Projects submenu'>
+					<Box
+						ref={menuRef}
+						role='menu'
+						aria-label='Projects submenu'
+						onBlur={handleMenuBlur}
+					>
 						{menuItems.map((item, index) => (
 							<MenuItem
 								key={item.route}
@@ -143,7 +151,7 @@ function MenuPopper({
 								to={item.route}
 								role='menuitem'
 								tabIndex={0}
-								onClick={() => closeAndReturnFocus()}
+								onClick={() => handleCloseMenu()}
 								onKeyDown={(e: React.KeyboardEvent) =>
 									handleMenuKeyDown(e, index, item.route)
 								}
@@ -162,5 +170,6 @@ function MenuPopper({
 			)}
 		</Popper>
 	);
-}
-export { MenuPopper };
+	},
+);
+export { MenuPopper, MenuPopperHandle };
