@@ -1,7 +1,7 @@
 import { Box, useMediaQuery, useTheme } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { AuthIconButton } from '../../../components/auth/AuthIconButton';
-import { AuthModal } from '../../../components/auth/AuthModal';
+import { SupabaseAuthModal } from '../../../components/auth/SupabaseAuthModal';
 import type { FileUploadHandle } from '../../../components/controls/FileUpload/FileUpload';
 import type { ImageUploadHandle } from '../../../components/controls/ImageUpload/ImageUpload';
 import { LoadingOverlay } from '../../../components/display/LoadingOverlay/LoadingOverlay';
@@ -174,7 +174,7 @@ function ClipboardContent() {
 				title='Saving changes...'
 				variant='progress'
 			/>
-			<AuthModal
+			<SupabaseAuthModal
 				open={authModalOpen}
 				onClose={handleAuthCancel}
 				onAuthenticated={handleAuthenticated}

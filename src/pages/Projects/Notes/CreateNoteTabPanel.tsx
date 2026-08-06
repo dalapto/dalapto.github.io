@@ -9,6 +9,7 @@ import { saveNote } from '../../../services/github.service';
 import type { ActionConfig } from '../../../types/basic.types';
 import type { Folder } from '../../../types/github.types';
 import { getErrorMessage } from '../../../utils/getErrorMessage';
+import { ToastSeverity } from '../../../context/ToastProvider';
 
 type NoteField = 'title' | 'folder' | 'text';
 
@@ -21,7 +22,7 @@ interface CreateNoteTabPanelProps {
 	onAuthRequired: () => void;
 	showToast: (
 		message: string,
-		severity: 'success' | 'error',
+		severity: ToastSeverity,
 		error?: unknown,
 	) => void;
 }
@@ -59,7 +60,7 @@ function CreateNoteTabPanel({
 				filename,
 				content: text,
 			});
-			showToast('Note saved.', 'success');
+			showToast(`Created ${title.trim()} successfully.`, ToastSeverity.SUCCESS);
 			setTitle('');
 			setText('');
 			setFolder('');
@@ -67,7 +68,8 @@ function CreateNoteTabPanel({
 			setTouched(emptyTouched);
 			onSaved();
 		} catch (error) {
-			showToast(getErrorMessage(error), 'error', error);
+			console.error(error);
+			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		} finally {
 			setSaving(false);
 		}

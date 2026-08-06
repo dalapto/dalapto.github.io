@@ -1,25 +1,29 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { FileUploadHandle } from '../../../components/controls/FileUpload/FileUpload';
-import type { StoredFile } from '../../../components/controls/FileUpload/FileUpload';
-import type { ImageUploadHandle } from '../../../components/controls/ImageUpload/ImageUpload';
-import type { StoredImage } from '../../../components/controls/ImageUpload/ImageUpload';
-import { useSupabase } from '../../../context/SupabaseContext';
+import type {
+	FileUploadHandle,
+	StoredFile,
+} from '../../../components/controls/FileUpload/FileUpload';
+import type {
+	ImageUploadHandle,
+	StoredImage,
+} from '../../../components/controls/ImageUpload/ImageUpload';
 import { useLoading } from '../../../context/LoadingContext';
 import { useSaving } from '../../../context/SavingContext';
-import { useToast } from '../../../context/ToastProvider';
-import { getClipboardErrorMessage } from '../../../utils/clipboard-helpers';
+import { useSupabase } from '../../../context/SupabaseContext';
+import { ToastSeverity, useToast } from '../../../context/ToastProvider';
+import { saveClipboardRow } from '../../../services/clipboard.service';
 import {
 	splitStorageFilenames,
 	supabase,
 	syncStorageFiles,
 } from '../../../supabase/supabase-utils';
-import { saveClipboardRow } from '../../../services/clipboard.service';
+import type { ClipboardRow, TabId } from '../../../utils/clipboard-helpers';
 import {
+	getClipboardErrorMessage,
 	parseTimestamp,
 	toStoredFiles,
 	toStoredImages,
 } from '../../../utils/clipboard-helpers';
-import type { ClipboardRow, TabId } from '../../../utils/clipboard-helpers';
 
 const TAB_LABELS: Record<TabId, string> = {
 	text: 'Text',
@@ -35,8 +39,12 @@ function useClipboard(onAuthRequired: () => void) {
 	const [lastTab, setLastTab] = useState<TabId>('text');
 	const [textContent, setTextContent] = useState('');
 	const [savedTextContent, setSavedTextContent] = useState('');
-	const [savedImageFilenames, setSavedImageFilenames] = useState<string | null>(null);
-	const [savedFileFilenames, setSavedFileFilenames] = useState<string | null>(null);
+	const [savedImageFilenames, setSavedImageFilenames] = useState<string | null>(
+		null,
+	);
+	const [savedFileFilenames, setSavedFileFilenames] = useState<string | null>(
+		null,
+	);
 	const [loadedImages, setLoadedImages] = useState<StoredImage[]>([]);
 	const [loadedFiles, setLoadedFiles] = useState<StoredFile[]>([]);
 	const [lastUpdatedFile, setLastUpdatedFile] = useState(new Date(0));
@@ -48,58 +56,69 @@ function useClipboard(onAuthRequired: () => void) {
 	const [hasFileContent, setHasFileContent] = useState(false);
 	const imageUploadRef = useRef<ImageUploadHandle>(null);
 	const fileUploadRef = useRef<FileUploadHandle>(null);
-	const pendingSaveRef = useRef<{ tab: TabId; save: () => Promise<void> } | null>(null);
+	const pendingSaveRef = useRef<{
+		tab: TabId;
+		save: () => Promise<void>;
+	} | null>(null);
 
 	const hasNoTextChanges = textContent === savedTextContent;
 	const hasNoImageChanges = imageRevision === 0;
 	const hasNoFileChanges = fileRevision === 0;
 
-	const loadClipboard = useCallback(async (options?: { silent?: boolean }) => {
-		if (!options?.silent) {
-			setLoading(true);
-		}
-		try {
-			const { data: row, error } = await supabase
-				.from('clipboard')
-				.select('*')
-				.single<ClipboardRow>();
-
-			if (error) {
-				if (error.code !== 'PGRST116') {
-					showToast(getClipboardErrorMessage(error), 'error', error);
-				}
-				return;
-			}
-
-			if (!row) return;
-
-			const text = row.text_content ?? '';
-
-			setLastTab(row.last_tab ?? 'text');
-			setTextContent(text);
-			setSavedTextContent(text);
-			setLastUpdatedText(parseTimestamp(row.text_last_updated));
-			setLastUpdatedImage(parseTimestamp(row.image_last_updated));
-			setLastUpdatedFile(parseTimestamp(row.file_last_updated));
-			setSavedImageFilenames(row.image_filename);
-			setSavedFileFilenames(row.file_filename);
-			setImageRevision(0);
-			setFileRevision(0);
-			const images = toStoredImages(row.image_filename);
-			const files = toStoredFiles(row.file_filename);
-			setLoadedImages(images);
-			setLoadedFiles(files);
-			setHasImageContent(images.length > 0);
-			setHasFileContent(files.length > 0);
-
-			if (!row.file_filename) fileUploadRef.current?.reset();
-			if (!row.image_filename) imageUploadRef.current?.reset();
-		} finally {
+	const loadClipboard = useCallback(
+		async (options?: { silent?: boolean }) => {
 			if (!options?.silent) {
-				setLoading(false);
+				setLoading(true);
 			}
-		}
-	}, [setLoading, showToast]);
+			try {
+				const { data: row, error } = await supabase
+					.from('clipboard')
+					.select('*')
+					.single<ClipboardRow>();
+
+				if (error) {
+					if (error.code !== 'PGRST116') {
+						console.error(error);
+						showToast(
+							getClipboardErrorMessage(error),
+							ToastSeverity.ERROR,
+							error,
+						);
+					}
+					return;
+				}
+
+				if (!row) return;
+
+				const text = row.text_content ?? '';
+
+				setLastTab(row.last_tab ?? 'text');
+				setTextContent(text);
+				setSavedTextContent(text);
+				setLastUpdatedText(parseTimestamp(row.text_last_updated));
+				setLastUpdatedImage(parseTimestamp(row.image_last_updated));
+				setLastUpdatedFile(parseTimestamp(row.file_last_updated));
+				setSavedImageFilenames(row.image_filename);
+				setSavedFileFilenames(row.file_filename);
+				setImageRevision(0);
+				setFileRevision(0);
+				const images = toStoredImages(row.image_filename);
+				const files = toStoredFiles(row.file_filename);
+				setLoadedImages(images);
+				setLoadedFiles(files);
+				setHasImageContent(images.length > 0);
+				setHasFileContent(files.length > 0);
+
+				if (!row.file_filename) fileUploadRef.current?.reset();
+				if (!row.image_filename) imageUploadRef.current?.reset();
+			} finally {
+				if (!options?.silent) {
+					setLoading(false);
+				}
+			}
+		},
+		[setLoading, showToast],
+	);
 
 	const refreshClipboard = useCallback(
 		() => loadClipboard({ silent: true }),
@@ -110,9 +129,13 @@ function useClipboard(onAuthRequired: () => void) {
 		setSaving(true);
 		try {
 			await save();
-			showToast(`${TAB_LABELS[tab]} saved`, 'success');
+			showToast(
+				`${TAB_LABELS[tab]} saved successfully.`,
+				ToastSeverity.SUCCESS,
+			);
 		} catch (error) {
-			showToast(getClipboardErrorMessage(error), 'error', error);
+			console.error(error);
+			showToast(getClipboardErrorMessage(error), ToastSeverity.ERROR, error);
 		} finally {
 			setSaving(false);
 		}
@@ -175,7 +198,9 @@ function useClipboard(onAuthRequired: () => void) {
 			setImageRevision(0);
 
 			if (imageFilenames) {
-				imageUploadRef.current?.commitSavedFilenames(splitStorageFilenames(imageFilenames));
+				imageUploadRef.current?.commitSavedFilenames(
+					splitStorageFilenames(imageFilenames),
+				);
 			} else {
 				imageUploadRef.current?.reset();
 			}
@@ -204,7 +229,9 @@ function useClipboard(onAuthRequired: () => void) {
 			setFileRevision(0);
 
 			if (fileFilenames) {
-				fileUploadRef.current?.commitSavedFilenames(splitStorageFilenames(fileFilenames));
+				fileUploadRef.current?.commitSavedFilenames(
+					splitStorageFilenames(fileFilenames),
+				);
 			} else {
 				setLoadedFiles([]);
 				fileUploadRef.current?.reset();
@@ -214,7 +241,9 @@ function useClipboard(onAuthRequired: () => void) {
 
 	function onImageChange() {
 		setImageRevision((n) => n + 1);
-		setHasImageContent((imageUploadRef.current?.getPreviews()?.length ?? 0) > 0);
+		setHasImageContent(
+			(imageUploadRef.current?.getPreviews()?.length ?? 0) > 0,
+		);
 	}
 
 	function onFileChange() {

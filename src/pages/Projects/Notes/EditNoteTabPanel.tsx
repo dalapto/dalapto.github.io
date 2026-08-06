@@ -1,5 +1,5 @@
-import { Box } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Box } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
 import { StandardAutocomplete } from '../../../components/controls/StandardAutocomplete/StandardAutocomplete';
 import { StandardCheckbox } from '../../../components/controls/StandardCheckbox/StandardCheckbox';
@@ -7,6 +7,7 @@ import { StandardTextArea } from '../../../components/controls/StandardTextArea/
 import { StandardTextField } from '../../../components/controls/StandardTextField/StandardTextField';
 import { ConfirmationModal } from '../../../components/layout/ConfirmationModal/ConfirmationModal';
 import { FormPanel } from '../../../components/layout/FormPanel/FormPanel';
+import { ToastSeverity } from '../../../context/ToastProvider';
 import {
 	deleteNote,
 	getNote,
@@ -15,6 +16,21 @@ import {
 import type { HeaderActions } from '../../../types/basic.types';
 import type { Folder } from '../../../types/github.types';
 import { getErrorMessage } from '../../../utils/getErrorMessage';
+
+type NoteField =
+	| 'folderName'
+	| 'noteName'
+	| 'newFolder'
+	| 'newTitle'
+	| 'text';
+
+const emptyTouched = {
+	folderName: false,
+	noteName: false,
+	newFolder: false,
+	newTitle: false,
+	text: false,
+};
 
 function noteDisplayName(filename: string): string {
 	return filename.replace(/\.txt$/i, '');
@@ -46,7 +62,7 @@ interface EditNoteTabPanelProps {
 	onAuthRequired: () => void;
 	showToast: (
 		message: string,
-		severity: 'success' | 'error',
+		severity: ToastSeverity,
 		error?: unknown,
 	) => void;
 }
@@ -69,6 +85,11 @@ function EditNoteTabPanel({
 	const [saving, setSaving] = useState(false);
 	const [deleting, setDeleting] = useState(false);
 	const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+	const [touched, setTouched] = useState(emptyTouched);
+
+	const markTouched = useCallback((field: NoteField) => {
+		setTouched((prev) => (prev[field] ? prev : { ...prev, [field]: true }));
+	}, []);
 
 	const folderOptions = folders.map((item) => item.name);
 	const selectedFolder = folders.find((item) => item.name === folderName);
@@ -84,6 +105,13 @@ function EditNoteTabPanel({
 		setText('');
 		setLoadedNote(null);
 		setIsHidden(true);
+		setTouched((prev) => ({
+			...prev,
+			noteName: false,
+			newFolder: false,
+			newTitle: false,
+			text: false,
+		}));
 	}, []);
 
 	const handleFolderChange = useCallback(
@@ -127,7 +155,8 @@ function EditNoteTabPanel({
 			})
 			.catch((error) => {
 				if (!cancelled) {
-					showToast(getErrorMessage(error), 'error', error);
+					console.error(error);
+					showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 				}
 			})
 			.finally(() => {
@@ -157,7 +186,7 @@ function EditNoteTabPanel({
 				newFolder:
 					trimmedFolder !== loadedNote.folderName ? trimmedFolder : undefined,
 			});
-			showToast('Note updated.', 'success');
+			showToast(`Updated ${loadedNote.title} successfully.`, ToastSeverity.SUCCESS);
 			onSaved();
 			setFolderName(trimmedFolder);
 			setNoteName(trimmedTitle);
@@ -171,8 +200,15 @@ function EditNoteTabPanel({
 				text,
 				updatedAt: saved.updatedAt,
 			});
+			setTouched((prev) => ({
+				...prev,
+				newFolder: false,
+				newTitle: false,
+				text: false,
+			}));
 		} catch (error) {
-			showToast(getErrorMessage(error), 'error', error);
+			console.error(error);
+			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		} finally {
 			setSaving(false);
 		}
@@ -200,11 +236,12 @@ function EditNoteTabPanel({
 		setDeleting(true);
 		try {
 			await deleteNote(githubToken, selectedFolder.id, loadedNote.filename);
-			showToast('Note deleted.', 'success');
+			showToast(`Deleted ${loadedNote.title} successfully.`, ToastSeverity.SUCCESS);
 			onSaved();
 			clearSelectedNote();
 		} catch (error) {
-			showToast(getErrorMessage(error), 'error', error);
+			console.error(error);
+			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		} finally {
 			setDeleting(false);
 		}
@@ -215,7 +252,7 @@ function EditNoteTabPanel({
 		clearSelectedNote,
 		selectedFolder,
 		showToast,
-	]);
+		]);
 
 	function handleDeleteConfirm() {
 		setConfirmDeleteOpen(false);
@@ -256,13 +293,38 @@ function EditNoteTabPanel({
 			trimmedNewTitle !== loadedNote.title ||
 			text !== loadedNote.text);
 
-	const newTitleError = isDuplicateNote;
-	const newTitleHelperText = isDuplicateNote
-		? 'A note with this title already exists in the target folder.'
+	const folderNameRequiredError = touched.folderName && !folderName.trim();
+	const noteNameRequiredError = touched.noteName && !noteName.trim();
+	const newFolderRequiredError = touched.newFolder && !trimmedNewFolder;
+	const newTitleRequiredError = touched.newTitle && !trimmedNewTitle;
+	const textRequiredError = touched.text && !text.trim();
+
+	const folderNameHelperText = folderNameRequiredError
+		? 'Folder is required.'
 		: undefined;
 
-	const newFolderHelperText = isNewFolder
-		? 'New folder will be created.'
+	const noteNameHelperText = noteNameRequiredError
+		? 'Note is required.'
+		: selectedFolder && noteOptions.length === 0
+			? 'This folder has no notes.'
+			: undefined;
+
+	const newFolderError = newFolderRequiredError;
+	const newFolderHelperText = newFolderRequiredError
+		? 'Folder is required.'
+		: isNewFolder
+			? 'New folder will be created.'
+			: undefined;
+
+	const newTitleError = isDuplicateNote || newTitleRequiredError;
+	const newTitleHelperText = isDuplicateNote
+		? 'A note with this title already exists in the target folder.'
+		: newTitleRequiredError
+			? 'Title is required.'
+			: undefined;
+
+	const textHelperText = textRequiredError
+		? 'Note text is required.'
 		: undefined;
 
 	const footerActions: HeaderActions = {
@@ -290,6 +352,7 @@ function EditNoteTabPanel({
 					!loadedNote ||
 					!trimmedNewFolder ||
 					!trimmedNewTitle ||
+					!text.trim() ||
 					!hasUnsavedChanges ||
 					isDuplicateNote,
 			},
@@ -311,8 +374,11 @@ function EditNoteTabPanel({
 						label='Folder'
 						value={folderName}
 						onChange={handleFolderChange}
+						onBlur={() => markTouched('folderName')}
 						options={folderOptions}
 						freeSolo={false}
+						error={folderNameRequiredError}
+						helperText={folderNameHelperText}
 						sx={{ flex: 1, minWidth: 0 }}
 						required
 					/>
@@ -322,14 +388,12 @@ function EditNoteTabPanel({
 						label='Note'
 						value={noteName}
 						onChange={setNoteName}
+						onBlur={() => markTouched('noteName')}
 						options={noteOptions}
 						freeSolo={false}
 						disabled={!selectedFolder || noteOptions.length === 0}
-						helperText={
-							selectedFolder && noteOptions.length === 0
-								? 'This folder has no notes.'
-								: undefined
-						}
+						error={noteNameRequiredError}
+						helperText={noteNameHelperText}
 						sx={{ flex: 1, minWidth: 0 }}
 						required
 					/>
@@ -344,7 +408,9 @@ function EditNoteTabPanel({
 								label='Target Folder'
 								value={newFolder}
 								onChange={setNewFolder}
+								onBlur={() => markTouched('newFolder')}
 								options={folderOptions}
+								error={newFolderError}
 								helperText={newFolderHelperText}
 								sx={{ flex: 1, minWidth: 0 }}
 								required
@@ -354,6 +420,7 @@ function EditNoteTabPanel({
 								label='Title'
 								value={newTitle}
 								onChange={(e) => setNewTitle(e.target.value)}
+								onBlur={() => markTouched('newTitle')}
 								sx={{ flex: 1, minWidth: 0 }}
 								size='small'
 								required
@@ -372,6 +439,10 @@ function EditNoteTabPanel({
 							placeholder='Edit your note…'
 							value={text}
 							onChange={setText}
+							onBlur={() => markTouched('text')}
+							error={textRequiredError}
+							helperText={textHelperText}
+							required
 						/>
 						<p style={{ margin: 0, fontSize: '0.8125rem', opacity: 0.6 }}>
 							Last updated: {new Date(loadedNote.updatedAt).toLocaleString()}

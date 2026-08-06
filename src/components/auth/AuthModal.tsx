@@ -1,10 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { colours } from '../../constants/colours';
-import { useSupabase } from '../../context/SupabaseContext';
-import { useToast } from '../../context/ToastProvider';
 import type { ActionConfig } from '../../types/basic.types';
-import { getErrorMessage } from '../../utils/getErrorMessage';
-import { StandardTextField } from '../controls/StandardTextField/StandardTextField';
 import { FormPanel } from '../layout/FormPanel/FormPanel';
 import { StandardModal } from '../layout/StandardModal/StandardModal';
 
@@ -12,67 +7,76 @@ interface AuthModalProps {
 	open: boolean;
 	onClose: () => void;
 	onAuthenticated?: () => void;
+	authLoading: boolean;
+	isSignedIn: boolean;
+	loadingHeader: string;
+	signedInHeader: string;
+	signInHeader: string;
+	signedInContent: React.ReactNode;
+	signedOutContent: (submitSignIn: () => void) => React.ReactNode;
+	onSignIn: () => void | Promise<void>;
+	onSignOut: () => void | Promise<void>;
+	signInDisabled?: boolean;
+	onReset?: () => void;
 }
 
-function AuthModal({ open, onClose, onAuthenticated }: AuthModalProps) {
-	const { user, authLoading, signInWithPassword, signOut } = useSupabase();
-	const { showToast } = useToast();
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
+function AuthModal({
+	open,
+	onClose,
+	onAuthenticated,
+	authLoading,
+	isSignedIn,
+	loadingHeader,
+	signedInHeader,
+	signInHeader,
+	signedInContent,
+	signedOutContent,
+	onSignIn,
+	onSignOut,
+	signInDisabled = false,
+	onReset,
+}: AuthModalProps) {
 	const [submitting, setSubmitting] = useState(false);
-	const userWhenOpenedRef = useRef<boolean>(false);
+	const signedInWhenOpenedRef = useRef(false);
 	const prevOpenRef = useRef(false);
 
 	useEffect(() => {
-		if (open && !prevOpenRef.current) {
-			userWhenOpenedRef.current = Boolean(user);
+		const wasOpen = prevOpenRef.current;
+
+		if (open && !wasOpen) {
+			signedInWhenOpenedRef.current = isSignedIn;
 		}
+
+		if (!open && wasOpen) {
+			setSubmitting(false);
+			onReset?.();
+		}
+
 		prevOpenRef.current = open;
-	}, [open, user]);
+	}, [open, isSignedIn, onReset]);
 
 	useEffect(() => {
-		if (open && user && !userWhenOpenedRef.current) {
+		if (open && isSignedIn && !signedInWhenOpenedRef.current) {
 			onAuthenticated?.();
 		}
-	}, [open, user, onAuthenticated]);
+	}, [open, isSignedIn, onAuthenticated]);
 
-	useEffect(() => {
-		if (!open) {
-			setEmail('');
-			setPassword('');
-			setSubmitting(false);
-		}
-	}, [open]);
-
-	async function handleSignOut() {
+	async function submitSignIn() {
 		setSubmitting(true);
 		try {
-			await signOut();
-			showToast('Signed out.', 'success');
-			onClose();
-		} catch (error) {
-			showToast(getErrorMessage(error), 'error', error);
+			await onSignIn();
 		} finally {
 			setSubmitting(false);
 		}
 	}
 
-	async function submitAuth() {
+	async function submitSignOut() {
 		setSubmitting(true);
-		const trimmedEmail = email.trim();
 		try {
-			await signInWithPassword(trimmedEmail, password);
-			showToast('Signed in.', 'success');
-		} catch (error) {
-			showToast(getErrorMessage(error), 'error', error);
+			await onSignOut();
 		} finally {
 			setSubmitting(false);
 		}
-	}
-
-	function handleSubmit(event: React.FormEvent) {
-		event.preventDefault();
-		void submitAuth();
 	}
 
 	const signedInFooter: ActionConfig[] = [
@@ -82,7 +86,7 @@ function AuthModal({ open, onClose, onAuthenticated }: AuthModalProps) {
 			label: submitting ? 'Please wait…' : 'Sign out',
 			variant: 'contained',
 			disabled: submitting,
-			onClick: () => void handleSignOut(),
+			onClick: () => void submitSignOut(),
 		},
 	];
 
@@ -92,49 +96,24 @@ function AuthModal({ open, onClose, onAuthenticated }: AuthModalProps) {
 			id: 'signin',
 			label: submitting ? 'Please wait…' : 'Sign in',
 			variant: 'contained',
-			disabled: submitting,
-			onClick: () => void submitAuth(),
+			disabled: submitting || signInDisabled,
+			onClick: () => void submitSignIn(),
 		},
 	];
 
 	return (
 		<StandardModal open={open} onClose={onClose}>
 			{authLoading ? (
-				<FormPanel header={user ? 'Account' : 'Sign in'}>
+				<FormPanel header={loadingHeader}>
 					<p>Checking sign-in…</p>
 				</FormPanel>
-			) : user ? (
-				<FormPanel header='Account' footerActions={signedInFooter}>
-					<p>
-						Signed in as{' '}
-						<span style={{ color: colours.secondary }}>{user.email}</span>
-					</p>
+			) : isSignedIn ? (
+				<FormPanel header={signedInHeader} footerActions={signedInFooter}>
+					{signedInContent}
 				</FormPanel>
 			) : (
-				<FormPanel header='Sign in' footerActions={signInFooter}>
-					<form
-						onSubmit={handleSubmit}
-						style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
-					>
-						<StandardTextField
-							type='email'
-							required
-							autoFocus
-							label='Email'
-							value={email}
-							onChange={(e) => setEmail(e.target.value)}
-							fullWidth
-						/>
-						<StandardTextField
-							type='password'
-							required
-							label='Password'
-							value={password}
-							onChange={(e) => setPassword(e.target.value)}
-							fullWidth
-							inputProps={{ minLength: 6 }}
-						/>
-					</form>
+				<FormPanel header={signInHeader} footerActions={signInFooter}>
+					{signedOutContent(submitSignIn)}
 				</FormPanel>
 			)}
 		</StandardModal>
@@ -142,3 +121,4 @@ function AuthModal({ open, onClose, onAuthenticated }: AuthModalProps) {
 }
 
 export { AuthModal };
+export type { AuthModalProps };

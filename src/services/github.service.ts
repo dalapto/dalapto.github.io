@@ -181,9 +181,6 @@ export async function updateNote(token: string, input: UpdateNoteInput): Promise
 	const newFilename = (input.newFilename ?? input.filename).trim();
 	const newFolder = input.newFolder?.trim();
 
-	if (!filename) throw new Error('Filename is required');
-	if (!newFilename) throw new Error('Filename is required');
-
 	const sourceGist = await getGist(token, input.folderId);
 	const sourceFolderName = (sourceGist.description ?? sourceGist.id).trim();
 	const isFolderChange =
@@ -195,7 +192,7 @@ export async function updateNote(token: string, input: UpdateNoteInput): Promise
 
 		if (targetGist && gistHasFile(targetGist, newFilename)) {
 			throw new Error(
-				`A note named "${newFilename}" already exists in folder "${newFolder}".`,
+				`${newFilename} already exists in folder "${newFolder}".`,
 			);
 		}
 
@@ -232,7 +229,7 @@ export async function updateNote(token: string, input: UpdateNoteInput): Promise
 	if (newFilename.toLowerCase() !== filename.toLowerCase()) {
 		if (gistHasFile(sourceGist, newFilename)) {
 			throw new Error(
-				`A note named "${newFilename}" already exists in this folder.`,
+				`${newFilename} already exists in this folder.`,
 			);
 		}
 		files[filename] = null;
@@ -257,15 +254,13 @@ export async function updateNote(token: string, input: UpdateNoteInput): Promise
 export async function saveNote(token: string, input: SaveNoteInput): Promise<Note> {
 	const folderName = input.folder.trim();
 	const filename = input.filename.trim();
-	if (!folderName) throw new Error('Folder name is required');
-	if (!filename) throw new Error('Filename is required');
 
 	const gists = await listGists(token);
 	const existing = findGistByFolderName(gists, folderName);
 
 	if (existing && gistHasFile(existing, filename)) {
 		throw new Error(
-			`A note named "${filename}" already exists in folder "${folderName}".`,
+			`${filename} already exists in folder "${folderName}".`,
 		);
 	}
 

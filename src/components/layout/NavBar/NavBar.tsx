@@ -258,7 +258,11 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 								to='/note'
 								icon={EditNote}
 								ariaLabel='Create Note'
-								style={{ marginBlock: theme.spacing(1), color: colours.text }}
+								style={{
+									marginBlock: theme.spacing(1),
+									color: colours.text,
+									fontSize: '1.75rem',
+								}}
 							/>
 						</Box>
 					</Box>

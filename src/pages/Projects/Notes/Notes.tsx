@@ -7,7 +7,7 @@ import { TabbedPanel } from '../../../components/Json/JsonTabs/TabbedPanel';
 import { ImgPaths } from '../../../constants/img-paths';
 import { useAuthRequest } from '../../../context/AuthRequestContext';
 import { useGitHub } from '../../../context/GitHubContext';
-import { useToast } from '../../../context/ToastProvider';
+import { ToastSeverity, useToast } from '../../../context/ToastProvider';
 import { listFolders } from '../../../services/github.service';
 import type { JsonTab } from '../../../types/basic.types';
 import type { Folder } from '../../../types/github.types';
@@ -42,7 +42,7 @@ function Notes() {
 			return;
 		}
 		loadFolders(githubToken).catch((error) => {
-			showToast(getErrorMessage(error), 'error', error);
+			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		});
 	}, [githubToken, loadFolders, showToast]);
 
@@ -66,7 +66,7 @@ function Notes() {
 	function handleSaved() {
 		if (!githubToken) return;
 		loadFolders(githubToken).catch((error) => {
-			showToast(getErrorMessage(error), 'error', error);
+			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		});
 	}
 

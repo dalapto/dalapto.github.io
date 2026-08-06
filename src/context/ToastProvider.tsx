@@ -4,11 +4,18 @@ import React, {
 	ReactNode,
 	useCallback,
 	useContext,
+	useMemo,
 	useState,
 } from 'react';
+import { colours } from '../constants/colours';
 import { logErrorDetails } from '../utils/getErrorMessage';
 
-type ToastSeverity = 'success' | 'error';
+enum ToastSeverity {
+	SUCCESS = 'success',
+	ERROR = 'error',
+	WARNING = 'warning',
+	INFO = 'info',
+}
 
 interface ToastContextValue {
 	showToast: (
@@ -37,12 +44,12 @@ function ToastProvider({ children }: { children: ReactNode }) {
 	const [toast, setToast] = useState<ToastState>({
 		open: false,
 		message: '',
-		severity: 'success',
+		severity: ToastSeverity.SUCCESS,
 	});
 
 	const showToast = useCallback(
 		(message: string, severity: ToastSeverity, error?: unknown) => {
-			if (severity === 'error') {
+			if (severity === ToastSeverity.ERROR) {
 				logErrorDetails(error ?? message, message);
 			}
 			setToastKey((key) => key + 1);
@@ -62,6 +69,20 @@ function ToastProvider({ children }: { children: ReactNode }) {
 		},
 		[closeToast],
 	);
+	const backgroundColor = useMemo(() => {
+		switch (toast.severity) {
+			case ToastSeverity.ERROR:
+				return colours.danger;
+			case ToastSeverity.WARNING:
+				return colours.warning;
+			case ToastSeverity.INFO:
+				return colours.info;
+			case ToastSeverity.SUCCESS:
+				return colours.success;
+			default:
+				return colours.secondary;
+		}
+	}, [toast.severity]);
 
 	return (
 		<ToastContext.Provider value={{ showToast }}>
@@ -69,12 +90,11 @@ function ToastProvider({ children }: { children: ReactNode }) {
 			<Snackbar
 				key={toastKey}
 				open={toast.open}
-				autoHideDuration={6000}
+				autoHideDuration={5000}
 				onClose={handleClose}
-				anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+				anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
 				sx={{
 					zIndex: (theme) => theme.zIndex.modal + 200,
-					top: { xs: '4.5rem', sm: '5rem' },
 				}}
 			>
 				<Alert
@@ -87,6 +107,8 @@ function ToastProvider({ children }: { children: ReactNode }) {
 						minWidth: '16rem',
 						maxWidth: '36rem',
 						boxShadow: 6,
+						backgroundColor,
+						color: colours.primary,
 					}}
 				>
 					{toast.message}
@@ -96,5 +118,4 @@ function ToastProvider({ children }: { children: ReactNode }) {
 	);
 }
 
-export { ToastProvider, useToast };
-export type { ToastContextValue, ToastSeverity };
+export { ToastProvider, useToast, ToastSeverity, type ToastContextValue };
