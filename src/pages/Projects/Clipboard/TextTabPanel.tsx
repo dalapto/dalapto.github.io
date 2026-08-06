@@ -1,7 +1,5 @@
 import React, { useLayoutEffect, useRef } from 'react';
-import { ActionsPanel } from '../../../components/layout/ActionsPanel/ActionsPanel';
-import { ClipboardTabActions } from './ClipboardButtons';
-import { ClipboardContentMeta } from './ClipboardContentMeta';
+import { ClipboardTabPanel } from './ClipboardTabPanel';
 
 interface TextTabPanelProps {
 	textContent: string;
@@ -37,13 +35,10 @@ function TextTabPanel({
 		if (!textarea) return;
 
 		const handleResize = () => resizeTextarea(textarea);
-
 		handleResize();
 
 		const observer = new IntersectionObserver((entries) => {
-			if (entries[0]?.isIntersecting) {
-				handleResize();
-			}
+			if (entries[0]?.isIntersecting) handleResize();
 		});
 		observer.observe(textarea);
 
@@ -51,16 +46,13 @@ function TextTabPanel({
 	}, [textContent]);
 
 	return (
-		<ActionsPanel
+		<ClipboardTabPanel
 			onRefresh={onRefresh}
-			actions={
-				<ClipboardTabActions
-					hasContent={hasContent}
-					hasNoChanges={hasNoTextChanges}
-					onClear={onClear}
-					onSave={onSave}
-				/>
-			}
+			onClear={onClear}
+			onSave={onSave}
+			hasContent={hasContent}
+			hasNoChanges={hasNoTextChanges}
+			lastUpdated={lastUpdatedText}
 		>
 			<textarea
 				ref={textareaRef}
@@ -82,11 +74,7 @@ function TextTabPanel({
 					display: 'block',
 				}}
 			/>
-			<ClipboardContentMeta
-				lastUpdated={lastUpdatedText}
-				hasContent={hasContent}
-			/>
-		</ActionsPanel>
+		</ClipboardTabPanel>
 	);
 }
 

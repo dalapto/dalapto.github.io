@@ -1,5 +1,6 @@
 import { Box, useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
+import type { ActionConfig } from '../../../types/basic.types';
 import { StandardButton } from '../StandardButton/StandardButton';
 
 interface ActionButtonProps {
@@ -10,6 +11,22 @@ interface ActionButtonProps {
 	icon?: React.ReactElement;
 	/** Hide label on mobile when an icon is set. Defaults to true if icon is provided. */
 	mobileIconOnly?: boolean;
+}
+
+function renderActions(configs: ActionConfig[]): React.ReactNode {
+	return configs
+		.filter((c) => !c.hidden)
+		.map((c) => (
+			<ActionButton
+				key={c.id}
+				label={c.label}
+				variant={c.variant}
+				onClick={c.onClick}
+				disabled={c.disabled}
+				icon={c.icon}
+				mobileIconOnly={c.mobileIconOnly}
+			/>
+		));
 }
 
 const iconOnlySx = {
@@ -76,5 +93,5 @@ function ActionButton({
 	);
 }
 
-export { ActionButton };
+export { ActionButton, renderActions };
 export type { ActionButtonProps };

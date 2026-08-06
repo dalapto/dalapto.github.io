@@ -4,12 +4,7 @@ import type {
 	StoredFile,
 } from '../../../components/controls/FileUpload/FileUpload';
 import { FileUpload } from '../../../components/controls/FileUpload/FileUpload';
-import { ActionsPanel } from '../../../components/layout/ActionsPanel/ActionsPanel';
-import {
-	ClipboardTabActions,
-	ClipboardUploadButton,
-} from './ClipboardButtons';
-import { ClipboardContentMeta } from './ClipboardContentMeta';
+import { ClipboardTabPanel } from './ClipboardTabPanel';
 
 interface FileTabPanelProps {
 	fileUploadRef: React.RefObject<FileUploadHandle>;
@@ -35,32 +30,21 @@ function FileTabPanel({
 	onRefresh,
 }: FileTabPanelProps) {
 	return (
-		<ActionsPanel
+		<ClipboardTabPanel
 			onRefresh={onRefresh}
-			leadingActions={
-				<ClipboardUploadButton
-					onClick={() => fileUploadRef.current?.trigger()}
-				/>
-			}
-			actions={
-				<ClipboardTabActions
-					hasContent={hasContent}
-					hasNoChanges={hasNoFileChanges}
-					onClear={onClear}
-					onSave={onSave}
-				/>
-			}
+			onClear={onClear}
+			onSave={onSave}
+			hasContent={hasContent}
+			hasNoChanges={hasNoFileChanges}
+			lastUpdated={lastUpdatedFile}
+			onUpload={() => fileUploadRef.current?.trigger()}
 		>
 			<FileUpload
 				ref={fileUploadRef}
 				initialFiles={initialFiles}
 				onChange={onFileChange}
 			/>
-			<ClipboardContentMeta
-				lastUpdated={lastUpdatedFile}
-				hasContent={hasContent}
-			/>
-		</ActionsPanel>
+		</ClipboardTabPanel>
 	);
 }
 

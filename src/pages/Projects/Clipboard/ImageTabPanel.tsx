@@ -4,12 +4,7 @@ import type {
 	StoredImage,
 } from '../../../components/controls/ImageUpload/ImageUpload';
 import { ImageUpload } from '../../../components/controls/ImageUpload/ImageUpload';
-import { ActionsPanel } from '../../../components/layout/ActionsPanel/ActionsPanel';
-import {
-	ClipboardTabActions,
-	ClipboardUploadButton,
-} from './ClipboardButtons';
-import { ClipboardContentMeta } from './ClipboardContentMeta';
+import { ClipboardTabPanel } from './ClipboardTabPanel';
 
 interface ImageTabPanelProps {
 	imageUploadRef: React.RefObject<ImageUploadHandle>;
@@ -35,32 +30,21 @@ function ImageTabPanel({
 	onRefresh,
 }: ImageTabPanelProps) {
 	return (
-		<ActionsPanel
+		<ClipboardTabPanel
 			onRefresh={onRefresh}
-			leadingActions={
-				<ClipboardUploadButton
-					onClick={() => imageUploadRef.current?.trigger()}
-				/>
-			}
-			actions={
-				<ClipboardTabActions
-					hasContent={hasContent}
-					hasNoChanges={hasNoImageChanges}
-					onClear={onClear}
-					onSave={onSave}
-				/>
-			}
+			onClear={onClear}
+			onSave={onSave}
+			hasContent={hasContent}
+			hasNoChanges={hasNoImageChanges}
+			lastUpdated={lastUpdatedImage}
+			onUpload={() => imageUploadRef.current?.trigger()}
 		>
 			<ImageUpload
 				ref={imageUploadRef}
 				initialImages={initialImages}
 				onChange={onImageChange}
 			/>
-			<ClipboardContentMeta
-				lastUpdated={lastUpdatedImage}
-				hasContent={hasContent}
-			/>
-		</ActionsPanel>
+		</ClipboardTabPanel>
 	);
 }
 

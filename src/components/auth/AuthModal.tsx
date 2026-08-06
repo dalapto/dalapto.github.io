@@ -1,17 +1,12 @@
-import {
-	Dialog,
-	DialogContent,
-	DialogTitle,
-	useMediaQuery,
-	useTheme,
-} from '@mui/material';
+import { Dialog, useMediaQuery, useTheme } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { colours } from '../../constants/colours';
 import { useSupabase } from '../../context/SupabaseContext';
 import { useToast } from '../../context/ToastProvider';
+import type { ActionConfig } from '../../types/basic.types';
 import { getErrorMessage } from '../../utils/getErrorMessage';
-import { StandardButton } from '../controls/StandardButton/StandardButton';
 import { StandardTextField } from '../controls/StandardTextField/StandardTextField';
+import { FormPanel } from '../layout/FormPanel/FormPanel';
 
 interface AuthModalProps {
 	open: boolean;
@@ -66,9 +61,7 @@ function AuthModal({ open, onClose, onAuthenticated }: AuthModalProps) {
 
 	async function submitAuth() {
 		setSubmitting(true);
-
 		const trimmedEmail = email.trim();
-
 		try {
 			await signInWithPassword(trimmedEmail, password);
 			showToast('Signed in.', 'success');
@@ -84,6 +77,28 @@ function AuthModal({ open, onClose, onAuthenticated }: AuthModalProps) {
 		void submitAuth();
 	}
 
+	const signedInFooter: ActionConfig[] = [
+		{ id: 'close', label: 'Close', variant: 'outlined', onClick: onClose },
+		{
+			id: 'signout',
+			label: submitting ? 'Please wait…' : 'Sign out',
+			variant: 'contained',
+			disabled: submitting,
+			onClick: () => void handleSignOut(),
+		},
+	];
+
+	const signInFooter: ActionConfig[] = [
+		{ id: 'cancel', label: 'Cancel', variant: 'outlined', onClick: onClose },
+		{
+			id: 'signin',
+			label: submitting ? 'Please wait…' : 'Sign in',
+			variant: 'contained',
+			disabled: submitting,
+			onClick: () => void submitAuth(),
+		},
+	];
+
 	return (
 		<Dialog
 			open={open}
@@ -98,53 +113,22 @@ function AuthModal({ open, onClose, onAuthenticated }: AuthModalProps) {
 				},
 			}}
 		>
-			<DialogTitle sx={{ color: colours.text }}>
-				{user ? 'Account' : 'Sign in to save'}
-			</DialogTitle>
-			<DialogContent sx={{ color: colours.text }}>
-				{authLoading ? (
+			{authLoading ? (
+				<FormPanel header={user ? 'Account' : 'Sign in'}>
 					<p>Checking sign-in…</p>
-				) : user ? (
-					<div
-						style={{
-							display: 'flex',
-							flexDirection: 'column',
-							gap: '1rem',
-							paddingTop: '0.25rem',
-						}}
-					>
-						<p>
-							Signed in as{' '}
-							<span style={{ color: colours.secondary }}>{user.email}</span>
-						</p>
-						<div
-							style={{
-								display: 'flex',
-								justifyContent: 'flex-end',
-								gap: '0.5rem',
-							}}
-						>
-							<StandardButton variant='outlined' onClick={onClose}>
-								Close
-							</StandardButton>
-							<StandardButton
-								variant='contained'
-								disabled={submitting}
-								onClick={handleSignOut}
-							>
-								{submitting ? 'Please wait…' : 'Sign out'}
-							</StandardButton>
-						</div>
-					</div>
-				) : (
+				</FormPanel>
+			) : user ? (
+				<FormPanel header='Account' footerActions={signedInFooter}>
+					<p>
+						Signed in as{' '}
+						<span style={{ color: colours.secondary }}>{user.email}</span>
+					</p>
+				</FormPanel>
+			) : (
+				<FormPanel header='Sign in' footerActions={signInFooter}>
 					<form
 						onSubmit={handleSubmit}
-						style={{
-							display: 'flex',
-							flexDirection: 'column',
-							gap: '1.5rem',
-							paddingTop: '1rem',
-						}}
+						style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
 					>
 						<StandardTextField
 							type='email'
@@ -164,27 +148,9 @@ function AuthModal({ open, onClose, onAuthenticated }: AuthModalProps) {
 							fullWidth
 							inputProps={{ minLength: 6 }}
 						/>
-						<div
-							style={{
-								display: 'flex',
-								justifyContent: 'flex-end',
-								gap: '0.5rem',
-							}}
-						>
-							<StandardButton variant='outlined' onClick={onClose}>
-								Cancel
-							</StandardButton>
-							<StandardButton
-								variant='contained'
-								disabled={submitting}
-								onClick={submitAuth}
-							>
-								{submitting ? 'Please wait…' : 'Sign in'}
-							</StandardButton>
-						</div>
 					</form>
-				)}
-			</DialogContent>
+				</FormPanel>
+			)}
 		</Dialog>
 	);
 }
