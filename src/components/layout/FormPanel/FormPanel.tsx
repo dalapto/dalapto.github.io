@@ -8,7 +8,7 @@ interface FormPanelProps {
 	header?: string;
 	headerActions?: HeaderActions;
 	children: React.ReactNode;
-	footerActions?: ActionConfig[];
+	footerActions?: HeaderActions;
 	/** Override or extend the outer Box styles. */
 	sx?: SxProps<Theme>;
 }
@@ -50,9 +50,16 @@ function FormPanel({
 	footerActions,
 	sx,
 }: FormPanelProps) {
-	const { start, end } = resolveHeaderActions(headerActions);
-	const hasToolbar = start.length > 0 || end.length > 0;
-	const hasFooter = footerActions && footerActions.length > 0;
+	const { start: headerStart, end: headerEnd } = resolveHeaderActions(headerActions);
+	const { start: footerStart, end: footerEnd } = resolveHeaderActions(footerActions);
+	const hasToolbar = headerStart.length > 0 || headerEnd.length > 0;
+	const hasFooter = footerStart.length > 0 || footerEnd.length > 0;
+	const footerJustify =
+		footerStart.length > 0 && footerEnd.length > 0
+			? 'space-between'
+			: footerEnd.length > 0
+				? 'flex-end'
+				: 'flex-start';
 
 	return (
 		<Box
@@ -78,8 +85,8 @@ function FormPanel({
 						...actionButtonSx,
 					}}
 				>
-					<ActionGroup actions={start} />
-					<ActionGroup actions={end} />
+					<ActionGroup actions={headerStart} />
+					<ActionGroup actions={headerEnd} />
 				</Box>
 			)}
 
@@ -91,12 +98,13 @@ function FormPanel({
 				<Box
 					sx={{
 						display: 'flex',
-						justifyContent: 'flex-end',
+						justifyContent: footerJustify,
 						gap: { xs: 0.5, sm: 1 },
 						...actionButtonSx,
 					}}
 				>
-					{renderActions(footerActions)}
+					<ActionGroup actions={footerStart} />
+					<ActionGroup actions={footerEnd} />
 				</Box>
 			)}
 		</Box>

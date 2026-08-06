@@ -16,5 +16,9 @@ export const colours = {
 	teal: 'rgba(62, 171, 164, 0.95)',
 	success: '#4caf50',
 	warning: '#ffc107',
-	danger: '#ff5252',
+	/** ~6.4:1 on primary — WCAG AA */
+	info: '#64b5f6',
+	/** ~5.0:1 on primary — WCAG AA for labels and helper text on dark panels */
+	error: '#ff6b6b',
+	danger: '#ff6b6b',
 } as const;

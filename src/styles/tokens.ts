@@ -22,6 +22,7 @@ export const tokens = {
 		underline: '#646cff',
 		panelRust: 'rgba(130, 60, 55, 0.95)',
 		panelTeal: 'rgba(62, 171, 164, 0.95)',
+		error: '#ff6b6b',
 	},
 
 	layout: {

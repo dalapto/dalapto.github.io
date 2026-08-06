@@ -1,6 +1,7 @@
 import { Box, useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
 import type { ActionConfig } from '../../../types/basic.types';
+import type { ButtonColor } from '../StandardButton/StandardButton';
 import { StandardButton } from '../StandardButton/StandardButton';
 
 interface ActionButtonProps {
@@ -11,6 +12,7 @@ interface ActionButtonProps {
 	icon?: React.ReactElement;
 	/** Hide label on mobile when an icon is set. Defaults to true if icon is provided. */
 	mobileIconOnly?: boolean;
+	color?: ButtonColor;
 }
 
 function renderActions(configs: ActionConfig[]): React.ReactNode {
@@ -25,6 +27,7 @@ function renderActions(configs: ActionConfig[]): React.ReactNode {
 				disabled={c.disabled}
 				icon={c.icon}
 				mobileIconOnly={c.mobileIconOnly}
+				color={c.color}
 			/>
 		));
 }
@@ -44,6 +47,7 @@ function ActionButton({
 	disabled = false,
 	icon,
 	mobileIconOnly = Boolean(icon),
+	color,
 }: ActionButtonProps) {
 	const theme = useTheme();
 	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -64,10 +68,8 @@ function ActionButton({
 				variant={variant}
 				onClick={onClick}
 				disabled={disabled}
-				props={{
-					'aria-label': label,
-					sx: iconOnlySx,
-				}}
+				color={color}
+				props={{ 'aria-label': label, sx: iconOnlySx }}
 			>
 				{icon}
 			</StandardButton>
@@ -79,14 +81,8 @@ function ActionButton({
 			variant={variant}
 			onClick={onClick}
 			disabled={disabled}
-			props={
-				icon
-					? {
-							startIcon: icon,
-							'aria-label': label,
-						}
-					: undefined
-			}
+			color={color}
+			props={icon ? { startIcon: icon, 'aria-label': label } : undefined}
 		>
 			{labelContent}
 		</StandardButton>

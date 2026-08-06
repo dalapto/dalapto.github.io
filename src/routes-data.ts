@@ -82,6 +82,13 @@ export const routesData: RouteData[] = [
 		ogDescription: 'Clipboard for saving and sharing text, images, and files.',
 		ogImage: ImgPaths.pages.clipboard.windowapple,
 	},
+	{
+		path: '/note',
+		label: 'Notes',
+		ogTitle: 'Notes | dalapto.github.io',
+		ogDescription: 'Notes for saving text files.',
+		ogImage: ImgPaths.pages.clipboard.graffiti,
+	},
 ];
 
 /** Look up route data by path. Strips trailing slashes so /uni/recyclotron/ matches /uni/recyclotron. */

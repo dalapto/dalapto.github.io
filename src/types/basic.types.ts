@@ -41,6 +41,8 @@ interface ActionConfig {
 	/** When true the button is not rendered. Replaces conditional JSX like {hasContent && <ClearButton />}. */
 	hidden?: boolean;
 	mobileIconOnly?: boolean;
+	/** Semantic colour override for this button. */
+	color?: 'danger' | 'success' | 'warning' | 'info';
 }
 
 type HeaderActions =

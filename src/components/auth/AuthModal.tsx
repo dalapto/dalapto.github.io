@@ -1,4 +1,3 @@
-import { Dialog, useMediaQuery, useTheme } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { colours } from '../../constants/colours';
 import { useSupabase } from '../../context/SupabaseContext';
@@ -7,6 +6,7 @@ import type { ActionConfig } from '../../types/basic.types';
 import { getErrorMessage } from '../../utils/getErrorMessage';
 import { StandardTextField } from '../controls/StandardTextField/StandardTextField';
 import { FormPanel } from '../layout/FormPanel/FormPanel';
+import { StandardModal } from '../layout/StandardModal/StandardModal';
 
 interface AuthModalProps {
 	open: boolean;
@@ -15,8 +15,6 @@ interface AuthModalProps {
 }
 
 function AuthModal({ open, onClose, onAuthenticated }: AuthModalProps) {
-	const theme = useTheme();
-	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 	const { user, authLoading, signInWithPassword, signOut } = useSupabase();
 	const { showToast } = useToast();
 	const [email, setEmail] = useState('');
@@ -100,19 +98,7 @@ function AuthModal({ open, onClose, onAuthenticated }: AuthModalProps) {
 	];
 
 	return (
-		<Dialog
-			open={open}
-			onClose={onClose}
-			maxWidth='xs'
-			fullWidth
-			fullScreen={isMobile}
-			PaperProps={{
-				sx: {
-					bgcolor: colours.primary,
-					color: colours.text,
-				},
-			}}
-		>
+		<StandardModal open={open} onClose={onClose}>
 			{authLoading ? (
 				<FormPanel header={user ? 'Account' : 'Sign in'}>
 					<p>Checking sign-in…</p>
@@ -151,7 +137,7 @@ function AuthModal({ open, onClose, onAuthenticated }: AuthModalProps) {
 					</form>
 				</FormPanel>
 			)}
-		</Dialog>
+		</StandardModal>
 	);
 }
 

@@ -8,7 +8,7 @@ import { LoadingOverlay } from '../../../components/display/LoadingOverlay/Loadi
 import { JsonSection } from '../../../components/Json/JsonSection/JsonSection';
 import { TabbedPanel } from '../../../components/Json/JsonTabs/TabbedPanel';
 import { ImgPaths } from '../../../constants/img-paths';
-import { useClipboardAuth } from '../../../context/ClipboardAuthContext';
+import { useAuthRequest } from '../../../context/AuthRequestContext';
 import { LoadingProvider, useLoading } from '../../../context/LoadingContext';
 import { SavingProvider, useSaving } from '../../../context/SavingContext';
 import { useSupabase } from '../../../context/SupabaseContext';
@@ -18,17 +18,13 @@ import { ImageTabPanel } from './ImageTabPanel';
 import { TextTabPanel } from './TextTabPanel';
 import { useClipboard } from './useClipboard';
 
-// TODO : undo / redo
-// undo resets content to supa content
-// redo resets content back
-
 function ClipboardContent() {
 	const theme = useTheme();
 	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 	const { loading } = useLoading();
 	const { saving } = useSaving();
 	const { user, authLoading } = useSupabase();
-	const { requestAuth, registerAuthRequestHandler } = useClipboardAuth();
+	const { requestAuth, registerAuthRequestHandler } = useAuthRequest();
 	const [authModalOpen, setAuthModalOpen] = useState(false);
 
 	useEffect(() => {

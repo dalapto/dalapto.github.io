@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { JsonImageTextPanel } from '../../components/JsonSection/JsonPanel';
-import { JsonSection } from '../../components/JsonSection/JsonSection';
+import { JsonSection } from '../../components/Json/JsonSection/JsonSection';
 import { ImgPaths } from '../../constants/img-paths';
 import { useBackground } from '../../context/BackgroundContext';
+import { JsonImageTextPanel } from '../../components/Json/JsonSection/JsonPanel';
 
 const projectSection: JsonImageTextPanel = {
 	kind: 'image-text',

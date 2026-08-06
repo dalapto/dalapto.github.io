@@ -2,12 +2,11 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Box, IconButton, Tooltip } from '@mui/material';
-import type { User } from '@supabase/supabase-js';
 import React from 'react';
 import { colours } from '../../constants/colours';
 
 interface AuthIconButtonProps {
-	user: User | null;
+	user: { login?: string | null; email?: string | null } | null;
 	authLoading: boolean;
 	onClick: () => void;
 	inline?: boolean;

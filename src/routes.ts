@@ -4,6 +4,7 @@ import { Home } from './pages/Home/Home';
 import { Clipboard } from './pages/Projects/Clipboard/ClipboardPage';
 import { LitterApp } from './pages/Projects/LitterApp/LitterApp';
 import { Medieval2TotalWar } from './pages/Projects/m2tw/m2tw';
+import { Notes } from './pages/Projects/Notes/Notes';
 import { Recyclotron } from './pages/Projects/Recylotron/Recylotron';
 import { RiseOfNations } from './pages/Projects/RON/Ron';
 import { YouthWork } from './pages/YouthWork/YouthWork';
@@ -50,6 +51,13 @@ const projectsRoutes: NavRoute[] = [
 		route: '/clipboard',
 		component: Clipboard,
 		...og('/clipboard'),
+		hide: true,
+	},
+	{
+		label: 'Notes',
+		route: '/note',
+		component: Notes,
+		...og('/note'),
 		hide: true,
 	},
 ];

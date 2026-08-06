@@ -87,7 +87,21 @@ function JsonSection({ background, items, className, gap, paddingTop, paddingBot
 	});
 
 	if (!background) {
-		return content;
+		return (
+			<div
+				className={className}
+				style={{
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center',
+					...(gap && { gap }),
+					...(paddingTop && { paddingTop }),
+					...(paddingBottom && { paddingBottom }),
+				}}
+			>
+				{content}
+			</div>
+		);
 	}
 
 	return (

@@ -1,24 +1,29 @@
+import { EditNote } from '@mui/icons-material';
+import AssignmentOutlined from '@mui/icons-material/AssignmentOutlined';
 import HomeIcon from '@mui/icons-material/Home';
+import { useMediaQuery } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import { useMediaQuery } from '@mui/material';
 import { SxProps, Theme, useTheme } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar';
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import { AuthIconButton } from '../../auth/AuthIconButton';
+import { colours } from '../../../constants/colours';
 import { externalLinks } from '../../../constants/link-constants';
-import { useClipboardAuth } from '../../../context/ClipboardAuthContext';
+import { useAuthRequest } from '../../../context/AuthRequestContext';
+import { useGitHub } from '../../../context/GitHubContext';
 import { useSupabase } from '../../../context/SupabaseContext';
 import { NavRoute } from '../../../routes';
+import { AuthIconButton } from '../../auth/AuthIconButton';
 import { HamburgerMenu } from '../../controls/HamburgerMenu/HamburgerMenu';
 import { IconButtonLink } from '../../controls/IconButton/IconButtonLink';
-import { MenuPopper, MenuPopperHandle } from '../../display/MenuPopper/MenuPopper';
+import {
+	MenuPopper,
+	MenuPopperHandle,
+} from '../../display/MenuPopper/MenuPopper';
 import { ToolbarItemList } from '../../display/ToolbarList/ToolbarList';
 import './NavBar.css';
-import { colours } from '../../../constants/colours';
-import AssignmentOutlined from '@mui/icons-material/AssignmentOutlined';
 interface NavItem {
 	name: string;
 	route: string;
@@ -31,7 +36,12 @@ interface NavBarProps {
 const sx = {
 	homeIconGroup: { display: 'flex', mr: 3 },
 	spacer: { flexGrow: 0.75 },
-	externalLinksGroup: { display: { xs: 'none', md: 'flex' }, gap: 1, ml: 2, mr: 1 },
+	externalLinksGroup: {
+		display: { xs: 'none', md: 'flex' },
+		gap: 1,
+		ml: 2,
+		mr: 1,
+	},
 	mobileAuthGroup: { display: { xs: 'flex', sm: 'none' }, ml: 'auto', mr: 0.5 },
 } satisfies Record<string, SxProps<Theme>>;
 
@@ -39,8 +49,10 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 	const theme = useTheme();
 	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 	const { user, authLoading } = useSupabase();
-	const { requestAuth } = useClipboardAuth();
+	const { githubUser, authLoading: githubAuthLoading } = useGitHub();
+	const { requestAuth } = useAuthRequest();
 	const isClipboardPage = currentPage === '/clipboard';
+	const isNotesPage = currentPage === '/note';
 	const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 	const [menuAnchor, setMenuAnchor] = React.useState<HTMLElement | null>(null);
 	const [menuItems, setMenuItems] = React.useState<NavRoute[]>([]);
@@ -70,11 +82,7 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 	}, [currentPage, closeMenu]);
 
 	const openDropdownMenu = useCallback(
-		(
-			anchor: HTMLElement,
-			children: NavRoute[],
-			parentRoute: string,
-		) => {
+		(anchor: HTMLElement, children: NavRoute[], parentRoute: string) => {
 			setMenuAnchor(anchor);
 			setMenuItems(children);
 			setOpenMenuRoute(parentRoute);
@@ -245,6 +253,14 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 								style={{ marginBlock: theme.spacing(1), color: colours.text }}
 							/>
 						</Box>
+						<Box sx={sx.homeIconGroup}>
+							<IconButtonLink
+								to='/note'
+								icon={EditNote}
+								ariaLabel='Create Note'
+								style={{ marginBlock: theme.spacing(1), color: colours.text }}
+							/>
+						</Box>
 					</Box>
 
 					{/* Used for empty space on bar */}
@@ -262,28 +278,28 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 						/>
 					)}
 
-				<Box sx={sx.externalLinksGroup}>
-					{externalLinks.map((link, index) => (
-						<IconButtonLink
-							key={index}
-							href={link.href}
-							icon={link.icon}
-							ariaLabel={link.label}
-							style={{ color: colours.text }}
-						/>
-					))}
-				</Box>
-
-					{isMobile && isClipboardPage && (
-						<Box sx={sx.mobileAuthGroup}>
-							<AuthIconButton
-								inline
-								user={user}
-								authLoading={authLoading}
-								onClick={requestAuth}
+					<Box sx={sx.externalLinksGroup}>
+						{externalLinks.map((link, index) => (
+							<IconButtonLink
+								key={index}
+								href={link.href}
+								icon={link.icon}
+								ariaLabel={link.label}
+								style={{ color: colours.text }}
 							/>
-						</Box>
-					)}
+						))}
+					</Box>
+
+				{isMobile && (isClipboardPage || isNotesPage) && (
+					<Box sx={sx.mobileAuthGroup}>
+						<AuthIconButton
+							inline
+							user={isNotesPage ? githubUser : user}
+							authLoading={isNotesPage ? githubAuthLoading : authLoading}
+							onClick={requestAuth}
+						/>
+					</Box>
+				)}
 
 					<HamburgerMenu handleOpenMenu={(e) => openMenu(e, hamburgerItems)} />
 				</Toolbar>

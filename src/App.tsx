@@ -6,8 +6,9 @@ import { PageInConstruction } from './components/display/PageInConstruction/Page
 import { FooterBar } from './components/layout/FooterBar/FooterBar';
 import { NavBar } from './components/layout/NavBar/NavBar';
 import { BackgroundProvider, useBackground } from './context/BackgroundContext';
+import { AuthRequestProvider } from './context/AuthRequestContext';
+import { GitHubProvider } from './context/GitHubContext';
 import { SupabaseProvider } from './context/SupabaseContext';
-import { ClipboardAuthProvider } from './context/ClipboardAuthContext';
 import { ToastProvider } from './context/ToastProvider';
 import { NavRoute, navRoutes } from './routes';
 import { getRouteData } from './routes-data';
@@ -120,11 +121,13 @@ function App() {
 	return (
 		<BackgroundProvider>
 			<SupabaseProvider>
-				<ClipboardAuthProvider>
-					<ToastProvider>
-						<AppInner />
-					</ToastProvider>
-				</ClipboardAuthProvider>
+				<GitHubProvider>
+					<AuthRequestProvider>
+						<ToastProvider>
+							<AppInner />
+						</ToastProvider>
+					</AuthRequestProvider>
+				</GitHubProvider>
 			</SupabaseProvider>
 		</BackgroundProvider>
 	);
