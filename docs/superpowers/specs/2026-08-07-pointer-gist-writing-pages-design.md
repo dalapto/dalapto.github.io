@@ -37,12 +37,12 @@ The current `Key:"id"` format must be migrated to JSON before the feature is use
 ### New service functions — `github.service.ts`
 
 **`fetchPointerGistIds(): Promise<Record<string, string>>`**
-- Fetches the pointer gist (`7d48f1881df7e46bf6e0425b50666131`) unauthenticated via plain `fetch` (public gist, no token needed)
+- Fetches the pointer gist (`7d48f1881df7e46bf6e0425b50666131`) unauthenticated via plain `fetch` — **not** via the existing `githubFetch` helper which requires a token. Public gists are readable without auth.
 - Reads the `PointerGistIDs` file content and parses it as JSON
 - Returns the key→id map (e.g. `{ Analog: "...", Bannjan: "..." }`)
 
 **`fetchPublicGistFiles(gistId: string): Promise<Array<{ filename: string; content: string }>>`**
-- Fetches any public gist by ID unauthenticated
+- Fetches any public gist by ID unauthenticated (plain `fetch`, no token required)
 - Returns files as a sorted array of `{ filename, content }`
 
 **`updatePointerGistId(token: string, oldId: string, newId: string): Promise<void>`**
