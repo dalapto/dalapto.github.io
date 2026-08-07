@@ -1,6 +1,6 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
-import { Box } from '@mui/material';
+import { Box, FormHelperText } from '@mui/material';
 import React, { useCallback, useState } from 'react';
 import { StandardAutocomplete } from '../../../components/controls/StandardAutocomplete/StandardAutocomplete';
 import { StandardCheckbox } from '../../../components/controls/StandardCheckbox/StandardCheckbox';
@@ -10,6 +10,7 @@ import {
 	ActionToolbar,
 	FormPanel,
 } from '../../../components/layout/FormPanel/FormPanel';
+import { useBusy } from '../../../context/BusyContext';
 import { ToastSeverity } from '../../../context/ToastProvider';
 import { useTextClipboard } from '../../../hooks/useTextClipboard';
 import { saveNote } from '../../../services/github.service';
@@ -24,7 +25,7 @@ const emptyTouched = { title: false, folder: false, text: false };
 interface CreateNoteTabPanelProps {
 	folders: Folder[];
 	githubToken: string | null;
-	onSaved: () => void;
+	onSaved: () => void | Promise<void>;
 	onAuthRequired: () => void;
 	showToast: (
 		message: string,
@@ -44,7 +45,7 @@ function CreateNoteTabPanel({
 	const [isHidden, setIsHidden] = useState(true);
 	const [text, setText] = useState('');
 	const [folder, setFolder] = useState('');
-	const [saving, setSaving] = useState(false);
+	const { busy, operation, setBusy } = useBusy();
 	const [touched, setTouched] = useState(emptyTouched);
 
 	const { copy, paste } = useTextClipboard(text, setText);
@@ -55,18 +56,36 @@ function CreateNoteTabPanel({
 
 	const folderOptions = folders.map((item) => item.name);
 
+	const handleFolderChange = useCallback(
+		(value: string) => {
+			setFolder(value);
+			const match = folders.find(
+				(item) => item.name.toLowerCase() === value.trim().toLowerCase(),
+			);
+			if (match) {
+				setIsHidden(!match.isPublic);
+			}
+		},
+		[folders],
+	);
+
 	const performSave = useCallback(async () => {
 		if (!githubToken) return;
 
 		const folderName = folder.trim();
 		const filename = `${title.trim()}.txt`;
 
-		setSaving(true);
+		setBusy(true, {
+			label: title.trim(),
+			variant: 'progress',
+			operation: 'save',
+		});
 		try {
 			await saveNote(githubToken, {
 				folder: folderName,
 				filename,
 				content: text,
+				isPublic: !isHidden,
 			});
 			showToast(`Created ${title.trim()} successfully.`, ToastSeverity.SUCCESS);
 			setTitle('');
@@ -79,9 +98,9 @@ function CreateNoteTabPanel({
 			console.error(error);
 			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		} finally {
-			setSaving(false);
+			setBusy(false);
 		}
-	}, [folder, githubToken, onSaved, showToast, text, title]);
+	}, [folder, githubToken, isHidden, onSaved, setBusy, showToast, text, title]);
 
 	function handleSave() {
 		if (!githubToken) {
@@ -163,11 +182,12 @@ function CreateNoteTabPanel({
 		},
 		{
 			id: 'save',
-			label: saving ? 'Saving…' : 'Save',
+			label:
+				busy && operation === 'save' ? 'Saving…' : 'Save',
 			variant: 'contained',
 			onClick: handleSave,
 			disabled:
-				saving ||
+				(busy && operation === 'save') ||
 				!title.trim() ||
 				!text.trim() ||
 				!folder.trim() ||
@@ -184,45 +204,78 @@ function CreateNoteTabPanel({
 			}}
 		>
 			<Box
-				sx={{
-					display: 'flex',
-					flexDirection: { xs: 'column', sm: 'row' },
-					gap: 2,
-					minWidth: 0,
-					alignItems: { xs: 'stretch', sm: 'start' },
-				}}
+				sx={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}
 			>
+				<Box
+					sx={{
+						display: 'flex',
+						flexDirection: { xs: 'column', sm: 'row' },
+						gap: 1.5,
+						minWidth: 0,
+						width: { xs: '100%', sm: '50%' },
+						alignItems: { xs: 'stretch', sm: 'center' },
+						justifyContent: { xs: 'center', sm: 'center' },
+					}}
+				>
+					<StandardAutocomplete
+						id='note-folder'
+						label='Folder'
+						value={folder}
+						onChange={handleFolderChange}
+						onBlur={() => markTouched('folder')}
+						options={folderOptions}
+						error={folderError}
+						helperText={folderHelperText}
+						sx={{ flex: { sm: 1 }, minWidth: 0, width: '100%' }}
+						required
+					/>
+				<Box
+					sx={{
+						position: 'relative',
+						flexShrink: 0,
+						alignSelf: 'flex-start',
+					}}
+				>
+					<StandardCheckbox
+						label='Public'
+						checked={!isHidden}
+						onChange={(checked) => setIsHidden(!checked)}
+					/>
+					{!isNewFolder &&
+						selectedFolder &&
+						!isHidden !== selectedFolder.isPublic && (
+							<FormHelperText
+								sx={{
+									position: 'absolute',
+									top: '100%',
+									left: 0,
+									mt: 0.5,
+									mx: 0,
+									whiteSpace: 'nowrap',
+								}}
+							>
+								This will affect all notes in this folder.
+							</FormHelperText>
+						)}
+				</Box>
+				</Box>
 				<StandardTextField
 					id='note-title'
 					label='Title'
 					value={title}
 					onChange={(e) => setTitle(e.target.value)}
 					onBlur={() => markTouched('title')}
-					sx={{ flex: { sm: 1 }, minWidth: 0, width: '100%' }}
+					sx={{ minWidth: 0, width: { xs: '100%', sm: '50%' } }}
 					size='small'
 					required
 					error={titleError}
 					helperText={titleHelperText}
 				/>
-				<StandardAutocomplete
-					id='note-folder'
-					label='Folder'
-					value={folder}
-					onChange={setFolder}
-					onBlur={() => markTouched('folder')}
-					options={folderOptions}
-					error={folderError}
-					helperText={folderHelperText}
-					sx={{ flex: { sm: 1 }, minWidth: 0, width: '100%' }}
-					required
-				/>
-				<StandardCheckbox
-					label='Hidden'
-					checked={isHidden}
-					onChange={setIsHidden}
-				/>
 			</Box>
-			<ActionToolbar actions={{ end: textToolbarActions }} sx={{ justifyContent: 'flex-end' }} />
+			<ActionToolbar
+				actions={{ end: textToolbarActions }}
+				sx={{ justifyContent: 'flex-end', mt: 1 }}
+			/>
 			<StandardTextArea
 				id='note-text'
 				name='note-text'

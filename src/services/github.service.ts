@@ -19,6 +19,7 @@ interface Gist {
 	html_url: string;
 	description: string | null;
 	updated_at: string;
+	public: boolean;
 	files: Record<string, GistFile>;
 }
 
@@ -57,6 +58,7 @@ function gistToFolder(gist: Gist): Folder {
 		updatedAt: gist.updated_at,
 		htmlUrl: gist.html_url,
 		noteFilenames: Object.values(gist.files).map((file) => file.filename),
+		isPublic: gist.public,
 	};
 }
 
@@ -87,12 +89,12 @@ async function getGist(token: string, gistId: string): Promise<Gist> {
 
 async function createGist(
 	token: string,
-	input: { description: string; files: Record<string, { content: string }> },
+	input: { description: string; files: Record<string, { content: string }>; isPublic?: boolean },
 ): Promise<Gist> {
 	return githubFetch<Gist>(token, '/gists', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ ...input, public: false }),
+		body: JSON.stringify({ description: input.description, files: input.files, public: input.isPublic ?? false }),
 	});
 }
 
@@ -174,6 +176,13 @@ export interface UpdateNoteInput {
 	newFilename?: string;
 	/** When set and different from the source folder, the note is moved. */
 	newFolder?: string;
+	/**
+	 * Desired gist visibility. When this differs from the current gist's visibility the gist is
+	 * deleted and recreated with the new value (GitHub does not support PATCH-ing the public field).
+	 * Only applies to same-folder saves; when moving to an existing folder the target folder's
+	 * visibility is unchanged. When moving to a new folder the new gist is created with this value.
+	 */
+	isPublic?: boolean;
 }
 
 export async function updateNote(token: string, input: UpdateNoteInput): Promise<Note> {
@@ -185,6 +194,44 @@ export async function updateNote(token: string, input: UpdateNoteInput): Promise
 	const sourceFolderName = (sourceGist.description ?? sourceGist.id).trim();
 	const isFolderChange =
 		!!newFolder && newFolder.toLowerCase() !== sourceFolderName.toLowerCase();
+
+	const wantVisibilityChange =
+		input.isPublic !== undefined && input.isPublic !== sourceGist.public;
+
+	// Changing visibility requires delete → recreate because the GitHub PATCH API
+	// does not support toggling the public field on an existing gist.
+	if (wantVisibilityChange && !isFolderChange) {
+		if (
+			newFilename.toLowerCase() !== filename.toLowerCase() &&
+			gistHasFile(sourceGist, newFilename)
+		) {
+			throw new Error(`${newFilename} already exists in this folder.`);
+		}
+
+		// Rebuild all files from the source gist, applying this note's changes.
+		const allFiles: Record<string, { content: string }> = {};
+		for (const file of Object.values(sourceGist.files)) {
+			if (file.filename.toLowerCase() === filename.toLowerCase()) {
+				allFiles[newFilename] = { content: input.content };
+			} else {
+				allFiles[file.filename] = { content: file.content ?? '' };
+			}
+		}
+
+		const newGist = await createGist(token, {
+			description: sourceFolderName,
+			files: allFiles,
+			isPublic: input.isPublic,
+		});
+		await deleteGist(token, input.folderId);
+
+		return {
+			folderId: newGist.id,
+			filename: newFilename,
+			content: input.content,
+			updatedAt: newGist.updated_at,
+		};
+	}
 
 	if (isFolderChange) {
 		const gists = await listGists(token);
@@ -200,6 +247,7 @@ export async function updateNote(token: string, input: UpdateNoteInput): Promise
 			const gist = await createGist(token, {
 				description: newFolder!,
 				files: { [newFilename]: { content: input.content } },
+				isPublic: input.isPublic,
 			});
 			await updateGist(token, input.folderId, { files: { [filename]: null } });
 			return {
@@ -268,12 +316,44 @@ export async function saveNote(token: string, input: SaveNoteInput): Promise<Not
 		const gist = await createGist(token, {
 			description: folderName,
 			files: { [filename]: { content: input.content } },
+			isPublic: input.isPublic,
 		});
 		return {
 			folderId: gist.id,
 			filename,
 			content: input.content,
 			updatedAt: gist.updated_at,
+		};
+	}
+
+	// When the desired visibility differs from the existing gist's visibility,
+	// GitHub's PATCH API does not support toggling the public field, so we must
+	// delete the gist and recreate it with all existing files plus the new one.
+	const wantVisibilityChange =
+		input.isPublic !== undefined && input.isPublic !== existing.public;
+
+	if (wantVisibilityChange) {
+		// listGists does not include file content — fetch the full gist first so
+		// we can rebuild every file with its actual content.
+		const fullGist = await getGist(token, existing.id);
+		const allFiles: Record<string, { content: string }> = {};
+		for (const file of Object.values(fullGist.files)) {
+			allFiles[file.filename] = { content: file.content ?? '' };
+		}
+		allFiles[filename] = { content: input.content };
+
+		const newGist = await createGist(token, {
+			description: folderName,
+			files: allFiles,
+			isPublic: input.isPublic,
+		});
+		await deleteGist(token, existing.id);
+
+		return {
+			folderId: newGist.id,
+			filename,
+			content: input.content,
+			updatedAt: newGist.updated_at,
 		};
 	}
 

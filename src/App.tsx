@@ -5,9 +5,10 @@ import './App.css';
 import { PageInConstruction } from './components/display/PageInConstruction/PageInConstruction';
 import { FooterBar } from './components/layout/FooterBar/FooterBar';
 import { NavBar } from './components/layout/NavBar/NavBar';
-import { BackgroundProvider, useBackground } from './context/BackgroundContext';
 import { AuthRequestProvider } from './context/AuthRequestContext';
+import { BackgroundProvider, useBackground } from './context/BackgroundContext';
 import { GitHubProvider } from './context/GitHubContext';
+import { BusyProvider } from './context/BusyContext';
 import { SupabaseProvider } from './context/SupabaseContext';
 import { ToastProvider } from './context/ToastProvider';
 import { NavRoute, navRoutes } from './routes';
@@ -65,7 +66,9 @@ function AppInner() {
 		const routeData = getRouteData(currentPage);
 		document.title =
 			routeData?.ogTitle ??
-			(currentPageSlice === '' ? 'dalapto | Welcome' : `${currentPageSlice} | dalapto.github.io`);
+			(currentPageSlice === ''
+				? 'dalapto | Welcome'
+				: `${currentPageSlice} | dalapto.github.io`);
 	}, [currentPage, currentPageSlice]);
 
 	useEffect(() => {
@@ -73,7 +76,8 @@ function AppInner() {
 		// On the initial load (previousPage === null) there is no outgoing page, so
 		// we must NOT freeze — otherwise the IntersectionObserver callbacks that
 		// fire shortly after mount would be blocked and the background would never appear.
-		const isNavigation = previousPage.current !== null && previousPage.current !== currentPage;
+		const isNavigation =
+			previousPage.current !== null && previousPage.current !== currentPage;
 		previousPage.current = currentPage;
 		setBackground(null, { freezeObservers: isNavigation });
 		window.scrollTo(0, 0);
@@ -123,9 +127,11 @@ function App() {
 			<SupabaseProvider>
 				<GitHubProvider>
 					<AuthRequestProvider>
-						<ToastProvider>
-							<AppInner />
-						</ToastProvider>
+						<BusyProvider initialBusy>
+							<ToastProvider>
+								<AppInner />
+							</ToastProvider>
+						</BusyProvider>
 					</AuthRequestProvider>
 				</GitHubProvider>
 			</SupabaseProvider>

@@ -2,11 +2,13 @@ import { Box, useMediaQuery, useTheme } from '@mui/material';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AuthIconButton } from '../../../components/auth/AuthIconButton';
 import { GitHubAuthModal } from '../../../components/auth/GitHubAuthModal';
+import { LoadingOverlay } from '../../../components/display/LoadingOverlay/LoadingOverlay';
 import { JsonSection } from '../../../components/Json/JsonSection/JsonSection';
 import { TabbedPanel } from '../../../components/Json/JsonTabs/TabbedPanel';
 import { ImgPaths } from '../../../constants/img-paths';
 import { useAuthRequest } from '../../../context/AuthRequestContext';
 import { useGitHub } from '../../../context/GitHubContext';
+import { busyTitle, useBusy } from '../../../context/BusyContext';
 import { ToastSeverity, useToast } from '../../../context/ToastProvider';
 import { listFolders } from '../../../services/github.service';
 import type { JsonTab } from '../../../types/basic.types';
@@ -19,9 +21,11 @@ function Notes() {
 	const theme = useTheme();
 	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 	const { githubUser, githubToken, authLoading } = useGitHub();
+	const { busy, label, variant, operation } = useBusy();
 	const { requestAuth, registerAuthRequestHandler } = useAuthRequest();
 	const { showToast } = useToast();
 	const [authModalOpen, setAuthModalOpen] = useState(false);
+	const [foldersLoading, setFoldersLoading] = useState(false);
 	const pendingSaveRef = useRef(false);
 
 	const [folders, setFolders] = useState<Folder[]>([]);
@@ -41,9 +45,13 @@ function Notes() {
 			setFolders([]);
 			return;
 		}
-		loadFolders(githubToken).catch((error) => {
-			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
-		});
+		setFoldersLoading(true);
+		loadFolders(githubToken)
+			.catch((error) => {
+				console.error(error);
+				showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
+			})
+			.finally(() => setFoldersLoading(false));
 	}, [githubToken, loadFolders, showToast]);
 
 	function handleAuthRequired() {
@@ -63,12 +71,35 @@ function Notes() {
 		setAuthModalOpen(false);
 	}
 
-	function handleSaved() {
+	const handleSaved = useCallback(async () => {
 		if (!githubToken) return;
-		loadFolders(githubToken).catch((error) => {
+		setFoldersLoading(true);
+		try {
+			await loadFolders(githubToken);
+		} catch (error) {
+			console.error(error);
 			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
-		});
-	}
+		} finally {
+			setFoldersLoading(false);
+		}
+	}, [githubToken, loadFolders, showToast]);
+
+	const spinnerBusy = busy && variant === 'spinner';
+	const progressBusy = busy && variant === 'progress';
+
+	const pageLoadingTitle =
+		spinnerBusy && label
+			? busyTitle('fetch', label, 'Loading notes…')
+			: authLoading && foldersLoading
+				? 'Loading…'
+				: authLoading
+					? 'Restoring session…'
+					: 'Loading notes…';
+
+	const progressTitle =
+		operation === 'delete'
+			? busyTitle('delete', label, 'Deleting note…')
+			: busyTitle('save', label, 'Saving changes…');
 
 	const tabs: JsonTab[] = [
 		{
@@ -136,6 +167,16 @@ function Notes() {
 
 	return (
 		<>
+			<LoadingOverlay
+				open={authLoading || foldersLoading || spinnerBusy}
+				title={pageLoadingTitle}
+				variant='spinner'
+			/>
+			<LoadingOverlay
+				open={progressBusy}
+				title={progressTitle}
+				variant='progress'
+			/>
 			<GitHubAuthModal
 				open={authModalOpen}
 				onClose={handleAuthClose}

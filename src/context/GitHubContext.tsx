@@ -44,22 +44,32 @@ function GitHubProvider({ children }: { children: React.ReactNode }) {
 	}, []);
 
 	const signIn = useCallback(async (token: string) => {
-		const user = await fetchGitHubUser(token);
-		const expectedLogin = import.meta.env.VITE_GITHUB_USERNAME as string;
-		if (expectedLogin && user.login.toLowerCase() !== expectedLogin.toLowerCase()) {
-			throw new Error(
-				`This token belongs to @${user.login}, but only @${expectedLogin} is permitted here.`,
-			);
+		setAuthLoading(true);
+		try {
+			const user = await fetchGitHubUser(token);
+			const expectedLogin = import.meta.env.VITE_GITHUB_USERNAME as string;
+			if (
+				expectedLogin &&
+				user.login.toLowerCase() !== expectedLogin.toLowerCase()
+			) {
+				throw new Error(
+					`This token belongs to @${user.login}, but only @${expectedLogin} is permitted here.`,
+				);
+			}
+			localStorage.setItem(TOKEN_KEY, token);
+			setGitHubToken(token);
+			setGitHubUser(user);
+		} finally {
+			setAuthLoading(false);
 		}
-		localStorage.setItem(TOKEN_KEY, token);
-		setGitHubToken(token);
-		setGitHubUser(user);
 	}, []);
 
 	const signOut = useCallback(() => {
+		setAuthLoading(true);
 		localStorage.removeItem(TOKEN_KEY);
 		setGitHubToken(null);
 		setGitHubUser(null);
+		setAuthLoading(false);
 	}, []);
 
 	const value = useMemo(

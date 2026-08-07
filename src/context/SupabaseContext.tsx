@@ -42,12 +42,17 @@ function SupabaseProvider({ children }: { children: ReactNode }) {
 
 	const signInWithPassword = useCallback(
 		async (email: string, password: string) => {
-			const { error } = await supabase.auth.signInWithPassword({
-				email,
-				password,
-			});
+			setAuthLoading(true);
+			try {
+				const { error } = await supabase.auth.signInWithPassword({
+					email,
+					password,
+				});
 
-			if (error) throw error;
+				if (error) throw error;
+			} finally {
+				setAuthLoading(false);
+			}
 		},
 		[],
 	);
@@ -65,8 +70,13 @@ function SupabaseProvider({ children }: { children: ReactNode }) {
 	);
 
 	const signOut = useCallback(async () => {
-		const { error } = await supabase.auth.signOut();
-		if (error) throw error;
+		setAuthLoading(true);
+		try {
+			const { error } = await supabase.auth.signOut();
+			if (error) throw error;
+		} finally {
+			setAuthLoading(false);
+		}
 	}, []);
 
 	return (

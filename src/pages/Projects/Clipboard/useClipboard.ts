@@ -7,8 +7,7 @@ import type {
 	ImageUploadHandle,
 	StoredImage,
 } from '../../../components/controls/ImageUpload/ImageUpload';
-import { useLoading } from '../../../context/LoadingContext';
-import { useSaving } from '../../../context/SavingContext';
+import { busyTitle, useBusy } from '../../../context/BusyContext';
 import { useSupabase } from '../../../context/SupabaseContext';
 import { ToastSeverity, useToast } from '../../../context/ToastProvider';
 import { saveClipboardRow } from '../../../services/clipboard.service';
@@ -34,8 +33,7 @@ const TAB_LABELS: Record<TabId, string> = {
 function useClipboard(onAuthRequired: () => void) {
 	const { showToast } = useToast();
 	const { user } = useSupabase();
-	const { setLoading } = useLoading();
-	const { setSaving } = useSaving();
+	const { setBusy } = useBusy();
 	const [lastTab, setLastTab] = useState<TabId>('text');
 	const [textContent, setTextContent] = useState('');
 	const [savedTextContent, setSavedTextContent] = useState('');
@@ -68,7 +66,7 @@ function useClipboard(onAuthRequired: () => void) {
 	const loadClipboard = useCallback(
 		async (options?: { silent?: boolean }) => {
 			if (!options?.silent) {
-				setLoading(true);
+				setBusy(true, { variant: 'spinner', operation: 'fetch' });
 			}
 			try {
 				const { data: row, error } = await supabase
@@ -113,11 +111,11 @@ function useClipboard(onAuthRequired: () => void) {
 				if (!row.image_filename) imageUploadRef.current?.reset();
 			} finally {
 				if (!options?.silent) {
-					setLoading(false);
+					setBusy(false);
 				}
 			}
 		},
-		[setLoading, showToast],
+		[setBusy, showToast],
 	);
 
 	const refreshClipboard = useCallback(
@@ -126,7 +124,7 @@ function useClipboard(onAuthRequired: () => void) {
 	);
 
 	async function performSave(tab: TabId, save: () => Promise<void>) {
-		setSaving(true);
+		setBusy(true, { variant: 'progress', operation: 'save' });
 		try {
 			await save();
 			showToast(
@@ -137,7 +135,7 @@ function useClipboard(onAuthRequired: () => void) {
 			console.error(error);
 			showToast(getClipboardErrorMessage(error), ToastSeverity.ERROR, error);
 		} finally {
-			setSaving(false);
+			setBusy(false);
 		}
 	}
 

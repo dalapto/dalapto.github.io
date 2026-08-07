@@ -2,14 +2,18 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { Box } from '@mui/material';
+import { Box, FormHelperText } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
 import { StandardAutocomplete } from '../../../components/controls/StandardAutocomplete/StandardAutocomplete';
 import { StandardCheckbox } from '../../../components/controls/StandardCheckbox/StandardCheckbox';
 import { StandardTextArea } from '../../../components/controls/StandardTextArea/StandardTextArea';
 import { StandardTextField } from '../../../components/controls/StandardTextField/StandardTextField';
 import { ConfirmationModal } from '../../../components/layout/ConfirmationModal/ConfirmationModal';
-import { ActionToolbar, FormPanel } from '../../../components/layout/FormPanel/FormPanel';
+import {
+	ActionToolbar,
+	FormPanel,
+} from '../../../components/layout/FormPanel/FormPanel';
+import { useBusy } from '../../../context/BusyContext';
 import { ToastSeverity } from '../../../context/ToastProvider';
 import { useTextClipboard } from '../../../hooks/useTextClipboard';
 import {
@@ -57,7 +61,7 @@ interface LoadedNote {
 interface EditNoteTabPanelProps {
 	folders: Folder[];
 	githubToken: string | null;
-	onSaved: () => void;
+	onSaved: () => void | Promise<void>;
 	onAuthRequired: () => void;
 	showToast: (
 		message: string,
@@ -77,12 +81,12 @@ function EditNoteTabPanel({
 	const [noteName, setNoteName] = useState('');
 	const [newFolder, setNewFolder] = useState('');
 	const [newTitle, setNewTitle] = useState('');
-	const [isHidden, setIsHidden] = useState(true);
+	const [isPublic, setIsPublic] = useState(false);
+	const [committedIsPublic, setCommittedIsPublic] = useState(false);
 	const [text, setText] = useState('');
 	const [loadedNote, setLoadedNote] = useState<LoadedNote | null>(null);
-	const [loading, setLoading] = useState(false);
-	const [saving, setSaving] = useState(false);
-	const [deleting, setDeleting] = useState(false);
+	const { busy, operation, setBusy } = useBusy();
+	const [noteSelectKey, setNoteSelectKey] = useState(0);
 	const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 	const [touched, setTouched] = useState(emptyTouched);
 
@@ -105,7 +109,9 @@ function EditNoteTabPanel({
 		setNewTitle('');
 		setText('');
 		setLoadedNote(null);
-		setIsHidden(true);
+		setIsPublic(false);
+		setCommittedIsPublic(false);
+		setNoteSelectKey((key) => key + 1);
 		setTouched((prev) => ({
 			...prev,
 			noteName: false,
@@ -136,7 +142,11 @@ function EditNoteTabPanel({
 		if (!filename) return;
 
 		let cancelled = false;
-		setLoading(true);
+		setBusy(true, {
+			label: noteName.trim(),
+			variant: 'spinner',
+			operation: 'fetch',
+		});
 
 		getNote(githubToken, selectedFolder.id, filename)
 			.then((note) => {
@@ -161,13 +171,13 @@ function EditNoteTabPanel({
 				}
 			})
 			.finally(() => {
-				if (!cancelled) setLoading(false);
+				if (!cancelled) setBusy(false);
 			});
 
 		return () => {
 			cancelled = true;
 		};
-	}, [folderName, githubToken, noteName, selectedFolder, showToast]);
+	}, [folderName, githubToken, noteName, selectedFolder, setBusy, showToast]);
 
 	const performSave = useCallback(async () => {
 		if (!githubToken || !selectedFolder || !loadedNote) return;
@@ -176,7 +186,11 @@ function EditNoteTabPanel({
 		const trimmedTitle = newTitle.trim();
 		const newFilename = `${trimmedTitle}.txt`;
 
-		setSaving(true);
+		setBusy(true, {
+			label: trimmedTitle,
+			variant: 'progress',
+			operation: 'save',
+		});
 		try {
 			const saved = await updateNote(githubToken, {
 				folderId: loadedNote.folderId,
@@ -186,12 +200,13 @@ function EditNoteTabPanel({
 					newFilename !== loadedNote.filename ? newFilename : undefined,
 				newFolder:
 					trimmedFolder !== loadedNote.folderName ? trimmedFolder : undefined,
+				isPublic: isPublic,
 			});
 			showToast(
 				`Updated ${loadedNote.title} successfully.`,
 				ToastSeverity.SUCCESS,
 			);
-			onSaved();
+			await onSaved();
 			setFolderName(trimmedFolder);
 			setNoteName(trimmedTitle);
 			setNewFolder(trimmedFolder);
@@ -204,6 +219,7 @@ function EditNoteTabPanel({
 				text,
 				updatedAt: saved.updatedAt,
 			});
+			setCommittedIsPublic(isPublic);
 			setTouched((prev) => ({
 				...prev,
 				newFolder: false,
@@ -214,15 +230,17 @@ function EditNoteTabPanel({
 			console.error(error);
 			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		} finally {
-			setSaving(false);
+			setBusy(false);
 		}
 	}, [
 		githubToken,
+		isPublic,
 		loadedNote,
 		newFolder,
 		newTitle,
 		onSaved,
 		selectedFolder,
+		setBusy,
 		showToast,
 		text,
 	]);
@@ -237,20 +255,24 @@ function EditNoteTabPanel({
 
 	const performDelete = useCallback(async () => {
 		if (!githubToken || !selectedFolder || !loadedNote) return;
-		setDeleting(true);
+		setBusy(true, {
+			label: loadedNote.title,
+			variant: 'progress',
+			operation: 'delete',
+		});
 		try {
 			await deleteNote(githubToken, selectedFolder.id, loadedNote.filename);
 			showToast(
 				`Deleted ${loadedNote.title} successfully.`,
 				ToastSeverity.SUCCESS,
 			);
-			onSaved();
 			clearSelectedNote();
+			await onSaved();
 		} catch (error) {
 			console.error(error);
 			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		} finally {
-			setDeleting(false);
+			setBusy(false);
 		}
 	}, [
 		githubToken,
@@ -258,6 +280,7 @@ function EditNoteTabPanel({
 		onSaved,
 		clearSelectedNote,
 		selectedFolder,
+		setBusy,
 		showToast,
 	]);
 
@@ -272,7 +295,11 @@ function EditNoteTabPanel({
 		const filename = findNoteFilename(selectedFolder, noteName);
 		if (!filename) return;
 
-		setLoading(true);
+		setBusy(true, {
+			label: noteName.trim(),
+			variant: 'spinner',
+			operation: 'fetch',
+		});
 		try {
 			const note = await getNote(githubToken, selectedFolder.id, filename);
 			if (!note) return;
@@ -299,9 +326,9 @@ function EditNoteTabPanel({
 			console.error(error);
 			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		} finally {
-			setLoading(false);
+			setBusy(false);
 		}
-	}, [folderName, githubToken, noteName, selectedFolder, showToast]);
+	}, [folderName, githubToken, noteName, selectedFolder, setBusy, showToast]);
 
 	function handleClearText() {
 		setText('');
@@ -339,7 +366,8 @@ function EditNoteTabPanel({
 		loadedNote !== null &&
 		(trimmedNewFolder !== loadedNote.folderName ||
 			trimmedNewTitle !== loadedNote.title ||
-			text !== loadedNote.text);
+			text !== loadedNote.text ||
+			isPublic !== committedIsPublic);
 
 	const folderNameRequiredError = touched.folderName && !folderName.trim();
 	const noteNameRequiredError = touched.noteName && !noteName.trim();
@@ -384,7 +412,7 @@ function EditNoteTabPanel({
 				icon: <RefreshIcon />,
 				onClick: () => void reloadSelectedNote(),
 				disabled:
-					loading || !githubToken || !selectedFolder || !noteName.trim(),
+					busy || !githubToken || !selectedFolder || !noteName.trim(),
 			},
 		],
 		end: [
@@ -411,12 +439,13 @@ function EditNoteTabPanel({
 		start: [
 			{
 				id: 'delete',
-				label: deleting ? 'Deleting…' : 'Delete',
+				label:
+					busy && operation === 'delete' ? 'Deleting…' : 'Delete',
 				variant: 'outlined',
 				color: 'danger',
 				icon: <DeleteIcon />,
 				onClick: () => setConfirmDeleteOpen(true),
-				disabled: deleting || saving || loading || !loadedNote,
+				disabled: busy || !loadedNote,
 				hidden: !loadedNote,
 			},
 		],
@@ -430,12 +459,11 @@ function EditNoteTabPanel({
 			},
 			{
 				id: 'save',
-				label: saving ? 'Saving…' : 'Save',
+				label: busy && operation === 'save' ? 'Saving…' : 'Save',
 				variant: 'contained',
 				onClick: handleSave,
 				disabled:
-					saving ||
-					loading ||
+					busy ||
 					!loadedNote ||
 					!trimmedNewFolder ||
 					!trimmedNewTitle ||
@@ -466,7 +494,7 @@ function EditNoteTabPanel({
 				>
 					<StandardAutocomplete
 						id='edit-note-folder'
-						label='Folder'
+						label='Existing Folder'
 						value={folderName}
 						onChange={handleFolderChange}
 						onBlur={() => markTouched('folderName')}
@@ -478,9 +506,9 @@ function EditNoteTabPanel({
 						required
 					/>
 					<StandardAutocomplete
-						key={folderName}
+						key={`${folderName}-${noteSelectKey}`}
 						id='edit-note-name'
-						label='Note'
+						label='Existing Note'
 						value={noteName}
 						onChange={setNoteName}
 						onBlur={() => markTouched('noteName')}
@@ -498,43 +526,77 @@ function EditNoteTabPanel({
 						<Box
 							sx={{
 								display: 'flex',
-								flexDirection: { xs: 'column', sm: 'row' },
-								gap: 2,
+								flexDirection: 'column',
+								gap: 0,
 								minWidth: 0,
-								alignItems: { xs: 'stretch', sm: 'start' },
+								mt: 4,
 							}}
 						>
-							<StandardAutocomplete
-								id='edit-note-target-folder'
-								label='Target Folder'
-								value={newFolder}
-								onChange={setNewFolder}
-								onBlur={() => markTouched('newFolder')}
-								options={folderOptions}
-								error={newFolderError}
-								helperText={newFolderHelperText}
-								sx={{ flex: { sm: 1 }, minWidth: 0, width: '100%' }}
-								required
-							/>
+							{/* Target Folder + Public (with helper text directly below checkbox) */}
+							<Box
+								sx={{
+									display: 'flex',
+									flexDirection: { xs: 'column', sm: 'row' },
+									gap: 1.5,
+									minWidth: 0,
+									width: { xs: '100%', sm: '50%' },
+									alignItems: { xs: 'stretch', sm: 'flex-start' },
+								}}
+							>
+								<StandardAutocomplete
+									id='edit-note-target-folder'
+									label='Target Folder'
+									value={newFolder}
+									onChange={setNewFolder}
+									onBlur={() => markTouched('newFolder')}
+									options={folderOptions}
+									error={newFolderError}
+									helperText={newFolderHelperText}
+									sx={{ flex: { sm: 1 }, minWidth: 0, width: '100%' }}
+									required
+								/>
+								<Box
+									sx={{
+										position: 'relative',
+										flexShrink: 0,
+										alignSelf: 'flex-start',
+									}}
+								>
+									<StandardCheckbox
+										label='Public'
+										checked={isPublic}
+										onChange={setIsPublic}
+									/>
+									{isPublic !== committedIsPublic && (
+										<FormHelperText
+											sx={{
+												position: 'absolute',
+												top: '100%',
+												left: 0,
+												mt: 0.5,
+												mx: 0,
+												whiteSpace: 'nowrap',
+											}}
+										>
+											This will affect all notes in this folder.
+										</FormHelperText>
+									)}
+								</Box>
+							</Box>
 							<StandardTextField
 								id='edit-note-title'
 								label='Title'
 								value={newTitle}
 								onChange={(e) => setNewTitle(e.target.value)}
 								onBlur={() => markTouched('newTitle')}
-								sx={{ flex: { sm: 1 }, minWidth: 0, width: '100%' }}
+								sx={{ minWidth: 0, width: { xs: '100%', sm: '50%' }, mt: 6 }}
 								size='small'
 								required
 								error={newTitleError}
 								helperText={newTitleHelperText}
 							/>
-							<StandardCheckbox
-								label='Hidden'
-								checked={isHidden}
-								onChange={setIsHidden}
-							/>
 						</Box>
-						<ActionToolbar actions={textToolbarActions} />
+						<ActionToolbar actions={textToolbarActions} sx={{ mt: 4 }} />
 						<StandardTextArea
 							id='edit-note-text'
 							name='edit-note-text'

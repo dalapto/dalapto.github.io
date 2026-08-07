@@ -43,9 +43,17 @@ function StandardAutocomplete({
 		freeSolo,
 		disabled,
 		options,
-		inputValue: value,
-		onInputChange: (_, newValue) => onChange(newValue),
-		onChange: (_, newValue) => onChange(typeof newValue === 'string' ? newValue : ''),
+		...(freeSolo
+			? {
+					inputValue: value,
+					onInputChange: (_, newValue) => onChange(newValue),
+					onChange: (_, newValue) =>
+						onChange(typeof newValue === 'string' ? newValue : ''),
+				}
+			: {
+					value: options.includes(value) ? value : null,
+					onChange: (_, newValue) => onChange(newValue ?? ''),
+				}),
 		renderInput: (params) => (
 			<StandardTextField
 				{...params}

@@ -9,8 +9,7 @@ import { JsonSection } from '../../../components/Json/JsonSection/JsonSection';
 import { TabbedPanel } from '../../../components/Json/JsonTabs/TabbedPanel';
 import { ImgPaths } from '../../../constants/img-paths';
 import { useAuthRequest } from '../../../context/AuthRequestContext';
-import { LoadingProvider, useLoading } from '../../../context/LoadingContext';
-import { SavingProvider, useSaving } from '../../../context/SavingContext';
+import { busyTitle, useBusy } from '../../../context/BusyContext';
 import { useSupabase } from '../../../context/SupabaseContext';
 import type { JsonTab } from '../../../types/basic.types';
 import { FileTabPanel } from './FileTabPanel';
@@ -18,11 +17,10 @@ import { ImageTabPanel } from './ImageTabPanel';
 import { TextTabPanel } from './TextTabPanel';
 import { useClipboard } from './useClipboard';
 
-function ClipboardContent() {
+function Clipboard() {
 	const theme = useTheme();
 	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-	const { loading } = useLoading();
-	const { saving } = useSaving();
+	const { busy, label, variant, operation } = useBusy();
 	const { user, authLoading } = useSupabase();
 	const { requestAuth, registerAuthRequestHandler } = useAuthRequest();
 	const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -72,11 +70,15 @@ function ClipboardContent() {
 		flushPendingSave();
 	}
 
-	if (loading) {
-		return (
-			<LoadingOverlay open title='Fetching saved content…' variant='spinner' />
-		);
-	}
+	const spinnerBusy = busy && variant === 'spinner';
+	const progressBusy = busy && variant === 'progress';
+
+	const pageLoadingTitle =
+		spinnerBusy && authLoading
+			? 'Loading…'
+			: spinnerBusy
+				? busyTitle('fetch', label, 'Fetching saved content…')
+				: 'Restoring session…';
 
 	const tabs: JsonTab[] = [
 		{
@@ -170,8 +172,13 @@ function ClipboardContent() {
 	return (
 		<>
 			<LoadingOverlay
-				open={saving}
-				title='Saving changes...'
+				open={spinnerBusy || authLoading}
+				title={pageLoadingTitle}
+				variant='spinner'
+			/>
+			<LoadingOverlay
+				open={progressBusy}
+				title={busyTitle(operation, label, 'Saving changes…')}
 				variant='progress'
 			/>
 			<SupabaseAuthModal
@@ -193,16 +200,6 @@ function ClipboardContent() {
 				}}
 			/>
 		</>
-	);
-}
-
-function Clipboard() {
-	return (
-		<LoadingProvider initialLoading>
-			<SavingProvider>
-				<ClipboardContent />
-			</SavingProvider>
-		</LoadingProvider>
 	);
 }
 
