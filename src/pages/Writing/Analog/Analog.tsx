@@ -5,9 +5,9 @@ import { JsonSection } from '../../../components/Json/JsonSection/JsonSection';
 import { colours } from '../../../constants/colours';
 import { usePointerGistContent } from '../../../hooks/usePointerGistContent';
 
-const PAGE_KEY = 'Bannjan';
+const PAGE_KEY = 'Analog';
 
-function Bannjan() {
+function Analog() {
 	const { files, loading, error } = usePointerGistContent(PAGE_KEY);
 
 	if (loading) {
@@ -49,4 +49,4 @@ function Bannjan() {
 	return <JsonSection items={[headerPanel, ...filePanels]} gap='6rem' />;
 }
 
-export { Bannjan };
+export { Analog };

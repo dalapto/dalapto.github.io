@@ -89,6 +89,20 @@ export const routesData: RouteData[] = [
 		ogDescription: 'Notes for saving text files.',
 		ogImage: ImgPaths.pages.clipboard.graffiti,
 	},
+	{
+		path: '/analog',
+		label: 'Analog',
+		ogTitle: 'Analog | dalapto.github.io',
+		ogDescription: 'Analog story.',
+		// ogImage: ImgPaths.pages.clipboard.graffiti,
+	},
+	{
+		path: '/bannjan',
+		label: 'Bannjan',
+		ogTitle: 'Bannjan | dalapto.github.io',
+		ogDescription: 'Bannjan story.',
+		// ogImage: ImgPaths.pages.clipboard.graffiti,
+	},
 ];
 
 /** Look up route data by path. Strips trailing slashes so /uni/recyclotron/ matches /uni/recyclotron. */

@@ -9,6 +9,9 @@ import type {
 
 const GITHUB_API_BASE = 'https://api.github.com';
 
+const POINTER_GIST_ID = '7d48f1881df7e46bf6e0425b50666131';
+const POINTER_GIST_FILENAME = 'PointerGistIDs';
+
 interface GistFile {
 	filename: string;
 	content?: string;
@@ -115,6 +118,52 @@ async function updateGist(
 
 async function deleteGist(token: string, gistId: string): Promise<void> {
 	await githubFetch<void>(token, `/gists/${gistId}`, { method: 'DELETE' });
+}
+
+export async function fetchPointerGistIds(): Promise<Record<string, string>> {
+	const res = await fetch(`${GITHUB_API_BASE}/gists/${POINTER_GIST_ID}`, {
+		headers: { Accept: 'application/vnd.github+json' },
+	});
+	if (!res.ok) throw new Error(`Failed to fetch pointer gist: ${res.status}`);
+	const gist = await res.json() as Gist;
+	const file = gist.files[POINTER_GIST_FILENAME];
+	if (!file?.content) throw new Error('PointerGistIDs file missing or empty');
+	return JSON.parse(file.content) as Record<string, string>;
+}
+
+export async function fetchPublicGistFiles(
+	gistId: string,
+): Promise<Array<{ filename: string; content: string }>> {
+	const res = await fetch(`${GITHUB_API_BASE}/gists/${gistId}`, {
+		headers: { Accept: 'application/vnd.github+json' },
+	});
+	if (!res.ok) throw new Error(`Failed to fetch gist ${gistId}: ${res.status}`);
+	const gist = await res.json() as Gist;
+	return Object.values(gist.files)
+		.map((file) => ({ filename: file.filename, content: file.content ?? '' }))
+		.sort((a, b) => a.filename.localeCompare(b.filename));
+}
+
+async function updatePointerGistId(
+	token: string,
+	oldId: string,
+	newId: string,
+): Promise<void> {
+	const ids = await fetchPointerGistIds();
+	const entry = Object.entries(ids).find(([, v]) => v === oldId);
+	if (!entry) return;
+	const updated = { ...ids, [entry[0]]: newId };
+	await githubFetch<Gist>(token, `/gists/${POINTER_GIST_ID}`, {
+		method: 'PATCH',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			files: {
+				[POINTER_GIST_FILENAME]: {
+					content: JSON.stringify(updated, null, 2),
+				},
+			},
+		}),
+	});
 }
 
 function findGistByFolderName(gists: Gist[], folderName: string): Gist | undefined {
@@ -224,6 +273,9 @@ export async function updateNote(token: string, input: UpdateNoteInput): Promise
 			isPublic: input.isPublic,
 		});
 		await deleteGist(token, input.folderId);
+		await updatePointerGistId(token, input.folderId, newGist.id).catch((err) =>
+			console.warn('Pointer gist update failed:', err),
+		);
 
 		return {
 			folderId: newGist.id,
@@ -348,6 +400,9 @@ export async function saveNote(token: string, input: SaveNoteInput): Promise<Not
 			isPublic: input.isPublic,
 		});
 		await deleteGist(token, existing.id);
+		await updatePointerGistId(token, existing.id, newGist.id).catch((err) =>
+			console.warn('Pointer gist update failed:', err),
+		);
 
 		return {
 			folderId: newGist.id,

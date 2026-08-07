@@ -7,6 +7,8 @@ import { Medieval2TotalWar } from './pages/Projects/m2tw/m2tw';
 import { Notes } from './pages/Projects/Notes/Notes';
 import { Recyclotron } from './pages/Projects/Recylotron/Recylotron';
 import { RiseOfNations } from './pages/Projects/RON/Ron';
+import { Analog } from './pages/Writing/Analog/Analog';
+import { Bannjan } from './pages/Writing/Bannjan/Bannjan';
 import { YouthWork } from './pages/YouthWork/YouthWork';
 import { getRouteData } from './routes-data';
 
@@ -77,6 +79,21 @@ const moddingRoutes: NavRoute[] = [
 	},
 ];
 
+const writingRoutes: NavRoute[] = [
+	{
+		label: 'Analog',
+		route: '/analog',
+		component: Analog,
+		...og('/analog'),
+	},
+	{
+		label: 'Bannjan',
+		route: '/bannjan',
+		component: Bannjan,
+		...og('/bannjan'),
+	},
+];
+
 const litterAppRoute: NavRoute = {
 	label: 'LitterApp',
 	route: LITTER_APP_PATH,
@@ -119,7 +136,7 @@ const navRoutes: NavRoute[] = [
 		component: YouthWork,
 		...og('/youth'),
 	},
-	{ label: 'Writing', route: '/writing', ...og('/writing') },
+	{ label: 'Writing', route: '/writing', ...og('/writing'), children: [...writingRoutes], },
 ];
 
 export { litterAppRoute, NavRoute, navRoutes, recyclotronRoute };
