@@ -1,9 +1,11 @@
 import RefreshIcon from '@mui/icons-material/Refresh';
 import UploadIcon from '@mui/icons-material/Upload';
+import { Box } from '@mui/material';
 import React from 'react';
-import { FormPanel } from '../../../components/layout/FormPanel/FormPanel';
-import type { HeaderActions } from '../../../types/basic.types';
-import { ClipboardContentMeta } from './ClipboardContentMeta';
+import { ActionToolbar, FormPanel } from '../../../components/layout/FormPanel/FormPanel';
+import type { ActionConfig, HeaderActions } from '../../../types/basic.types';
+import { ClipboardContentMeta, ClipboardExpiry, ClipboardLastUpdated } from './ClipboardContentMeta';
+
 
 interface ClipboardTabPanelProps {
 	onRefresh: () => void;
@@ -14,6 +16,9 @@ interface ClipboardTabPanelProps {
 	lastUpdated: Date;
 	/** When provided, an Upload button is added to the start of the toolbar. */
 	onUpload?: () => void;
+	/** When provided with footerActions, replaces Clear/Save in the header end. */
+	headerEndActions?: ActionConfig[];
+	footerActions?: HeaderActions;
 	children: React.ReactNode;
 }
 
@@ -25,8 +30,27 @@ function ClipboardTabPanel({
 	hasNoChanges,
 	lastUpdated,
 	onUpload,
+	headerEndActions,
+	footerActions,
 	children,
 }: ClipboardTabPanelProps) {
+	const defaultHeaderEnd: ActionConfig[] = [
+		{
+			id: 'clear',
+			label: 'Clear',
+			variant: 'outlined',
+			onClick: onClear,
+			hidden: !hasContent,
+		},
+		{
+			id: 'save',
+			label: 'Save',
+			variant: 'contained',
+			onClick: onSave,
+			disabled: hasNoChanges,
+		},
+	];
+
 	const headerActions: HeaderActions = {
 		start: [
 			{
@@ -48,22 +72,7 @@ function ClipboardTabPanel({
 					]
 				: []),
 		],
-		end: [
-			{
-				id: 'clear',
-				label: 'Clear',
-				variant: 'outlined',
-				onClick: onClear,
-				hidden: !hasContent,
-			},
-			{
-				id: 'save',
-				label: 'Save',
-				variant: 'contained',
-				onClick: onSave,
-				disabled: hasNoChanges,
-			},
-		],
+		end: footerActions ? (headerEndActions ?? []) : defaultHeaderEnd,
 	};
 
 	return (
@@ -72,7 +81,66 @@ function ClipboardTabPanel({
 			sx={{ minWidth: { xs: '80vw', sm: '50vw' }, maxWidth: { xs: '80vw', sm: '50vw' } }}
 		>
 			{children}
-			<ClipboardContentMeta lastUpdated={lastUpdated} hasContent={hasContent} />
+			{footerActions ? (
+				<Box
+					sx={{
+						display: 'flex',
+						flexDirection: { xs: 'column', sm: 'row' },
+						alignItems: { xs: 'stretch', sm: 'center' },
+						gap: 1,
+					}}
+				>
+					<Box
+						sx={{
+							order: { xs: 2, sm: 1 },
+							flex: { sm: 1 },
+							minWidth: 0,
+							display: 'flex',
+							flexDirection: 'column',
+							gap: 0.25,
+						}}
+					>
+						<ClipboardLastUpdated lastUpdated={lastUpdated} />
+						<Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+							<ClipboardExpiry
+								lastUpdated={lastUpdated}
+								hasContent={hasContent}
+								hasNoChanges={hasNoChanges}
+							/>
+						</Box>
+					</Box>
+					<Box
+						sx={{
+							order: { xs: 3, sm: 2 },
+							flex: { sm: 1 },
+							display: { xs: 'none', sm: 'flex' },
+							justifyContent: 'center',
+							minWidth: 0,
+						}}
+					>
+						<ClipboardExpiry
+							lastUpdated={lastUpdated}
+							hasContent={hasContent}
+							hasNoChanges={hasNoChanges}
+						/>
+					</Box>
+				<ActionToolbar
+					actions={footerActions}
+					sx={{
+						order: { xs: 1, sm: 3 },
+						flex: { sm: 1 },
+						flexWrap: 'nowrap',
+						justifyContent: 'flex-end',
+					}}
+				/>
+				</Box>
+			) : (
+				<ClipboardContentMeta
+					lastUpdated={lastUpdated}
+					hasContent={hasContent}
+					hasNoChanges={hasNoChanges}
+				/>
+			)}
 		</FormPanel>
 	);
 }

@@ -10,7 +10,7 @@ interface ActionButtonProps {
 	variant: 'outlined' | 'contained';
 	disabled?: boolean;
 	icon?: React.ReactElement;
-	/** Hide label on mobile when an icon is set. Defaults to true if icon is provided. */
+	/** When true (default with icon), only the icon shows on mobile. Set false to keep label + icon. */
 	mobileIconOnly?: boolean;
 	color?: ButtonColor;
 }
@@ -31,6 +31,20 @@ function renderActions(configs: ActionConfig[]): React.ReactNode {
 			/>
 		));
 }
+
+const actionButtonSx = {
+	'& .MuiButton-root': {
+		fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+		px: { xs: 1.5, sm: 2 },
+		py: { xs: 1, sm: 1 },
+		minWidth: { xs: 'unset', sm: 64 },
+		flexShrink: 0,
+	},
+	'& .MuiButton-startIcon': {
+		marginRight: { xs: 0.5, sm: 1 },
+		'& > svg': { fontSize: { xs: '1.125rem', sm: '1.25rem' } },
+	},
+} as const;
 
 const iconOnlySx = {
 	minWidth: 'unset',
@@ -89,5 +103,5 @@ function ActionButton({
 	);
 }
 
-export { ActionButton, renderActions };
+export { ActionButton, actionButtonSx, renderActions };
 export type { ActionButtonProps };

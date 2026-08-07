@@ -8,7 +8,7 @@ interface StandardTextAreaProps {
 	value: string;
 	onChange: (value: string) => void;
 	placeholder?: string;
-	/** Minimum height of the textarea. Defaults to '30em'. */
+	/** Minimum height override. Defaults to 15em on mobile and 25em on sm+. */
 	minHeight?: string;
 	style?: React.CSSProperties;
 	className?: string;
@@ -24,7 +24,10 @@ function resizeTextarea(textarea: HTMLTextAreaElement) {
 	const scrollY = window.scrollY;
 	textarea.style.height = '0px';
 	const minHeight = parseFloat(getComputedStyle(textarea).minHeight);
-	textarea.style.height = `${Math.max(textarea.scrollHeight, minHeight || 0)}px`;
+	textarea.style.height = `${Math.max(
+		textarea.scrollHeight,
+		minHeight || 0,
+	)}px`;
 	window.scrollTo(0, scrollY);
 }
 
@@ -35,7 +38,7 @@ function StandardTextArea({
 	value,
 	onChange,
 	placeholder,
-	minHeight = '30em',
+	minHeight,
 	style,
 	className,
 	error,
@@ -76,7 +79,7 @@ function StandardTextArea({
 				style={{
 					width: '100%',
 					minWidth: '100%',
-					minHeight,
+					...(minHeight ? { minHeight } : {}),
 					boxSizing: 'border-box',
 					resize: 'none',
 					overflow: 'hidden',

@@ -1,5 +1,9 @@
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import React from 'react';
+import { useTextClipboard } from '../../../hooks/useTextClipboard';
 import { StandardTextArea } from '../../../components/controls/StandardTextArea/StandardTextArea';
+import type { HeaderActions } from '../../../types/basic.types';
 import { ClipboardTabPanel } from './ClipboardTabPanel';
 
 interface TextTabPanelProps {
@@ -23,6 +27,46 @@ function TextTabPanel({
 	onSave,
 	onRefresh,
 }: TextTabPanelProps) {
+	const { copy, paste } = useTextClipboard(textContent, onTextChange);
+
+	const headerEndActions = [
+		{
+			id: 'copy',
+			label: 'Copy',
+			variant: 'outlined' as const,
+			icon: <ContentCopyIcon />,
+			onClick: copy,
+			disabled: !hasContent,
+		},
+		{
+			id: 'paste',
+			label: 'Paste',
+			variant: 'contained' as const,
+			icon: <ContentPasteIcon />,
+			onClick: paste,
+			mobileIconOnly: false,
+		},
+	];
+
+	const footerActions: HeaderActions = {
+		end: [
+			{
+				id: 'clear',
+				label: 'Clear',
+				variant: 'outlined',
+				onClick: onClear,
+				hidden: !hasContent,
+			},
+			{
+				id: 'save',
+				label: 'Save',
+				variant: 'contained',
+				onClick: onSave,
+				disabled: hasNoTextChanges,
+			},
+		],
+	};
+
 	return (
 		<ClipboardTabPanel
 			onRefresh={onRefresh}
@@ -31,6 +75,8 @@ function TextTabPanel({
 			hasContent={hasContent}
 			hasNoChanges={hasNoTextChanges}
 			lastUpdated={lastUpdatedText}
+			headerEndActions={headerEndActions}
+			footerActions={footerActions}
 		>
 			<StandardTextArea
 				id='textpaste'

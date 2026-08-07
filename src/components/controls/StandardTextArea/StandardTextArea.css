@@ -3,6 +3,7 @@
 	border-radius: 4px;
 	outline: none;
 	padding: 0.5rem;
+	min-height: 10em;
 	transition:
 		border-color 0.15s ease-in-out,
 		box-shadow 0.15s ease-in-out;
@@ -10,6 +11,12 @@
 	background-color: transparent;
 	font-family: inherit;
 	font-size: inherit;
+}
+
+@media (min-width: 600px) {
+	.standard-textarea {
+		min-height: 25em;
+	}
 }
 
 /* iOS Safari zooms in on focus when font-size < 16px. Enforce a minimum on

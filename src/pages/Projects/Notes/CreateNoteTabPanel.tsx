@@ -1,15 +1,21 @@
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import { Box } from '@mui/material';
 import React, { useCallback, useState } from 'react';
 import { StandardAutocomplete } from '../../../components/controls/StandardAutocomplete/StandardAutocomplete';
 import { StandardCheckbox } from '../../../components/controls/StandardCheckbox/StandardCheckbox';
 import { StandardTextArea } from '../../../components/controls/StandardTextArea/StandardTextArea';
 import { StandardTextField } from '../../../components/controls/StandardTextField/StandardTextField';
-import { FormPanel } from '../../../components/layout/FormPanel/FormPanel';
+import {
+	ActionToolbar,
+	FormPanel,
+} from '../../../components/layout/FormPanel/FormPanel';
+import { ToastSeverity } from '../../../context/ToastProvider';
+import { useTextClipboard } from '../../../hooks/useTextClipboard';
 import { saveNote } from '../../../services/github.service';
 import type { ActionConfig } from '../../../types/basic.types';
 import type { Folder } from '../../../types/github.types';
 import { getErrorMessage } from '../../../utils/getErrorMessage';
-import { ToastSeverity } from '../../../context/ToastProvider';
 
 type NoteField = 'title' | 'folder' | 'text';
 
@@ -40,6 +46,8 @@ function CreateNoteTabPanel({
 	const [folder, setFolder] = useState('');
 	const [saving, setSaving] = useState(false);
 	const [touched, setTouched] = useState(emptyTouched);
+
+	const { copy, paste } = useTextClipboard(text, setText);
 
 	const markTouched = useCallback((field: NoteField) => {
 		setTouched((prev) => (prev[field] ? prev : { ...prev, [field]: true }));
@@ -83,6 +91,10 @@ function CreateNoteTabPanel({
 		void performSave();
 	}
 
+	function handleClearText() {
+		setText('');
+	}
+
 	const isNewFolder =
 		folder.trim() !== '' &&
 		!folders.some(
@@ -122,7 +134,33 @@ function CreateNoteTabPanel({
 		? 'Note text is required.'
 		: undefined;
 
+	const textToolbarActions: ActionConfig[] = [
+		{
+			id: 'copy',
+			label: 'Copy',
+			variant: 'outlined',
+			icon: <ContentCopyIcon />,
+			onClick: () => void copy(),
+			disabled: !text.trim(),
+		},
+		{
+			id: 'paste',
+			label: 'Paste',
+			variant: 'contained',
+			icon: <ContentPasteIcon />,
+			onClick: () => void paste(),
+			mobileIconOnly: false,
+		},
+	];
+
 	const footerActions: ActionConfig[] = [
+		{
+			id: 'clear',
+			label: 'Clear',
+			variant: 'outlined',
+			onClick: handleClearText,
+			hidden: !text.trim(),
+		},
 		{
 			id: 'save',
 			label: saving ? 'Saving…' : 'Save',
@@ -145,14 +183,22 @@ function CreateNoteTabPanel({
 				maxWidth: { xs: '80vw', sm: '50vw' },
 			}}
 		>
-			<Box sx={{ display: 'flex', gap: 2, minWidth: 0, alignItems: 'start' }}>
+			<Box
+				sx={{
+					display: 'flex',
+					flexDirection: { xs: 'column', sm: 'row' },
+					gap: 2,
+					minWidth: 0,
+					alignItems: { xs: 'stretch', sm: 'start' },
+				}}
+			>
 				<StandardTextField
 					id='note-title'
 					label='Title'
 					value={title}
 					onChange={(e) => setTitle(e.target.value)}
 					onBlur={() => markTouched('title')}
-					sx={{ flex: 1, minWidth: 0 }}
+					sx={{ flex: { sm: 1 }, minWidth: 0, width: '100%' }}
 					size='small'
 					required
 					error={titleError}
@@ -167,7 +213,7 @@ function CreateNoteTabPanel({
 					options={folderOptions}
 					error={folderError}
 					helperText={folderHelperText}
-					sx={{ flex: 1, minWidth: 0 }}
+					sx={{ flex: { sm: 1 }, minWidth: 0, width: '100%' }}
 					required
 				/>
 				<StandardCheckbox
@@ -176,6 +222,7 @@ function CreateNoteTabPanel({
 					onChange={setIsHidden}
 				/>
 			</Box>
+			<ActionToolbar actions={{ end: textToolbarActions }} sx={{ justifyContent: 'flex-end' }} />
 			<StandardTextArea
 				id='note-text'
 				name='note-text'

@@ -1,6 +1,6 @@
 import { Box, type SxProps, type Theme } from '@mui/material';
 import React from 'react';
-import { renderActions } from '../../controls/ActionButton/ActionButton';
+import { actionButtonSx, renderActions } from '../../controls/ActionButton/ActionButton';
 import type { ActionConfig, HeaderActions } from '../../../types/basic.types';
 import { resolveHeaderActions } from '../../../types/basic.types';
 
@@ -12,20 +12,6 @@ interface FormPanelProps {
 	/** Override or extend the outer Box styles. */
 	sx?: SxProps<Theme>;
 }
-
-const actionButtonSx = {
-	'& .MuiButton-root': {
-		fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-		px: { xs: 1.5, sm: 2 },
-		py: { xs: 1, sm: 1 },
-		minWidth: { xs: 'unset', sm: 64 },
-		flexShrink: 0,
-	},
-	'& .MuiButton-startIcon': {
-		marginRight: { xs: 0.5, sm: 1 },
-		'& > svg': { fontSize: { xs: '1.125rem', sm: '1.25rem' } },
-	},
-} as const;
 
 function ActionGroup({ actions }: { actions: ActionConfig[] }) {
 	if (actions.length === 0) return null;
@@ -43,6 +29,44 @@ function ActionGroup({ actions }: { actions: ActionConfig[] }) {
 	);
 }
 
+function ActionToolbar({ actions, sx }: { actions?: HeaderActions; sx?: SxProps<Theme> }) {
+	const { start, startSecondary, end } = resolveHeaderActions(actions);
+	if (start.length === 0 && startSecondary.length === 0 && end.length === 0) return null;
+
+	return (
+		<Box
+			sx={[
+				{
+					display: 'flex',
+					flexWrap: { xs: 'nowrap', sm: 'wrap' },
+					justifyContent: 'space-between',
+					alignItems: 'center',
+					gap: { xs: 0.5, sm: 1 },
+					...actionButtonSx,
+				},
+				...(Array.isArray(sx) ? sx : [sx]),
+			]}
+		>
+			{startSecondary.length > 0 ? (
+				<Box
+					sx={{
+						display: 'flex',
+						flexDirection: 'column',
+						gap: { xs: 0.5, sm: 1 },
+						flexShrink: 0,
+					}}
+				>
+					<ActionGroup actions={start} />
+					<ActionGroup actions={startSecondary} />
+				</Box>
+			) : (
+				<ActionGroup actions={start} />
+			)}
+			<ActionGroup actions={end} />
+		</Box>
+	);
+}
+
 function FormPanel({
 	header,
 	headerActions,
@@ -50,9 +74,7 @@ function FormPanel({
 	footerActions,
 	sx,
 }: FormPanelProps) {
-	const { start: headerStart, end: headerEnd } = resolveHeaderActions(headerActions);
 	const { start: footerStart, end: footerEnd } = resolveHeaderActions(footerActions);
-	const hasToolbar = headerStart.length > 0 || headerEnd.length > 0;
 	const hasFooter = footerStart.length > 0 || footerEnd.length > 0;
 	const footerJustify =
 		footerStart.length > 0 && footerEnd.length > 0
@@ -74,21 +96,7 @@ function FormPanel({
 				</Box>
 			)}
 
-			{hasToolbar && (
-				<Box
-					sx={{
-						display: 'flex',
-						flexWrap: { xs: 'nowrap', sm: 'wrap' },
-						justifyContent: 'space-between',
-						alignItems: 'center',
-						gap: { xs: 0.5, sm: 1 },
-						...actionButtonSx,
-					}}
-				>
-					<ActionGroup actions={headerStart} />
-					<ActionGroup actions={headerEnd} />
-				</Box>
-			)}
+			<ActionToolbar actions={headerActions} />
 
 			<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
 				{children}
@@ -111,5 +119,5 @@ function FormPanel({
 	);
 }
 
-export { FormPanel };
+export { ActionToolbar, FormPanel };
 export type { FormPanelProps };
