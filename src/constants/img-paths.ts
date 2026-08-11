@@ -35,7 +35,9 @@ export const ImgPaths = {
 			tile: {
 				about: `${IMG_ROOT}/pages/home/tile/about.png`,
 				blog: `${IMG_ROOT}/pages/home/tile/blog.png`,
+				youthwork: `${IMG_ROOT}/pages/home/tile/apple.jpeg`,
 				m2: `${IMG_ROOT}/pages/home/tile/m2.png`,
+				writing: `${IMG_ROOT}/pages/home/tile/writing.jpeg`,
 			},
 		},
 
@@ -142,6 +144,14 @@ export const ImgPaths = {
 			music: `${IMG_ROOT}/pages/recommendations/music/`,
 			podcasts: `${IMG_ROOT}/pages/recommendations/podcasts/`,
 			tv: `${IMG_ROOT}/pages/recommendations/tv/`,
+		},
+
+		writing: {
+			tile: {
+				analog: `${IMG_ROOT}/pages/writing/analog.jpeg`,
+				bannjan: `${IMG_ROOT}/pages/writing/bannjan.jpeg`,
+				recs: `${IMG_ROOT}/pages/writing/recs.jpeg`,
+			},
 		},
 	},
 } as const;

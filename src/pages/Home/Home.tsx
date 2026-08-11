@@ -1,60 +1,28 @@
-import { Box, Grid, Typography } from '@mui/material';
-import { Container } from '@mui/system';
 import React from 'react';
 import { SwapText } from '../../components/display/SwapText/SwapText';
-import { TextList } from '../../components/display/TextList/TextList';
-import { PageTile } from '../../components/layout/ResponsiveTile/PageTile';
+import { HubPage } from '../../components/layout/HubPage/HubPage';
 import { translations, welcomes } from '../../constants/home-constants';
 import { navRoutes } from '../../routes';
-import './Home.css';
 
 const tileBgPositions: Record<string, string> = {
 	'/about': 'center -10%',
 	'/projects': 'center 100%',
 	'/youth': 'center 0%',
+	'/writing': 'center 40%',
 };
 
 function Home() {
 	const pages = navRoutes.filter((r) => r.tileImg && r.label && !r.hide);
 
-	const pageTiles = pages.map((page) => (
-		<PageTile
-			key={page.route}
-			page={page}
-			bgImgPosition={tileBgPositions[page.route]}
-		/>
-	));
-
 	return (
-		<div className='App'>
-			<Container>
-				<Box marginTop={'5%'}>
-					<Typography
-						variant='h2'
-						fontFamily='monospace'
-						aria-label='Welcome'
-						sx={{
-							fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3.75rem' },
-							letterSpacing: { xs: 2, sm: 3, md: 5 },
-						}}
-					>
-						<SwapText string_list={welcomes} />
-					</Typography>
-				</Box>
-				<Box marginTop={'5%'}>
-					<span>{<TextList strings={translations.welcome_blurb} />}</span>
-				</Box>
-				<Box marginTop={'5%'}>
-					<Grid
-						container
-						columnSpacing={navRoutes.length}
-						justifyContent='center'
-					>
-						{pageTiles}
-					</Grid>
-				</Box>
-			</Container>
-		</div>
+		<HubPage
+			title={<SwapText string_list={welcomes} />}
+			ariaLabel='Welcome'
+			blurb={translations.welcome_blurb}
+			pages={pages}
+			tileBgPositions={tileBgPositions}
+			columnSpacing={navRoutes.length}
+		/>
 	);
 }
 

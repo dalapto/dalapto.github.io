@@ -5,10 +5,13 @@ import { Clipboard } from './pages/Projects/Clipboard/ClipboardPage';
 import { LitterApp } from './pages/Projects/LitterApp/LitterApp';
 import { Medieval2TotalWar } from './pages/Projects/m2tw/m2tw';
 import { Notes } from './pages/Projects/Notes/Notes';
+import { Projects } from './pages/Projects/Projects';
 import { Recyclotron } from './pages/Projects/Recylotron/Recylotron';
 import { RiseOfNations } from './pages/Projects/RON/Ron';
 import { Analog } from './pages/Writing/Analog/Analog';
 import { Bannjan } from './pages/Writing/Bannjan/Bannjan';
+import { TheToybot } from './pages/Writing/TheToybot/TheToybot';
+import { Writing } from './pages/Writing/Writing';
 import { YouthWork } from './pages/YouthWork/YouthWork';
 import { getRouteData } from './routes-data';
 
@@ -92,6 +95,12 @@ const writingRoutes: NavRoute[] = [
 		component: Bannjan,
 		...og('/bannjan'),
 	},
+	{
+		label: 'The Toybot',
+		route: '/thetoybot',
+		component: TheToybot,
+		...og('/thetoybot'),
+	},
 ];
 
 const litterAppRoute: NavRoute = {
@@ -122,21 +131,28 @@ const navRoutes: NavRoute[] = [
 		...og('/about/me'),
 	},
 	{
-		label: 'Projects',
-		route: '/projects',
-		tileImg: 'm2',
-		// component: Projects,
-		children: [...projectsRoutes, ...moddingRoutes],
-		...og('/projects'),
-	},
-	{
 		label: 'Youth Work',
 		route: '/youth',
-		tileImg: 'blog',
+		tileImg: 'youthwork',
 		component: YouthWork,
 		...og('/youth'),
 	},
-	{ label: 'Writing', route: '/writing', ...og('/writing'), children: [...writingRoutes], },
+	{
+		label: 'Writing',
+		component: Writing,
+		route: '/writing',
+		tileImg: 'writing',
+		...og('/writing'),
+		children: [...writingRoutes],
+	},
+	{
+		label: 'Projects',
+		route: '/projects',
+		tileImg: 'm2',
+		component: Projects,
+		children: [...projectsRoutes, ...moddingRoutes],
+		...og('/projects'),
+	},
 ];
 
 export { litterAppRoute, NavRoute, navRoutes, recyclotronRoute };
