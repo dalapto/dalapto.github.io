@@ -1,6 +1,6 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
-import { Box, FormHelperText } from '@mui/material';
+import { Box } from '@mui/material';
 import React, { useCallback, useState } from 'react';
 import { StandardAutocomplete } from '../../../components/controls/StandardAutocomplete/StandardAutocomplete';
 import { StandardCheckbox } from '../../../components/controls/StandardCheckbox/StandardCheckbox';
@@ -10,10 +10,12 @@ import {
 	ActionToolbar,
 	FormPanel,
 } from '../../../components/layout/FormPanel/FormPanel';
+import { useAuthRequest } from '../../../context/AuthRequestContext';
 import { useBusy } from '../../../context/BusyContext';
+import { useGitHub } from '../../../context/GitHubContext';
 import { ToastSeverity } from '../../../context/ToastProvider';
 import { useTextClipboard } from '../../../hooks/useTextClipboard';
-import { saveNote } from '../../../services/github.service';
+import { isPointerGistFolder, reconcilePointerGist, registerPointerGistEntry, saveNote } from '../../../services/github.service';
 import type { ActionConfig } from '../../../types/basic.types';
 import type { Folder } from '../../../types/github.types';
 import { getErrorMessage } from '../../../utils/getErrorMessage';
@@ -24,9 +26,7 @@ const emptyTouched = { title: false, folder: false, text: false };
 
 interface CreateNoteTabPanelProps {
 	folders: Folder[];
-	githubToken: string | null;
 	onSaved: () => void | Promise<void>;
-	onAuthRequired: () => void;
 	showToast: (
 		message: string,
 		severity: ToastSeverity,
@@ -36,11 +36,11 @@ interface CreateNoteTabPanelProps {
 
 function CreateNoteTabPanel({
 	folders,
-	githubToken,
 	onSaved,
-	onAuthRequired,
 	showToast,
 }: CreateNoteTabPanelProps) {
+	const { githubToken } = useGitHub();
+	const { requestAuth } = useAuthRequest();
 	const [title, setTitle] = useState('');
 	const [isHidden, setIsHidden] = useState(true);
 	const [text, setText] = useState('');
@@ -54,23 +54,25 @@ function CreateNoteTabPanel({
 		setTouched((prev) => (prev[field] ? prev : { ...prev, [field]: true }));
 	}, []);
 
-	const folderOptions = folders.map((item) => item.name);
+	const folderOptions = folders
+		.filter((item) => !isPointerGistFolder(item))
+		.map((item) => item.name);
 
-	const handleFolderChange = useCallback(
-		(value: string) => {
-			setFolder(value);
-			const match = folders.find(
-				(item) => item.name.toLowerCase() === value.trim().toLowerCase(),
-			);
-			if (match) {
-				setIsHidden(!match.isPublic);
-			}
-		},
-		[folders],
-	);
+	const handleFolderChange = useCallback((value: string) => {
+		setFolder(value);
+	}, []);
+
+	const handleFolderOpen = useCallback(() => {
+		if (!githubToken) {
+			requestAuth();
+		}
+	}, [githubToken, requestAuth]);
 
 	const performSave = useCallback(async () => {
-		if (!githubToken) return;
+		if (!githubToken) {
+			requestAuth();
+			return;
+		}
 
 		const folderName = folder.trim();
 		const filename = `${title.trim()}.txt`;
@@ -81,12 +83,17 @@ function CreateNoteTabPanel({
 			operation: 'save',
 		});
 		try {
-			await saveNote(githubToken, {
+			const saved = await saveNote(githubToken, {
 				folder: folderName,
 				filename,
 				content: text,
-				isPublic: !isHidden,
 			});
+			await registerPointerGistEntry(githubToken, saved.folderId, folderName, [filename], isHidden).catch(
+				(err) => showToast('Pointer gist register failed.', ToastSeverity.WARNING, err),
+			);
+			await reconcilePointerGist(githubToken, saved.folderId, isHidden).catch(
+				(err) => showToast('Pointer gist sync failed.', ToastSeverity.WARNING, err),
+			);
 			showToast(`Created ${title.trim()} successfully.`, ToastSeverity.SUCCESS);
 			setTitle('');
 			setText('');
@@ -100,13 +107,9 @@ function CreateNoteTabPanel({
 		} finally {
 			setBusy(false);
 		}
-	}, [folder, githubToken, isHidden, onSaved, setBusy, showToast, text, title]);
+	}, [folder, githubToken, isHidden, requestAuth, onSaved, setBusy, showToast, text, title]);
 
 	function handleSave() {
-		if (!githubToken) {
-			onAuthRequired();
-			return;
-		}
 		void performSave();
 	}
 
@@ -222,6 +225,7 @@ function CreateNoteTabPanel({
 						label='Folder'
 						value={folder}
 						onChange={handleFolderChange}
+						onOpen={handleFolderOpen}
 						onBlur={() => markTouched('folder')}
 						options={folderOptions}
 						error={folderError}
@@ -229,35 +233,19 @@ function CreateNoteTabPanel({
 						sx={{ flex: { sm: 1 }, minWidth: 0, width: '100%' }}
 						required
 					/>
-				<Box
-					sx={{
-						position: 'relative',
-						flexShrink: 0,
-						alignSelf: 'flex-start',
-					}}
-				>
-					<StandardCheckbox
-						label='Public'
-						checked={!isHidden}
-						onChange={(checked) => setIsHidden(!checked)}
-					/>
-					{!isNewFolder &&
-						selectedFolder &&
-						!isHidden !== selectedFolder.isPublic && (
-							<FormHelperText
-								sx={{
-									position: 'absolute',
-									top: '100%',
-									left: 0,
-									mt: 0.5,
-									mx: 0,
-									whiteSpace: 'nowrap',
-								}}
-							>
-								This will affect all notes in this folder.
-							</FormHelperText>
-						)}
-				</Box>
+			<Box
+				sx={{
+					position: 'relative',
+					flexShrink: 0,
+					alignSelf: 'flex-start',
+				}}
+			>
+				<StandardCheckbox
+					label='Hidden'
+					checked={isHidden}
+					onChange={setIsHidden}
+				/>
+			</Box>
 				</Box>
 				<StandardTextField
 					id='note-title'

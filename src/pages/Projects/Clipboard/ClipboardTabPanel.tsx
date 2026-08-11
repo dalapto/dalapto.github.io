@@ -2,10 +2,18 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import UploadIcon from '@mui/icons-material/Upload';
 import { Box } from '@mui/material';
 import React from 'react';
-import { ActionToolbar, FormPanel } from '../../../components/layout/FormPanel/FormPanel';
+import {
+	ActionToolbar,
+	FormPanel,
+} from '../../../components/layout/FormPanel/FormPanel';
+import { useAuthRequest } from '../../../context/AuthRequestContext';
+import { useSupabase } from '../../../context/SupabaseContext';
 import type { ActionConfig, HeaderActions } from '../../../types/basic.types';
-import { ClipboardContentMeta, ClipboardExpiry, ClipboardLastUpdated } from './ClipboardContentMeta';
-
+import {
+	ClipboardContentMeta,
+	ClipboardExpiry,
+	ClipboardLastUpdated,
+} from './ClipboardContentMeta';
 
 interface ClipboardTabPanelProps {
 	onRefresh: () => void;
@@ -34,6 +42,16 @@ function ClipboardTabPanel({
 	footerActions,
 	children,
 }: ClipboardTabPanelProps) {
+	const { user } = useSupabase();
+	const { requestAuth } = useAuthRequest();
+
+	function handleSave() {
+		if (!user) {
+			requestAuth();
+		}
+		void onSave();
+	}
+
 	const defaultHeaderEnd: ActionConfig[] = [
 		{
 			id: 'clear',
@@ -46,8 +64,8 @@ function ClipboardTabPanel({
 			id: 'save',
 			label: 'Save',
 			variant: 'contained',
-			onClick: onSave,
-			disabled: hasNoChanges,
+			onClick: handleSave,
+			disabled: user ? hasNoChanges : !hasContent,
 		},
 	];
 
@@ -69,16 +87,19 @@ function ClipboardTabPanel({
 							icon: <UploadIcon />,
 							onClick: onUpload,
 						},
-					]
+				  ]
 				: []),
 		],
-		end: footerActions ? (headerEndActions ?? []) : defaultHeaderEnd,
+		end: footerActions ? headerEndActions ?? [] : defaultHeaderEnd,
 	};
 
 	return (
 		<FormPanel
 			headerActions={headerActions}
-			sx={{ minWidth: { xs: '80vw', sm: '50vw' }, maxWidth: { xs: '80vw', sm: '50vw' } }}
+			sx={{
+				minWidth: { xs: '80vw', sm: '50vw' },
+				maxWidth: { xs: '80vw', sm: '50vw' },
+			}}
 		>
 			{children}
 			{footerActions ? (
@@ -124,15 +145,15 @@ function ClipboardTabPanel({
 							hasNoChanges={hasNoChanges}
 						/>
 					</Box>
-				<ActionToolbar
-					actions={footerActions}
-					sx={{
-						order: { xs: 1, sm: 3 },
-						flex: { sm: 1 },
-						flexWrap: 'nowrap',
-						justifyContent: 'flex-end',
-					}}
-				/>
+					<ActionToolbar
+						actions={footerActions}
+						sx={{
+							order: { xs: 1, sm: 3 },
+							flex: { sm: 1 },
+							flexWrap: 'nowrap',
+							justifyContent: 'flex-end',
+						}}
+					/>
 				</Box>
 			) : (
 				<ClipboardContentMeta

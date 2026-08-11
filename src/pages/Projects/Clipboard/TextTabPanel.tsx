@@ -1,8 +1,10 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import React from 'react';
-import { useTextClipboard } from '../../../hooks/useTextClipboard';
 import { StandardTextArea } from '../../../components/controls/StandardTextArea/StandardTextArea';
+import { useAuthRequest } from '../../../context/AuthRequestContext';
+import { useSupabase } from '../../../context/SupabaseContext';
+import { useTextClipboard } from '../../../hooks/useTextClipboard';
 import type { HeaderActions } from '../../../types/basic.types';
 import { ClipboardTabPanel } from './ClipboardTabPanel';
 
@@ -28,6 +30,15 @@ function TextTabPanel({
 	onRefresh,
 }: TextTabPanelProps) {
 	const { copy, paste } = useTextClipboard(textContent, onTextChange);
+	const { user } = useSupabase();
+	const { requestAuth } = useAuthRequest();
+
+	function handleSave() {
+		if (!user) {
+			requestAuth();
+		}
+		void onSave();
+	}
 
 	const headerEndActions = [
 		{
@@ -61,8 +72,8 @@ function TextTabPanel({
 				id: 'save',
 				label: 'Save',
 				variant: 'contained',
-				onClick: onSave,
-				disabled: hasNoTextChanges,
+				onClick: handleSave,
+				disabled: user ? hasNoTextChanges : !hasContent,
 			},
 		],
 	};

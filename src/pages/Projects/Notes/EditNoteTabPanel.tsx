@@ -2,7 +2,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { Box, FormHelperText } from '@mui/material';
+import { Box } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
 import { StandardAutocomplete } from '../../../components/controls/StandardAutocomplete/StandardAutocomplete';
 import { StandardCheckbox } from '../../../components/controls/StandardCheckbox/StandardCheckbox';
@@ -13,12 +13,17 @@ import {
 	ActionToolbar,
 	FormPanel,
 } from '../../../components/layout/FormPanel/FormPanel';
+import { useAuthRequest } from '../../../context/AuthRequestContext';
 import { useBusy } from '../../../context/BusyContext';
+import { useGitHub } from '../../../context/GitHubContext';
 import { ToastSeverity } from '../../../context/ToastProvider';
 import { useTextClipboard } from '../../../hooks/useTextClipboard';
 import {
 	deleteNote,
 	getNote,
+	isPointerGistFolder,
+	reconcilePointerGist,
+	registerPointerGistEntry,
 	updateNote,
 } from '../../../services/github.service';
 import type { HeaderActions } from '../../../types/basic.types';
@@ -60,9 +65,7 @@ interface LoadedNote {
 
 interface EditNoteTabPanelProps {
 	folders: Folder[];
-	githubToken: string | null;
 	onSaved: () => void | Promise<void>;
-	onAuthRequired: () => void;
 	showToast: (
 		message: string,
 		severity: ToastSeverity,
@@ -72,17 +75,17 @@ interface EditNoteTabPanelProps {
 
 function EditNoteTabPanel({
 	folders,
-	githubToken,
 	onSaved,
-	onAuthRequired,
 	showToast,
 }: EditNoteTabPanelProps) {
+	const { githubToken } = useGitHub();
+	const { requestAuth } = useAuthRequest();
 	const [folderName, setFolderName] = useState('');
 	const [noteName, setNoteName] = useState('');
 	const [newFolder, setNewFolder] = useState('');
 	const [newTitle, setNewTitle] = useState('');
-	const [isPublic, setIsPublic] = useState(false);
-	const [committedIsPublic, setCommittedIsPublic] = useState(false);
+	const [isHidden, setIsHidden] = useState(true);
+	const [committedIsHidden, setCommittedIsHidden] = useState(true);
 	const [text, setText] = useState('');
 	const [loadedNote, setLoadedNote] = useState<LoadedNote | null>(null);
 	const { busy, operation, setBusy } = useBusy();
@@ -96,7 +99,9 @@ function EditNoteTabPanel({
 		setTouched((prev) => (prev[field] ? prev : { ...prev, [field]: true }));
 	}, []);
 
-	const folderOptions = folders.map((item) => item.name);
+	const folderOptions = folders
+		.filter((item) => !isPointerGistFolder(item))
+		.map((item) => item.name);
 	const selectedFolder = folders.find((item) => item.name === folderName);
 	const noteOptions =
 		selectedFolder?.noteFilenames.map((filename) =>
@@ -109,8 +114,8 @@ function EditNoteTabPanel({
 		setNewTitle('');
 		setText('');
 		setLoadedNote(null);
-		setIsPublic(false);
-		setCommittedIsPublic(false);
+		setIsHidden(true);
+		setCommittedIsHidden(true);
 		setNoteSelectKey((key) => key + 1);
 		setTouched((prev) => ({
 			...prev,
@@ -123,11 +128,21 @@ function EditNoteTabPanel({
 
 	const handleFolderChange = useCallback(
 		(newFolderValue: string) => {
+			if (!githubToken) {
+				requestAuth();
+				return;
+			}
 			setFolderName(newFolderValue);
 			clearSelectedNote();
 		},
-		[clearSelectedNote],
+		[clearSelectedNote, githubToken, requestAuth],
 	);
+
+	const handleFolderOpen = useCallback(() => {
+		if (!githubToken) {
+			requestAuth();
+		}
+	}, [githubToken, requestAuth]);
 
 	useEffect(() => {
 		if (!githubToken || !selectedFolder || !noteName.trim()) {
@@ -192,16 +207,23 @@ function EditNoteTabPanel({
 			operation: 'save',
 		});
 		try {
+			const isFolderMove = trimmedFolder !== loadedNote.folderName;
 			const saved = await updateNote(githubToken, {
 				folderId: loadedNote.folderId,
 				filename: loadedNote.filename,
 				content: text,
 				newFilename:
 					newFilename !== loadedNote.filename ? newFilename : undefined,
-				newFolder:
-					trimmedFolder !== loadedNote.folderName ? trimmedFolder : undefined,
-				isPublic: isPublic,
+				newFolder: isFolderMove ? trimmedFolder : undefined,
 			});
+			if (isFolderMove) {
+				await registerPointerGistEntry(githubToken, saved.folderId, trimmedFolder, [newFilename], isHidden).catch(
+					(err) => showToast('Pointer gist register failed.', ToastSeverity.WARNING, err),
+				);
+			}
+			await reconcilePointerGist(githubToken, saved.folderId, isHidden).catch(
+				(err) => showToast('Pointer gist sync failed.', ToastSeverity.WARNING, err),
+			);
 			showToast(
 				`Updated ${loadedNote.title} successfully.`,
 				ToastSeverity.SUCCESS,
@@ -219,7 +241,7 @@ function EditNoteTabPanel({
 				text,
 				updatedAt: saved.updatedAt,
 			});
-			setCommittedIsPublic(isPublic);
+			setCommittedIsHidden(isHidden);
 			setTouched((prev) => ({
 				...prev,
 				newFolder: false,
@@ -234,7 +256,7 @@ function EditNoteTabPanel({
 		}
 	}, [
 		githubToken,
-		isPublic,
+		isHidden,
 		loadedNote,
 		newFolder,
 		newTitle,
@@ -247,7 +269,7 @@ function EditNoteTabPanel({
 
 	function handleSave() {
 		if (!githubToken) {
-			onAuthRequired();
+			requestAuth();
 			return;
 		}
 		void performSave();
@@ -367,7 +389,7 @@ function EditNoteTabPanel({
 		(trimmedNewFolder !== loadedNote.folderName ||
 			trimmedNewTitle !== loadedNote.title ||
 			text !== loadedNote.text ||
-			isPublic !== committedIsPublic);
+			isHidden !== committedIsHidden);
 
 	const folderNameRequiredError = touched.folderName && !folderName.trim();
 	const noteNameRequiredError = touched.noteName && !noteName.trim();
@@ -497,6 +519,7 @@ function EditNoteTabPanel({
 						label='Existing Folder'
 						value={folderName}
 						onChange={handleFolderChange}
+						onOpen={handleFolderOpen}
 						onBlur={() => markTouched('folderName')}
 						options={folderOptions}
 						freeSolo={false}
@@ -555,33 +578,19 @@ function EditNoteTabPanel({
 									sx={{ flex: { sm: 1 }, minWidth: 0, width: '100%' }}
 									required
 								/>
-								<Box
-									sx={{
-										position: 'relative',
-										flexShrink: 0,
-										alignSelf: 'flex-start',
-									}}
-								>
-									<StandardCheckbox
-										label='Public'
-										checked={isPublic}
-										onChange={setIsPublic}
-									/>
-									{isPublic !== committedIsPublic && (
-										<FormHelperText
-											sx={{
-												position: 'absolute',
-												top: '100%',
-												left: 0,
-												mt: 0.5,
-												mx: 0,
-												whiteSpace: 'nowrap',
-											}}
-										>
-											This will affect all notes in this folder.
-										</FormHelperText>
-									)}
-								</Box>
+							<Box
+								sx={{
+									position: 'relative',
+									flexShrink: 0,
+									alignSelf: 'flex-start',
+								}}
+							>
+								<StandardCheckbox
+									label='Hidden'
+									checked={isHidden}
+									onChange={setIsHidden}
+								/>
+							</Box>
 							</Box>
 							<StandardTextField
 								id='edit-note-title'

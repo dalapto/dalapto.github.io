@@ -1,5 +1,5 @@
 import { Box, useMediaQuery, useTheme } from '@mui/material';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { AuthIconButton } from '../../../components/auth/AuthIconButton';
 import { GitHubAuthModal } from '../../../components/auth/GitHubAuthModal';
 import { LoadingOverlay } from '../../../components/display/LoadingOverlay/LoadingOverlay';
@@ -22,11 +22,10 @@ function Notes() {
 	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 	const { githubUser, githubToken, authLoading } = useGitHub();
 	const { busy, label, variant, operation } = useBusy();
-	const { requestAuth, registerAuthRequestHandler } = useAuthRequest();
+	const { registerAuthRequestHandler } = useAuthRequest();
 	const { showToast } = useToast();
 	const [authModalOpen, setAuthModalOpen] = useState(false);
 	const [foldersLoading, setFoldersLoading] = useState(false);
-	const pendingSaveRef = useRef(false);
 
 	const [folders, setFolders] = useState<Folder[]>([]);
 
@@ -54,20 +53,11 @@ function Notes() {
 			.finally(() => setFoldersLoading(false));
 	}, [githubToken, loadFolders, showToast]);
 
-	function handleAuthRequired() {
-		pendingSaveRef.current = true;
-		requestAuth();
-	}
-
 	function handleAuthenticated() {
 		setAuthModalOpen(false);
-		if (pendingSaveRef.current) {
-			pendingSaveRef.current = false;
-		}
 	}
 
 	function handleAuthClose() {
-		pendingSaveRef.current = false;
 		setAuthModalOpen(false);
 	}
 
@@ -85,10 +75,11 @@ function Notes() {
 	}, [githubToken, loadFolders, showToast]);
 
 	const spinnerBusy = busy && variant === 'spinner';
+	const noteFetchBusy = spinnerBusy && operation === 'fetch';
 	const progressBusy = busy && variant === 'progress';
 
 	const pageLoadingTitle =
-		spinnerBusy && label
+		noteFetchBusy && label
 			? busyTitle('fetch', label, 'Loading notes…')
 			: authLoading && foldersLoading
 				? 'Loading…'
@@ -108,9 +99,7 @@ function Notes() {
 			content: (
 				<CreateNoteTabPanel
 					folders={folders}
-					githubToken={githubToken}
 					onSaved={handleSaved}
-					onAuthRequired={handleAuthRequired}
 					showToast={showToast}
 				/>
 			),
@@ -121,9 +110,7 @@ function Notes() {
 			content: (
 				<EditNoteTabPanel
 					folders={folders}
-					githubToken={githubToken}
 					onSaved={handleSaved}
-					onAuthRequired={handleAuthRequired}
 					showToast={showToast}
 				/>
 			),
@@ -168,7 +155,7 @@ function Notes() {
 	return (
 		<>
 			<LoadingOverlay
-				open={authLoading || foldersLoading || spinnerBusy}
+				open={authLoading || foldersLoading || noteFetchBusy}
 				title={pageLoadingTitle}
 				variant='spinner'
 			/>

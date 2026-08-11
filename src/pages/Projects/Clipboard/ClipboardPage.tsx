@@ -22,11 +22,13 @@ function Clipboard() {
 	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 	const { busy, label, variant, operation } = useBusy();
 	const { user, authLoading } = useSupabase();
-	const { requestAuth, registerAuthRequestHandler } = useAuthRequest();
+	const { registerAuthRequestHandler } = useAuthRequest();
 	const [authModalOpen, setAuthModalOpen] = useState(false);
 
 	useEffect(() => {
-		registerAuthRequestHandler(() => setAuthModalOpen(true));
+		registerAuthRequestHandler(() => {
+			setAuthModalOpen(true);
+		});
 		return () => registerAuthRequestHandler(null);
 	}, [registerAuthRequestHandler]);
 
@@ -58,7 +60,7 @@ function Clipboard() {
 		saveImage,
 		saveText,
 		setTextContent,
-	} = useClipboard(requestAuth);
+	} = useClipboard();
 
 	function handleAuthCancel() {
 		setAuthModalOpen(false);

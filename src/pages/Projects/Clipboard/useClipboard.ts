@@ -7,7 +7,8 @@ import type {
 	ImageUploadHandle,
 	StoredImage,
 } from '../../../components/controls/ImageUpload/ImageUpload';
-import { busyTitle, useBusy } from '../../../context/BusyContext';
+import { useAuthRequest } from '../../../context/AuthRequestContext';
+import { useBusy } from '../../../context/BusyContext';
 import { useSupabase } from '../../../context/SupabaseContext';
 import { ToastSeverity, useToast } from '../../../context/ToastProvider';
 import { saveClipboardRow } from '../../../services/clipboard.service';
@@ -30,9 +31,10 @@ const TAB_LABELS: Record<TabId, string> = {
 	file: 'File',
 };
 
-function useClipboard(onAuthRequired: () => void) {
+function useClipboard() {
 	const { showToast } = useToast();
-	const { user } = useSupabase();
+	const { user, authLoading } = useSupabase();
+	const { requestAuth } = useAuthRequest();
 	const { setBusy } = useBusy();
 	const [lastTab, setLastTab] = useState<TabId>('text');
 	const [textContent, setTextContent] = useState('');
@@ -142,7 +144,7 @@ function useClipboard(onAuthRequired: () => void) {
 	async function withSave(tab: TabId, save: () => Promise<void>) {
 		if (!user) {
 			pendingSaveRef.current = { tab, save };
-			onAuthRequired();
+			requestAuth();
 			return;
 		}
 		await performSave(tab, save);
@@ -268,8 +270,13 @@ function useClipboard(onAuthRequired: () => void) {
 	}
 
 	useEffect(() => {
-		void loadClipboard();
-	}, [loadClipboard]);
+		if (authLoading) return;
+		if (user) {
+			void loadClipboard();
+		} else {
+			setBusy(false);
+		}
+	}, [authLoading, user, loadClipboard, setBusy]);
 
 	return {
 		fileUploadRef,

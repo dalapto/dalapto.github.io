@@ -8,6 +8,8 @@ interface JsonHeaderProps {
 	image?: Image;
 	titleText?: string;
 	subtitleText?: string;
+	/** HTML heading tag for the text title. Defaults to 'h1'. Has no effect when `image` is set. */
+	titleVariant?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 	/** Height of the desktop header container. Defaults to '50vh'. */
 	height?: string;
 	/** Width of the desktop header container. Defaults to '60%'. */
@@ -34,6 +36,7 @@ function JsonHeader({
 	image,
 	titleText,
 	subtitleText,
+	titleVariant = 'h1',
 	height = '50vh',
 	width = '60%',
 	imagePosition = 'center 0%',
@@ -46,10 +49,12 @@ function JsonHeader({
 	mobileImagePosition = 'center 10%',
 }: JsonHeaderProps) {
 	if (!image) {
+		const Heading = titleVariant;
+		const titleClass = titleVariant === 'h1' ? 'json-section-text-header__title' : undefined;
 		return (
 			<div className='json-section-text-header'>
 				{titleText && (
-					<h1 className='json-section-text-header__title'>{titleText}</h1>
+					<Heading className={titleClass}>{titleText}</Heading>
 				)}
 				{subtitleText && (
 					<p className='json-section-text-header__subtitle'>{subtitleText}</p>

@@ -1,0 +1,10 @@
+.json-section--constrained {
+	width: 100%;
+	margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+	.json-section--constrained {
+		max-width: var(--json-section-max-width);
+	}
+}

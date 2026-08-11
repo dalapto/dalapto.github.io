@@ -21,6 +21,7 @@ interface StandardAutocompleteProps {
 	error?: boolean;
 	helperText?: string;
 	onBlur?: () => void;
+	onOpen?: () => void;
 	sx?: SxProps<Theme>;
 }
 
@@ -37,11 +38,13 @@ function StandardAutocomplete({
 	error,
 	helperText,
 	onBlur,
+	onOpen,
 	sx,
 }: StandardAutocompleteProps) {
 	const autocompleteProps: AutocompleteProps<string, false, false, typeof freeSolo> = {
 		freeSolo,
 		disabled,
+		onOpen,
 		options,
 		...(freeSolo
 			? {

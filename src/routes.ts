@@ -20,7 +20,7 @@ interface NavRoute {
 	route: string;
 	tileImg?: string;
 	hide?: boolean;
-	component?: () => React.ReactNode;
+	component?: React.ComponentType;
 	children?: NavRoute[];
 	onMouseEnter?: (_event: React.MouseEvent<HTMLElement>) => void;
 	onFocus?: (_event: React.FocusEvent<HTMLElement>) => void;

@@ -24,7 +24,12 @@ function AuthRequestProvider({ children }: { children: React.ReactNode }) {
 	);
 
 	const requestAuth = useCallback(() => {
-		handlerRef.current?.();
+		console.log('[AuthRequestContext] requestAuth called, handler present:', !!handlerRef.current);
+		if (handlerRef.current) {
+			console.log('[AuthRequestContext] calling handler...');
+			handlerRef.current();
+			console.log('[AuthRequestContext] handler done');
+		}
 	}, []);
 
 	const value = useMemo(

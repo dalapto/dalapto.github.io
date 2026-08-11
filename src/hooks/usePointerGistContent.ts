@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useBusy } from '../context/BusyContext';
 import {
-	fetchPointerGistIds,
+	fetchPointerGistEntries,
 	fetchPublicGistFiles,
 } from '../services/github.service';
 
@@ -16,28 +17,33 @@ interface UsePointerGistContentResult {
 }
 
 function usePointerGistContent(pageKey: string): UsePointerGistContentResult {
+	const { setBusy } = useBusy();
 	const [files, setFiles] = useState<PointerGistFile[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		let cancelled = false;
+		setBusy(true, { label: 'content', operation: 'fetch' });
 
 		async function load() {
 			try {
-				const ids = await fetchPointerGistIds();
-				const gistId = ids[pageKey];
-				if (!gistId) {
+				const entries = await fetchPointerGistEntries();
+				const entry = entries[pageKey];
+				if (!entry) {
 					if (!cancelled) setError(`No gist registered for "${pageKey}"`);
 					return;
 				}
-				const fetched = await fetchPublicGistFiles(gistId);
+				const fetched = await fetchPublicGistFiles(entry.id, entry.files);
 				if (!cancelled) setFiles(fetched);
 			} catch (err) {
 				if (!cancelled)
-					setError(err instanceof Error ? err.message : 'Failed to load content');
+					setError(
+						err instanceof Error ? err.message : 'Failed to load content',
+					);
 			} finally {
 				if (!cancelled) setLoading(false);
+				setBusy(false);
 			}
 		}
 
@@ -45,7 +51,7 @@ function usePointerGistContent(pageKey: string): UsePointerGistContentResult {
 		return () => {
 			cancelled = true;
 		};
-	}, [pageKey]);
+	}, [pageKey, setBusy]);
 
 	return { files, loading, error };
 }

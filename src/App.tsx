@@ -105,13 +105,16 @@ function AppInner() {
 				{transitions((style, loc) => (
 					<animated.div style={style} className='page-transition-wrapper'>
 						<Routes location={loc}>
-							{flattenRoutes(navRoutes).map((r) => (
+						{flattenRoutes(navRoutes).map((r) => {
+							const Page = r.component;
+							return (
 								<Route
 									key={r.route}
 									path={r.route}
-									element={r.component ? r.component() : <PageInConstruction />}
+									element={Page ? <Page /> : <PageInConstruction />}
 								/>
-							))}
+							);
+						})}
 						</Routes>
 					</animated.div>
 				))}

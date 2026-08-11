@@ -13,7 +13,7 @@ export interface Folder {
 	updatedAt: string;
 	htmlUrl: string;
 	noteFilenames: string[];
-	isPublic: boolean;
+	isSecret: boolean;
 }
 
 /** One note = one file within a folder gist. */
@@ -30,8 +30,6 @@ export interface SaveNoteInput {
 	/** File name within the folder; must be unique within the folder. */
 	filename: string;
 	content: string;
-	/** When true the underlying gist is created as public; defaults to false (private/secret). */
-	isPublic?: boolean;
 }
 
 export interface ListFoldersOptions {

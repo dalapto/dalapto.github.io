@@ -1,6 +1,7 @@
 import React, { ReactElement, useEffect, useRef } from 'react';
 import { BackgroundConfig } from '../../../context/BackgroundContext.tsx';
 import { useBackground } from '../../../context/BackgroundContext.tsx';
+import './JsonSection.css';
 import { Image } from '../../../types/basic.types';
 import { ParallaxCanvas } from '../../display/ParallaxCanvas/ParallaxCanvas.tsx';
 import { JsonPanelData } from './JsonPanel.tsx';
@@ -38,6 +39,8 @@ interface JsonSectionProps {
 	paddingTop?: string;
 	/** Padding after the last item. Defaults to '8rem'. */
 	paddingBottom?: string;
+	/** Max width of the section container. Only applies when no background is set. */
+	maxWidth?: string;
 }
 
 function isGroup(item: JsonSectionChild): item is JsonSectionGroup {
@@ -72,7 +75,7 @@ function ScrollGroup({
 	);
 }
 
-function JsonSection({ background, items, className, gap, paddingTop, paddingBottom }: JsonSectionProps) {
+function JsonSection({ background, items, className, gap, paddingTop, paddingBottom, maxWidth }: JsonSectionProps) {
 	const content = items.map((item, i) => {
 		if (isGroup(item) && item.scrollBackground) {
 			return (
@@ -89,7 +92,7 @@ function JsonSection({ background, items, className, gap, paddingTop, paddingBot
 	if (!background) {
 		return (
 			<div
-				className={className}
+				className={[className, maxWidth ? 'json-section--constrained' : ''].filter(Boolean).join(' ')}
 				style={{
 					display: 'flex',
 					flexDirection: 'column',
@@ -97,6 +100,7 @@ function JsonSection({ background, items, className, gap, paddingTop, paddingBot
 					...(gap && { gap }),
 					...(paddingTop && { paddingTop }),
 					...(paddingBottom && { paddingBottom }),
+					...(maxWidth && { '--json-section-max-width': maxWidth } as React.CSSProperties),
 				}}
 			>
 				{content}
