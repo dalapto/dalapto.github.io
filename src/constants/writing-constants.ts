@@ -1,7 +1,7 @@
 const translations = {
 	writing_blurb: [
-		'I like to write.',
-		'Pick something below to read.',
+		'Want to read something I wrote?',
+		'Pick something to read below.',
 	],
 };
 
