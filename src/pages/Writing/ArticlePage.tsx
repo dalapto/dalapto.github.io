@@ -24,6 +24,7 @@ function ArticleChapter({ title, lines }: { title: string; lines: string[] }) {
 		>
 			<JsonHeader titleText={title} titleVariant='h3' />
 			<div
+				className='json-panel-content-bg'
 				style={{
 					backgroundColor: colours.primary,
 					padding: '1rem',
