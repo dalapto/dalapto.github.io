@@ -14,6 +14,14 @@ interface BusyOptions {
 	label?: string;
 	variant?: LoadingVariant;
 	operation?: BusyOperation;
+	/** Independent busy slot so overlapping fetches do not clear each other. */
+	source?: string;
+}
+
+interface BusyEntry {
+	label: string | null;
+	variant: LoadingVariant;
+	operation: BusyOperation | null;
 }
 
 interface BusyContextValue {
@@ -22,6 +30,23 @@ interface BusyContextValue {
 	variant: LoadingVariant;
 	operation: BusyOperation | null;
 	setBusy: (active: boolean, options?: BusyOptions) => void;
+}
+
+const DEFAULT_BUSY_SOURCE = 'default';
+
+function pickBusyEntry(entries: Record<string, BusyEntry>): BusyEntry | null {
+	const list = Object.values(entries);
+	if (list.length === 0) return null;
+	return (
+		[...list]
+			.reverse()
+			.find(
+				(entry) =>
+					entry.variant === 'progress' ||
+					entry.operation === 'save' ||
+					entry.operation === 'delete',
+			) ?? list[list.length - 1]
+	);
 }
 
 const BusyContext = createContext<BusyContextValue | null>(null);
@@ -49,23 +74,41 @@ function BusyProvider({
 	children: ReactNode;
 	initialBusy?: boolean;
 }) {
-	const [busy, setBusyState] = useState(initialBusy);
-	const [label, setLabel] = useState<string | null>(null);
-	const [variant, setVariant] = useState<LoadingVariant>('spinner');
-	const [operation, setOperation] = useState<BusyOperation | null>(null);
+	const [entries, setEntries] = useState<Record<string, BusyEntry>>(
+		initialBusy
+			? {
+					[DEFAULT_BUSY_SOURCE]: {
+						label: null,
+						variant: 'spinner',
+						operation: null,
+					},
+				}
+			: {},
+	);
 
 	const setBusy = useCallback((active: boolean, options?: BusyOptions) => {
-		setBusyState(active);
-		if (active) {
-			setLabel(options?.label ?? null);
-			setVariant(options?.variant ?? 'spinner');
-			setOperation(options?.operation ?? null);
-		} else {
-			setLabel(null);
-			setVariant('spinner');
-			setOperation(null);
-		}
+		const source = options?.source ?? DEFAULT_BUSY_SOURCE;
+		setEntries((prev) => {
+			const next = { ...prev };
+			if (active) {
+				delete next[source];
+				next[source] = {
+					label: options?.label ?? null,
+					variant: options?.variant ?? 'spinner',
+					operation: options?.operation ?? null,
+				};
+			} else {
+				delete next[source];
+			}
+			return next;
+		});
 	}, []);
+
+	const current = pickBusyEntry(entries);
+	const busy = current !== null;
+	const label = current?.label ?? null;
+	const variant = current?.variant ?? 'spinner';
+	const operation = current?.operation ?? null;
 
 	const value = useMemo(
 		() => ({ busy, label, variant, operation, setBusy }),

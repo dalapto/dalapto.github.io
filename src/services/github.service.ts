@@ -6,6 +6,18 @@ import type {
 	Note,
 	SaveNoteInput,
 } from '../types/github.types';
+import {
+	ARTICLE_PAGE_IMAGE_FILENAME,
+	articlePageImageRecordToObjectUrl,
+	binaryToImageObjectUrl,
+	encodeArticlePageImageFile,
+	filterArticleTextFilenames,
+	findOrphanImageFilenames,
+	findPageImageFilename,
+	isArticlePageImageFilename,
+	parseArticlePageImageRecord,
+	validateArticlePageImageFile,
+} from '../utils/article-page-image';
 
 const GITHUB_API_BASE = 'https://api.github.com';
 const GIST_RAW_BASE = 'https://gist.githubusercontent.com';
@@ -19,11 +31,102 @@ export interface PointerGistEntry {
 	id: string;
 	hidden: boolean;
 	files: string[];
+	/** Filename of the page image stored in the article gist (not a text chapter). */
+	image?: string;
+	/** ISO timestamp — cache-bust token for public raw image URLs after upload/replace. */
+	imageUpdatedAt?: string;
+}
+
+export function gistRawFileUrl(
+	gistId: string,
+	filename: string,
+	cacheBust?: string | number,
+): string {
+	const base = `${GIST_RAW_BASE}/${POINTER_GIST_OWNER}/${gistId}/raw/${encodeURIComponent(
+		filename.trim(),
+	)}`;
+	if (cacheBust === undefined) return base;
+	return `${base}?v=${encodeURIComponent(String(cacheBust))}`;
+}
+
+export async function createArticlePageImageObjectUrl(
+	entry: PointerGistEntry | undefined,
+	token?: string,
+): Promise<string | undefined> {
+	const filename = entry?.image?.trim();
+	if (!filename || !entry?.id) return undefined;
+
+	try {
+		if (token) {
+			const gist = await getGist(token, entry.id);
+			const file = findGistFileByFilename(gist.files, filename);
+			if (!file) return undefined;
+
+			if (file.content && !file.truncated) {
+				return objectUrlFromGistFileContent(file.content);
+			}
+
+			if (file.raw_url) {
+				return objectUrlFromRawResponse(
+					await fetch(file.raw_url, { cache: 'no-store' }),
+				);
+			}
+		}
+
+		return objectUrlFromRawResponse(
+			await fetch(
+				gistRawFileUrl(
+					entry.id,
+					filename,
+					entry.imageUpdatedAt ?? Date.now(),
+				),
+				{ cache: 'no-store' },
+			),
+		);
+	} catch {
+		return undefined;
+	}
+}
+
+function objectUrlFromGistFileContent(content: string): string | undefined {
+	const record = parseArticlePageImageRecord(content);
+	if (!record) return undefined;
+	return articlePageImageRecordToObjectUrl(record);
+}
+
+async function objectUrlFromRawResponse(
+	res: Response,
+): Promise<string | undefined> {
+	if (!res.ok) return undefined;
+	const contentType = res.headers.get('content-type') ?? '';
+	if (contentType.startsWith('image/')) {
+		return binaryToImageObjectUrl(await res.arrayBuffer(), contentType);
+	}
+	const record = parseArticlePageImageRecord(await res.text());
+	if (!record) return undefined;
+	return articlePageImageRecordToObjectUrl(record);
+}
+
+export function findPointerGistEntryByFolderName(
+	entries: Record<string, PointerGistEntry>,
+	folderName: string,
+): { key: string; entry: PointerGistEntry } | undefined {
+	const normalized = folderName.trim().toLowerCase();
+	const key = Object.keys(entries).find(
+		(k) => k.trim().toLowerCase() === normalized,
+	);
+	if (!key) return undefined;
+	return { key, entry: entries[key] };
 }
 
 interface GistFile {
 	filename: string;
 	content?: string;
+	encoding?: 'base64' | 'utf-8';
+	truncated?: boolean;
+	raw_url?: string;
+	size?: number;
+	type?: string;
 }
 
 interface Gist {
@@ -57,7 +160,12 @@ async function githubFetch<T>(
 			...init?.headers,
 		},
 	});
-	if (!res.ok) throw new Error(`GitHub API error: ${res.status} ${path}`);
+	if (!res.ok) {
+		const detail = (await res.text().catch(() => '')).slice(0, 300);
+		throw new Error(
+			`GitHub API error: ${res.status} ${path}${detail ? ` — ${detail}` : ''}`,
+		);
+	}
 	if (res.status === 204) return undefined as T;
 	return res.json() as Promise<T>;
 }
@@ -68,7 +176,9 @@ function gistToFolder(gist: Gist): Folder {
 		name: gist.description ?? gist.id,
 		updatedAt: gist.updated_at,
 		htmlUrl: gist.html_url,
-		noteFilenames: Object.values(gist.files).map((file) => file.filename),
+		noteFilenames: filterArticleTextFilenames(
+			Object.values(gist.files).map((file) => file.filename),
+		),
 		isSecret: true,
 	};
 }
@@ -92,6 +202,60 @@ async function listGists(
 	if (options.page) params.set('page', String(options.page));
 	const query = params.toString();
 	return githubFetch<Gist[]>(token, `/gists${query ? `?${query}` : ''}`);
+}
+
+async function listAllGists(token: string): Promise<Gist[]> {
+	const all: Gist[] = [];
+	let page = 1;
+	while (true) {
+		const batch = await listGists(token, { perPage: 100, page });
+		if (batch.length === 0) break;
+		all.push(...batch);
+		if (batch.length < 100) break;
+		page += 1;
+	}
+	return all;
+}
+
+function normalizePointerEntryFromGist(
+	entry: PointerGistEntry,
+	gistFilenames: string[],
+): { entry: PointerGistEntry; orphanImages: string[] } {
+	const gistKeys = new Set(gistFilenames.map((f) => f.trim().toLowerCase()));
+	let image = entry.image?.trim();
+	if (image && !gistKeys.has(image.toLowerCase())) {
+		image = undefined;
+	}
+	if (!image) {
+		image = findPageImageFilename(gistFilenames);
+	}
+
+	const orphanImages = findOrphanImageFilenames(gistFilenames, image);
+	const next: PointerGistEntry = {
+		...entry,
+		files: filterArticleTextFilenames(gistFilenames, image),
+	};
+
+	if (image) {
+		next.image = image;
+	} else {
+		delete next.image;
+		delete next.imageUpdatedAt;
+	}
+
+	return { entry: next, orphanImages };
+}
+
+async function deleteOrphanImagesFromGist(
+	token: string,
+	gistId: string,
+	filenames: string[],
+): Promise<void> {
+	if (filenames.length === 0) return;
+	const filesPatch = Object.fromEntries(
+		filenames.map((name) => [name, null]),
+	) as Record<string, null>;
+	await updateGist(token, gistId, { files: filesPatch });
 }
 
 async function getGist(token: string, gistId: string): Promise<Gist> {
@@ -185,13 +349,60 @@ async function patchPointerGist(
  * Used internally by write-path functions to avoid CDN staleness or auth issues
  * that can affect the public raw URL used by `fetchPointerGistEntries`.
  */
+function dedupePointerGistEntries(
+	entries: Record<string, PointerGistEntry>,
+): Record<string, PointerGistEntry> {
+	const byGistId = new Map<string, [string, PointerGistEntry]>();
+	for (const [key, entry] of Object.entries(entries)) {
+		const trimmedKey = key.trim();
+		const existing = byGistId.get(entry.id);
+		if (!existing) {
+			byGistId.set(entry.id, [trimmedKey, entry]);
+			continue;
+		}
+		if (trimmedKey.length < existing[0].length) {
+			byGistId.set(entry.id, [trimmedKey, entry]);
+		}
+	}
+
+	const byName = new Map<string, [string, PointerGistEntry]>();
+	for (const [key, entry] of byGistId.values()) {
+		const nameKey = key.trim().toLowerCase();
+		const existing = byName.get(nameKey);
+		if (!existing) {
+			byName.set(nameKey, [key, entry]);
+			continue;
+		}
+		const score = (item: PointerGistEntry) =>
+			(item.image ? 10 : 0) + item.files.length;
+		if (score(entry) > score(existing[1])) {
+			byName.set(nameKey, [key, entry]);
+		}
+	}
+
+	return Object.fromEntries(
+		[...byName.values()].map(([key, entry]) => [key, entry]),
+	);
+}
+
+function findGistFileByFilename(
+	files: Record<string, GistFile>,
+	filename: string,
+): GistFile | undefined {
+	const normalized = filename.trim().toLowerCase();
+	return Object.values(files).find(
+		(file) => file.filename.trim().toLowerCase() === normalized,
+	);
+}
+
 async function fetchPointerGistEntriesAuth(
 	token: string,
 ): Promise<Record<string, PointerGistEntry>> {
 	const gist = await getGist(token, POINTER_GIST_ID);
 	const file = gist.files[POINTER_GIST_FILENAME];
 	if (!file?.content) throw new Error('Pointer gist file not found or empty');
-	return JSON.parse(file.content) as Record<string, PointerGistEntry>;
+	const parsed = JSON.parse(file.content) as Record<string, PointerGistEntry>;
+	return dedupePointerGistEntries(parsed);
 }
 
 /** Updates the `files` list for a tracked gist, preserving its existing `hidden` value. No-ops silently if the gist isn't tracked. */
@@ -203,9 +414,14 @@ async function syncPointerGistFiles(
 	const entries = await fetchPointerGistEntriesAuth(token);
 	const key = Object.keys(entries).find((k) => entries[k].id === gistId);
 	if (!key) return;
+	const entry = entries[key];
 	await patchPointerGist(token, {
 		...entries,
-		[key]: { ...entries[key], id: gistId, files: filenames },
+		[key]: {
+			...entry,
+			id: gistId,
+			files: filterArticleTextFilenames(filenames, entry.image),
+		},
 	});
 }
 
@@ -244,15 +460,79 @@ export async function registerPointerGistEntry(
 	token: string,
 	gistId: string,
 	folderName: string,
-	filenames: string[],
+	_filenames: string[],
+	hidden: boolean,
+	image?: string,
+): Promise<void> {
+	const entries = await fetchPointerGistEntriesAuth(token);
+	const gist = await getGist(token, gistId);
+	const gistFilenames = Object.keys(gist.files);
+	const trimmedName = folderName.trim();
+	const trimmedImage = image?.trim();
+	const existingEntry = Object.entries(entries).find(
+		([, entry]) => entry.id === gistId,
+	)?.[1];
+
+	const draft: PointerGistEntry = {
+		...(existingEntry ?? { id: gistId, hidden, files: [] }),
+		id: gistId,
+		hidden,
+		...(trimmedImage ? { image: trimmedImage } : {}),
+	};
+
+	const { entry: normalized } = normalizePointerEntryFromGist(draft, gistFilenames);
+	const withoutGist = Object.fromEntries(
+		Object.entries(entries).filter(([, entry]) => entry.id !== gistId),
+	);
+
+	await patchPointerGist(token, {
+		...withoutGist,
+		[trimmedName]: normalized,
+	});
+}
+
+/**
+ * Moves or consolidates a pointer gist entry to a new folder name,
+ * removing duplicate keys that reference the same gist ID.
+ */
+export async function movePointerGistEntry(
+	token: string,
+	gistId: string,
+	oldFolderName: string,
+	newFolderName: string,
 	hidden: boolean,
 ): Promise<void> {
 	const entries = await fetchPointerGistEntriesAuth(token);
-	const alreadyTracked = Object.values(entries).some((e) => e.id === gistId);
-	if (alreadyTracked) return;
+	const gist = await getGist(token, gistId);
+	const gistFilenames = Object.keys(gist.files);
+	const trimmedNew = newFolderName.trim();
+	const trimmedOld = oldFolderName.trim();
+	const existing =
+		Object.entries(entries).find(([, entry]) => entry.id === gistId)?.[1] ??
+		entries[trimmedOld];
+
+	if (!existing) {
+		await registerPointerGistEntry(
+			token,
+			gistId,
+			trimmedNew,
+			gistFilenames,
+			hidden,
+		);
+		return;
+	}
+
+	const { entry: normalized } = normalizePointerEntryFromGist(
+		{ ...existing, hidden },
+		gistFilenames,
+	);
+	const withoutGist = Object.fromEntries(
+		Object.entries(entries).filter(([, entry]) => entry.id !== gistId),
+	);
+
 	await patchPointerGist(token, {
-		...entries,
-		[folderName]: { id: gistId, hidden, files: filenames },
+		...withoutGist,
+		[trimmedNew]: normalized,
 	});
 }
 
@@ -269,10 +549,14 @@ export async function syncPointerGistEntry(
 	const key = Object.keys(entries).find((k) => entries[k].id === gistId);
 	if (!key) return;
 	const gist = await getGist(token, gistId);
-	const filenames = Object.keys(gist.files);
+	const { entry: normalized, orphanImages } = normalizePointerEntryFromGist(
+		{ ...entries[key], hidden },
+		Object.keys(gist.files),
+	);
+	await deleteOrphanImagesFromGist(token, gistId, orphanImages);
 	await patchPointerGist(token, {
 		...entries,
-		[key]: { ...entries[key], hidden, files: filenames },
+		[key]: normalized,
 	});
 }
 
@@ -288,23 +572,158 @@ export async function reconcilePointerGist(
 	updatedGistId: string,
 	hidden: boolean,
 ): Promise<void> {
-	const [entries, gists] = await Promise.all([
+	const [entries, gists, freshUpdatedGist] = await Promise.all([
 		fetchPointerGistEntriesAuth(token),
-		listGists(token, { perPage: 100 }),
+		listAllGists(token),
+		getGist(token, updatedGistId),
 	]);
 	const gistMap = new Map(gists.map((g) => [g.id, g]));
+	gistMap.set(updatedGistId, freshUpdatedGist);
 	const updated: Record<string, PointerGistEntry> = {};
+
 	for (const [key, entry] of Object.entries(entries)) {
 		const gist = gistMap.get(entry.id);
-		updated[key] = gist
-			? {
-					...entry,
-					hidden: entry.id === updatedGistId ? hidden : entry.hidden,
-					files: Object.keys(gist.files),
-			  }
-			: entry;
+		if (!gist) {
+			updated[key] = entry;
+			continue;
+		}
+
+		const { entry: normalized, orphanImages } = normalizePointerEntryFromGist(
+			{
+				...entry,
+				hidden: entry.id === updatedGistId ? hidden : entry.hidden,
+			},
+			Object.keys(gist.files),
+		);
+		await deleteOrphanImagesFromGist(token, entry.id, orphanImages);
+		updated[key] = normalized;
 	}
+
 	await patchPointerGist(token, updated);
+}
+
+export interface ArticlePageImageInput {
+	/** New image file to upload. */
+	file?: File;
+	/** When true, removes the current page image from the gist and pointer entry. */
+	remove?: boolean;
+}
+
+/**
+ * Uploads, replaces, or removes the page image for a tracked article gist.
+ * Images are stored as `page-image.json` (base64 JSON text) because the gist
+ * HTTP API cannot persist binary files.
+ */
+export async function syncArticlePageImage(
+	token: string,
+	gistId: string,
+	input: ArticlePageImageInput,
+): Promise<void> {
+	if (!input.file && !input.remove) return;
+
+	if (input.file) {
+		const validationError = validateArticlePageImageFile(input.file);
+		if (validationError) throw new Error(validationError);
+	}
+
+	const entries = await fetchPointerGistEntriesAuth(token);
+	const key = Object.keys(entries).find((k) => entries[k].id === gistId);
+	if (!key) {
+		throw new Error(
+			'Article is not registered in the pointer gist. Save a note first or register the article.',
+		);
+	}
+
+	const entry = entries[key];
+	const gistBefore = await getGist(token, gistId);
+	const currentFilenames = Object.values(gistBefore.files).map(
+		(file) => file.filename,
+	);
+	const textFilenames = filterArticleTextFilenames(currentFilenames);
+
+	if (input.remove && textFilenames.length === 0) {
+		throw new Error(
+			'Cannot remove the page image because it is the only file in this article. Add a section first.',
+		);
+	}
+
+	const filesPatch: Record<string, { content: string } | null> = {};
+	let nextImage: string | undefined = entry.image;
+
+	if (input.remove) {
+		for (const name of currentFilenames) {
+			if (isArticlePageImageFilename(name)) {
+				filesPatch[name] = null;
+			}
+		}
+		nextImage = undefined;
+	} else if (input.file) {
+		const record = await encodeArticlePageImageFile(input.file);
+		for (const name of currentFilenames) {
+			if (
+				isArticlePageImageFilename(name) &&
+				name.trim().toLowerCase() !== ARTICLE_PAGE_IMAGE_FILENAME
+			) {
+				filesPatch[name] = null;
+			}
+		}
+		filesPatch[ARTICLE_PAGE_IMAGE_FILENAME] = {
+			content: JSON.stringify(record),
+		};
+		nextImage = ARTICLE_PAGE_IMAGE_FILENAME;
+	}
+
+	let gist = gistBefore;
+	if (Object.keys(filesPatch).length > 0) {
+		gist = await updateGist(token, gistId, { files: filesPatch });
+	}
+
+	const remainingFilenames = Object.values(gist.files)
+		.filter(Boolean)
+		.map((file) => file.filename);
+	if (remainingFilenames.length === 0) {
+		throw new Error('Cannot remove the last file from an article gist.');
+	}
+
+	if (nextImage && !findGistFileByFilename(gist.files, nextImage)) {
+		throw new Error('Uploaded image file missing from gist.');
+	}
+
+	const entryForNormalize: PointerGistEntry = { ...entry };
+	if (nextImage) {
+		entryForNormalize.image = nextImage;
+		entryForNormalize.imageUpdatedAt = gist.updated_at;
+	} else {
+		delete entryForNormalize.image;
+		delete entryForNormalize.imageUpdatedAt;
+	}
+
+	const { entry: normalized, orphanImages } = normalizePointerEntryFromGist(
+		entryForNormalize,
+		remainingFilenames,
+	);
+
+	await deleteOrphanImagesFromGist(token, gistId, orphanImages);
+
+	await patchPointerGist(token, {
+		...entries,
+		[key]: normalized,
+	});
+}
+
+export async function fetchPointerGistEntryByFolderName(
+	folderName: string,
+): Promise<PointerGistEntry | undefined> {
+	const entries = await fetchPointerGistEntries();
+	return findPointerGistEntryByFolderName(entries, folderName)?.entry;
+}
+
+export async function fetchPointerGistEntryByFolderNameAuth(
+	token: string,
+	folderName: string,
+): Promise<PointerGistEntry | undefined> {
+	const entries = await fetchPointerGistEntriesAuth(token);
+	return findPointerGistEntryByFolderName(entries, folderName)?.entry;
 }
 
 function findGistByFolderName(
@@ -334,10 +753,50 @@ export async function fetchGitHubUser(token: string): Promise<GitHubUser> {
 
 export async function listFolders(
 	token: string,
-	options: ListFoldersOptions = {},
+	_options: ListFoldersOptions = {},
 ): Promise<Folder[]> {
-	const gists = await listGists(token, options);
-	return gists.map(gistToFolder);
+	const [gists, entries] = await Promise.all([
+		listAllGists(token),
+		fetchPointerGistEntriesAuth(token).catch(
+			() => ({} as Record<string, PointerGistEntry>),
+		),
+	]);
+
+	const trackedIds = new Set(Object.values(entries).map((entry) => entry.id));
+	const nameByGistId = new Map(
+		Object.entries(entries).map(([name, entry]) => [entry.id, name.trim()]),
+	);
+
+	const byName = new Map<string, Folder>();
+
+	for (const gist of gists) {
+		if (gist.id === POINTER_GIST_ID) continue;
+
+		const folder = gistToFolder(gist);
+		const trackedName = nameByGistId.get(gist.id);
+		if (trackedName) {
+			folder.name = trackedName;
+		}
+
+		const nameKey = folder.name.trim().toLowerCase();
+		const existing = byName.get(nameKey);
+		if (!existing) {
+			byName.set(nameKey, folder);
+			continue;
+		}
+
+		const existingTracked = trackedIds.has(existing.id);
+		const currentTracked = trackedIds.has(folder.id);
+		if (currentTracked && !existingTracked) {
+			byName.set(nameKey, folder);
+		} else if (!currentTracked && !existingTracked) {
+			if (folder.updatedAt > existing.updatedAt) {
+				byName.set(nameKey, folder);
+			}
+		}
+	}
+
+	return Array.from(byName.values());
 }
 
 export async function getFolder(
@@ -395,7 +854,7 @@ export async function updateNote(
 		!!newFolder && newFolder.toLowerCase() !== sourceFolderName.toLowerCase();
 
 	if (isFolderChange) {
-		const gists = await listGists(token);
+		const gists = await listAllGists(token);
 		const targetGist = findGistByFolderName(gists, newFolder!);
 
 		if (targetGist && gistHasFile(targetGist, newFilename)) {
@@ -503,7 +962,7 @@ export async function saveNote(
 	const folderName = input.folder.trim();
 	const filename = input.filename.trim();
 
-	const gists = await listGists(token);
+	const gists = await listAllGists(token);
 	const existing = findGistByFolderName(gists, folderName);
 
 	if (existing && gistHasFile(existing, filename)) {
@@ -552,7 +1011,7 @@ export async function deleteNote(
 	);
 
 	// GitHub rejects a PATCH that would leave a gist with no files (422).
-	// Delete the whole gist when this is the last note in the folder.
+	// Delete the whole gist only when no files would remain (including page image).
 	if (remainingFilenames.length === 0) {
 		await deleteGist(token, folderId);
 		await removePointerGistEntry(token, folderId).catch((err) =>

@@ -1,3 +1,22 @@
+.image-upload-dropzone {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.image-upload-dropzone--drag-over .upload-placeholder,
+.image-upload-dropzone--drag-over.image-upload-dropzone--has-previews {
+	border-color: var(--color-secondary);
+	color: var(--color-secondary);
+}
+
+.image-upload-dropzone--drag-over.image-upload-dropzone--has-previews {
+	outline: 2px dashed var(--color-secondary);
+	outline-offset: 4px;
+	border-radius: 0.5rem;
+}
+
 .upload-placeholder {
 	display: flex;
 	flex-direction: column;
@@ -15,9 +34,15 @@
 	box-sizing: border-box;
 }
 
-.upload-placeholder:hover {
+.upload-placeholder:hover,
+.upload-placeholder:focus-visible {
 	border-color: var(--color-secondary);
 	color: var(--color-secondary);
+}
+
+.upload-placeholder:focus-visible {
+	outline: 2px solid var(--color-secondary);
+	outline-offset: 2px;
 }
 
 .image-upload-previews {

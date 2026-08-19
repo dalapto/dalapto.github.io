@@ -22,13 +22,19 @@ function buildMetaTags(route: RouteData): string {
 	const url = `${BASE_URL}${route.path}`;
 	const tags = [
 		`<meta property="og:type" content="website" />`,
-		route.ogTitle ? `<meta property="og:title" content="${route.ogTitle}" />` : '',
+		route.ogTitle
+			? `<meta property="og:title" content="${route.ogTitle}" />`
+			: '',
 		route.ogDescription
 			? `<meta property="og:description" content="${route.ogDescription}" />`
 			: '',
 		`<meta property="og:url" content="${url}" />`,
-		route.ogImage ? `<meta property="og:image" content="${route.ogImage}" />` : '',
-		`<meta name="twitter:card" content="${route.ogImage ? 'summary_large_image' : 'summary'}" />`,
+		route.ogImage
+			? `<meta property="og:image" content="${route.ogImage}" />`
+			: '',
+		`<meta name="twitter:card" content="${
+			route.ogImage ? 'summary_large_image' : 'summary'
+		}" />`,
 		route.ogDescription
 			? `<meta name="description" content="${route.ogDescription}" />`
 			: '',
@@ -39,7 +45,10 @@ function buildMetaTags(route: RouteData): string {
 function injectMeta(html: string, route: RouteData): string {
 	let result = html;
 	if (route.ogTitle) {
-		result = result.replace(/<title>[^<]*<\/title>/, `<title>${route.ogTitle}</title>`);
+		result = result.replace(
+			/<title>[^<]*<\/title>/,
+			`<title>${route.ogTitle}</title>`,
+		);
 	}
 	return result.replace('</head>', `\t\t${buildMetaTags(route)}\n\t</head>`);
 }

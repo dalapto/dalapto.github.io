@@ -8,6 +8,7 @@ import { TabbedPanel } from '../../../components/Json/JsonTabs/TabbedPanel';
 import { ImgPaths } from '../../../constants/img-paths';
 import { useAuthRequest } from '../../../context/AuthRequestContext';
 import { useGitHub } from '../../../context/GitHubContext';
+import { useWritingPages } from '../../../context/WritingPagesContext';
 import { busyTitle, useBusy } from '../../../context/BusyContext';
 import { ToastSeverity, useToast } from '../../../context/ToastProvider';
 import { listFolders } from '../../../services/github.service';
@@ -24,6 +25,7 @@ function Notes() {
 	const { busy, label, variant, operation } = useBusy();
 	const { registerAuthRequestHandler } = useAuthRequest();
 	const { showToast } = useToast();
+	const { refreshWritingPages } = useWritingPages();
 	const [authModalOpen, setAuthModalOpen] = useState(false);
 	const [foldersLoading, setFoldersLoading] = useState(false);
 
@@ -66,13 +68,14 @@ function Notes() {
 		setFoldersLoading(true);
 		try {
 			await loadFolders(githubToken);
+			await refreshWritingPages();
 		} catch (error) {
 			console.error(error);
 			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		} finally {
 			setFoldersLoading(false);
 		}
-	}, [githubToken, loadFolders, showToast]);
+	}, [githubToken, loadFolders, refreshWritingPages, showToast]);
 
 	const spinnerBusy = busy && variant === 'spinner';
 	const noteFetchBusy = spinnerBusy && operation === 'fetch';

@@ -5,7 +5,10 @@ import { JsonHeader } from '../../components/Json/JsonSection/JsonHeader';
 import { JsonSection } from '../../components/Json/JsonSection/JsonSection';
 import { colours } from '../../constants/colours';
 import { busyTitle, useBusy } from '../../context/BusyContext';
+import { useWritingPages } from '../../context/WritingPagesContext';
 import { usePointerGistContent } from '../../hooks/usePointerGistContent';
+import { getWritingPageBackgroundBlur } from '../../utils/writing-articles';
+import { ArticlePageHeader } from './ArticlePageHeader';
 
 interface ArticlePageProps {
 	pageKey: string;
@@ -38,8 +41,10 @@ function ArticleChapter({ title, lines }: { title: string; lines: string[] }) {
 }
 
 function ArticlePage({ pageKey }: ArticlePageProps) {
+	const { getArticleImageUrl } = useWritingPages();
 	const { files, loading, error } = usePointerGistContent(pageKey);
 	const { busy, label, variant, operation } = useBusy();
+	const backgroundImageUrl = getArticleImageUrl(pageKey);
 
 	if (error) {
 		return (
@@ -73,9 +78,11 @@ function ArticlePage({ pageKey }: ArticlePageProps) {
 			/>
 			{!loading && (
 				<>
-					<div style={{ paddingTop: '8rem', paddingBottom: '3rem', textAlign: 'center' }}>
-						<JsonHeader titleText={pageKey} />
-					</div>
+					<ArticlePageHeader
+						title={pageKey}
+						backgroundImageUrl={backgroundImageUrl}
+						backgroundBlur={getWritingPageBackgroundBlur(pageKey)}
+					/>
 					<JsonSection
 						items={chapters}
 						gap='20rem'

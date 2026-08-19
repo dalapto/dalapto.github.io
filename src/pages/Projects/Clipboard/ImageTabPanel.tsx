@@ -38,6 +38,7 @@ function ImageTabPanel({
 			hasNoChanges={hasNoImageChanges}
 			lastUpdated={lastUpdatedImage}
 			onUpload={() => imageUploadRef.current?.trigger()}
+			onPaste={() => void imageUploadRef.current?.pasteFromClipboard()}
 		>
 			<ImageUpload
 				ref={imageUploadRef}

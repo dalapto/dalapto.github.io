@@ -1,7 +1,8 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import { Box } from '@mui/material';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { PageImageField } from '../../../components/controls/PageImageField/PageImageField';
 import { StandardAutocomplete } from '../../../components/controls/StandardAutocomplete/StandardAutocomplete';
 import { StandardCheckbox } from '../../../components/controls/StandardCheckbox/StandardCheckbox';
 import { StandardTextArea } from '../../../components/controls/StandardTextArea/StandardTextArea';
@@ -15,14 +16,24 @@ import { useBusy } from '../../../context/BusyContext';
 import { useGitHub } from '../../../context/GitHubContext';
 import { ToastSeverity } from '../../../context/ToastProvider';
 import { useTextClipboard } from '../../../hooks/useTextClipboard';
-import { isPointerGistFolder, reconcilePointerGist, registerPointerGistEntry, saveNote } from '../../../services/github.service';
+import { usePageImageField } from '../../../hooks/usePageImageField';
+import {
+	fetchPointerGistEntryByFolderName,
+	isPointerGistFolder,
+	reconcilePointerGist,
+	registerPointerGistEntry,
+	saveNote,
+	syncArticlePageImage,
+} from '../../../services/github.service';
 import type { ActionConfig } from '../../../types/basic.types';
 import type { Folder } from '../../../types/github.types';
+import { filterArticleTextFilenames } from '../../../utils/article-page-image';
 import { getErrorMessage } from '../../../utils/getErrorMessage';
+import { isStaticWritingFolderKey } from '../../../utils/writing-articles';
 
-type NoteField = 'title' | 'folder' | 'text';
+type NoteField = 'section' | 'article' | 'text';
 
-const emptyTouched = { title: false, folder: false, text: false };
+const emptyTouched = { section: false, article: false, text: false };
 
 interface CreateNoteTabPanelProps {
 	folders: Folder[];
@@ -41,65 +52,141 @@ function CreateNoteTabPanel({
 }: CreateNoteTabPanelProps) {
 	const { githubToken } = useGitHub();
 	const { requestAuth } = useAuthRequest();
-	const [title, setTitle] = useState('');
+	const [section, setSection] = useState('');
 	const [isHidden, setIsHidden] = useState(true);
 	const [text, setText] = useState('');
-	const [folder, setFolder] = useState('');
+	const [article, setArticle] = useState('');
 	const { busy, operation, setBusy } = useBusy();
 	const [touched, setTouched] = useState(emptyTouched);
 
 	const { copy, paste } = useTextClipboard(text, setText);
+	const showPageImageControl =
+		article.trim() !== '' && !isStaticWritingFolderKey(article);
+	const {
+		previewUrl: pageImageUrl,
+		pendingFile: pendingPageImageFile,
+		removed: pageImageRemoved,
+		hasImageChanges: hasPageImageChanges,
+		handleFileSelect: handlePageImageSelect,
+		handleRemove: handlePageImageRemove,
+		resetAfterSave: resetPageImageAfterSave,
+		loading: pageImageLoading,
+	} = usePageImageField(showPageImageControl ? article : '', (message) =>
+		showToast(message, ToastSeverity.ERROR),
+	);
+
+	const isNewArticle =
+		article.trim() !== '' &&
+		!folders.some(
+			(item) => item.name.toLowerCase() === article.trim().toLowerCase(),
+		);
+
+	useEffect(() => {
+		if (!article.trim()) {
+			setIsHidden(true);
+			return;
+		}
+		if (isNewArticle) return;
+
+		let cancelled = false;
+		fetchPointerGistEntryByFolderName(article)
+			.then((entry) => {
+				if (cancelled || !entry) return;
+				setIsHidden(entry.hidden);
+			})
+			.catch(() => {
+				if (!cancelled) setIsHidden(true);
+			});
+
+		return () => {
+			cancelled = true;
+		};
+	}, [article, isNewArticle]);
 
 	const markTouched = useCallback((field: NoteField) => {
 		setTouched((prev) => (prev[field] ? prev : { ...prev, [field]: true }));
 	}, []);
 
-	const folderOptions = folders
-		.filter((item) => !isPointerGistFolder(item))
-		.map((item) => item.name);
+	const articleOptions = useMemo(() => {
+		const names = folders
+			.filter((item) => !isPointerGistFolder(item))
+			.map((item) => item.name.trim())
+			.filter(Boolean);
+		return [...new Set(names)];
+	}, [folders]);
 
-	const handleFolderChange = useCallback((value: string) => {
-		setFolder(value);
+	const handleArticleChange = useCallback((value: string) => {
+		setArticle(value);
 	}, []);
 
-	const handleFolderOpen = useCallback(() => {
+	const handleArticleOpen = useCallback(() => {
 		if (!githubToken) {
 			requestAuth();
 		}
 	}, [githubToken, requestAuth]);
 
-	const performSave = useCallback(async () => {
-		if (!githubToken) {
+	const noteFilename = section.trim() ? `${section.trim()}.txt` : '';
+	const selectedArticle = folders.find(
+		(item) => item.name.toLowerCase() === article.trim().toLowerCase(),
+	);
+	const isDuplicateNote =
+		noteFilename !== '' &&
+		(selectedArticle
+			? filterArticleTextFilenames(selectedArticle.noteFilenames).some(
+					(name) => name.toLowerCase() === noteFilename.toLowerCase(),
+				)
+			: false);
+
+	const canSaveNote =
+		!!section.trim() &&
+		!!text.trim() &&
+		!!article.trim() &&
+		!isDuplicateNote;
+	const canSaveImageOnly =
+		showPageImageControl &&
+		!!selectedArticle &&
+		hasPageImageChanges &&
+		!isNewArticle;
+
+	const syncPageImage = useCallback(
+		async (folderId: string, articleName: string) => {
+			if (!hasPageImageChanges || isStaticWritingFolderKey(articleName)) return;
+			await syncArticlePageImage(githubToken!, folderId, {
+				file: pendingPageImageFile ?? undefined,
+				remove: pageImageRemoved && !pendingPageImageFile,
+			});
+		},
+		[
+			githubToken,
+			hasPageImageChanges,
+			pageImageRemoved,
+			pendingPageImageFile,
+		],
+	);
+
+	const performSaveImageOnly = useCallback(async () => {
+		if (!githubToken || !selectedArticle || !canSaveImageOnly) {
 			requestAuth();
 			return;
 		}
 
-		const folderName = folder.trim();
-		const filename = `${title.trim()}.txt`;
-
+		const articleName = selectedArticle.name;
 		setBusy(true, {
-			label: title.trim(),
+			label: 'page image',
 			variant: 'progress',
 			operation: 'save',
 		});
 		try {
-			const saved = await saveNote(githubToken, {
-				folder: folderName,
-				filename,
-				content: text,
-			});
-			await registerPointerGistEntry(githubToken, saved.folderId, folderName, [filename], isHidden).catch(
-				(err) => showToast('Pointer gist register failed.', ToastSeverity.WARNING, err),
+			await registerPointerGistEntry(
+				githubToken,
+				selectedArticle.id,
+				articleName,
+				filterArticleTextFilenames(selectedArticle.noteFilenames),
+				isHidden,
 			);
-			await reconcilePointerGist(githubToken, saved.folderId, isHidden).catch(
-				(err) => showToast('Pointer gist sync failed.', ToastSeverity.WARNING, err),
-			);
-			showToast(`Created ${title.trim()} successfully.`, ToastSeverity.SUCCESS);
-			setTitle('');
-			setText('');
-			setFolder('');
-			setIsHidden(true);
-			setTouched(emptyTouched);
+			await syncPageImage(selectedArticle.id, articleName);
+			showToast('Page image saved.', ToastSeverity.SUCCESS);
+			resetPageImageAfterSave();
 			onSaved();
 		} catch (error) {
 			console.error(error);
@@ -107,9 +194,82 @@ function CreateNoteTabPanel({
 		} finally {
 			setBusy(false);
 		}
-	}, [folder, githubToken, isHidden, requestAuth, onSaved, setBusy, showToast, text, title]);
+	}, [
+		canSaveImageOnly,
+		githubToken,
+		isHidden,
+		onSaved,
+		registerPointerGistEntry,
+		requestAuth,
+		resetPageImageAfterSave,
+		selectedArticle,
+		setBusy,
+		showToast,
+		syncPageImage,
+	]);
+
+	const performSave = useCallback(async () => {
+		if (!githubToken) {
+			requestAuth();
+			return;
+		}
+
+		const articleName = article.trim();
+		const filename = `${section.trim()}.txt`;
+
+		setBusy(true, {
+			label: section.trim(),
+			variant: 'progress',
+			operation: 'save',
+		});
+		try {
+			const saved = await saveNote(githubToken, {
+				folder: articleName,
+				filename,
+				content: text,
+			});
+			await registerPointerGistEntry(
+				githubToken,
+				saved.folderId,
+				articleName,
+				[filename],
+				isHidden,
+			);
+			await reconcilePointerGist(githubToken, saved.folderId, isHidden);
+			await syncPageImage(saved.folderId, articleName);
+			showToast(`Created ${section.trim()} successfully.`, ToastSeverity.SUCCESS);
+			setSection('');
+			setText('');
+			setArticle('');
+			setIsHidden(true);
+			setTouched(emptyTouched);
+			resetPageImageAfterSave();
+			onSaved();
+		} catch (error) {
+			console.error(error);
+			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
+		} finally {
+			setBusy(false);
+		}
+	}, [
+		article,
+		githubToken,
+		isHidden,
+		onSaved,
+		requestAuth,
+		resetPageImageAfterSave,
+		section,
+		setBusy,
+		showToast,
+		syncPageImage,
+		text,
+	]);
 
 	function handleSave() {
+		if (canSaveImageOnly && !canSaveNote) {
+			void performSaveImageOnly();
+			return;
+		}
 		void performSave();
 	}
 
@@ -117,40 +277,23 @@ function CreateNoteTabPanel({
 		setText('');
 	}
 
-	const isNewFolder =
-		folder.trim() !== '' &&
-		!folders.some(
-			(item) => item.name.toLowerCase() === folder.trim().toLowerCase(),
-		);
-
-	const noteFilename = title.trim() ? `${title.trim()}.txt` : '';
-	const selectedFolder = folders.find(
-		(item) => item.name.toLowerCase() === folder.trim().toLowerCase(),
-	);
-	const isDuplicateNote =
-		noteFilename !== '' &&
-		(selectedFolder?.noteFilenames.some(
-			(name) => name.toLowerCase() === noteFilename.toLowerCase(),
-		) ??
-			false);
-
-	const titleRequiredError = touched.title && !title.trim();
-	const folderRequiredError = touched.folder && !folder.trim();
+	const sectionRequiredError = touched.section && !section.trim();
+	const articleRequiredError = touched.article && !article.trim();
 	const textRequiredError = touched.text && !text.trim();
 
-	const titleError = isDuplicateNote || titleRequiredError;
-	const titleHelperText = isDuplicateNote
-		? 'This note already exists in this folder.'
-		: titleRequiredError
-		? 'Title is required.'
-		: undefined;
+	const sectionError = isDuplicateNote || sectionRequiredError;
+	const sectionHelperText = isDuplicateNote
+		? 'This note already exists in this article.'
+		: sectionRequiredError
+			? 'Section is required.'
+			: undefined;
 
-	const folderError = folderRequiredError;
-	const folderHelperText = folderRequiredError
-		? 'Folder is required.'
-		: isNewFolder
-		? 'New folder will be created.'
-		: undefined;
+	const articleError = articleRequiredError;
+	const articleHelperText = articleRequiredError
+		? 'Article is required.'
+		: isNewArticle
+			? 'New article will be created.'
+			: undefined;
 
 	const textHelperText = textRequiredError
 		? 'Note text is required.'
@@ -185,16 +328,12 @@ function CreateNoteTabPanel({
 		},
 		{
 			id: 'save',
-			label:
-				busy && operation === 'save' ? 'Saving…' : 'Save',
+			label: busy && operation === 'save' ? 'Saving…' : 'Save',
 			variant: 'contained',
 			onClick: handleSave,
 			disabled:
 				(busy && operation === 'save') ||
-				!title.trim() ||
-				!text.trim() ||
-				!folder.trim() ||
-				isDuplicateNote,
+				(!canSaveNote && !canSaveImageOnly),
 		},
 	];
 
@@ -209,6 +348,27 @@ function CreateNoteTabPanel({
 			<Box
 				sx={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}
 			>
+				<StandardAutocomplete
+					id='note-article'
+					label='Article'
+					value={article}
+					onChange={handleArticleChange}
+					onOpen={handleArticleOpen}
+					onBlur={() => markTouched('article')}
+					options={articleOptions}
+					error={articleError}
+					helperText={articleHelperText}
+					sx={{ minWidth: 0, width: { xs: '100%', sm: '50%' } }}
+					required
+				/>
+				{showPageImageControl && (
+					<PageImageField
+						imageUrl={pageImageUrl}
+						onFileSelect={handlePageImageSelect}
+						onRemove={handlePageImageRemove}
+						disabled={pageImageLoading || (busy && operation === 'save')}
+					/>
+				)}
 				<Box
 					sx={{
 						display: 'flex',
@@ -216,49 +376,35 @@ function CreateNoteTabPanel({
 						gap: 1.5,
 						minWidth: 0,
 						width: { xs: '100%', sm: '50%' },
-						alignItems: { xs: 'stretch', sm: 'center' },
-						justifyContent: { xs: 'center', sm: 'center' },
+						alignItems: { xs: 'stretch', sm: 'flex-start' },
 					}}
 				>
-					<StandardAutocomplete
-						id='note-folder'
-						label='Folder'
-						value={folder}
-						onChange={handleFolderChange}
-						onOpen={handleFolderOpen}
-						onBlur={() => markTouched('folder')}
-						options={folderOptions}
-						error={folderError}
-						helperText={folderHelperText}
+					<StandardTextField
+						id='note-section'
+						label='Section'
+						value={section}
+						onChange={(e) => setSection(e.target.value)}
+						onBlur={() => markTouched('section')}
 						sx={{ flex: { sm: 1 }, minWidth: 0, width: '100%' }}
+						size='small'
 						required
+						error={sectionError}
+						helperText={sectionHelperText}
 					/>
-			<Box
-				sx={{
-					position: 'relative',
-					flexShrink: 0,
-					alignSelf: 'flex-start',
-				}}
-			>
-				<StandardCheckbox
-					label='Hidden'
-					checked={isHidden}
-					onChange={setIsHidden}
-				/>
-			</Box>
+					<Box
+						sx={{
+							position: 'relative',
+							flexShrink: 0,
+							alignSelf: 'flex-start',
+						}}
+					>
+						<StandardCheckbox
+							label='Hidden'
+							checked={isHidden}
+							onChange={setIsHidden}
+						/>
+					</Box>
 				</Box>
-				<StandardTextField
-					id='note-title'
-					label='Title'
-					value={title}
-					onChange={(e) => setTitle(e.target.value)}
-					onBlur={() => markTouched('title')}
-					sx={{ minWidth: 0, width: { xs: '100%', sm: '50%' } }}
-					size='small'
-					required
-					error={titleError}
-					helperText={titleHelperText}
-				/>
 			</Box>
 			<ActionToolbar
 				actions={{ end: textToolbarActions }}

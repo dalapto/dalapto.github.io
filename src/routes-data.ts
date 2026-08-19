@@ -111,13 +111,6 @@ export const routesData: RouteData[] = [
 		ogDescription: 'A story about a world where.',
 		ogImage: ImgPaths.pages.writing.tile.bannjan,
 	},
-	{
-		path: '/thetoybot',
-		label: 'TheToybot',
-		ogTitle: 'The Toybot | dalapto.github.io',
-		ogDescription: 'A story about a toy that plays with you.',
-		ogImage: ImgPaths.pages.writing.tile.recs,
-	},
 ];
 
 /** Look up route data by path. Strips trailing slashes so /uni/recyclotron/ matches /uni/recyclotron. */

@@ -17,6 +17,8 @@ interface StandardAutocompleteProps {
 	size?: 'small' | 'medium';
 	required?: boolean;
 	freeSolo?: boolean;
+	/** When true, selection is from the list only — no typing or inline search. */
+	dropdownOnly?: boolean;
 	disabled?: boolean;
 	error?: boolean;
 	helperText?: string;
@@ -34,6 +36,7 @@ function StandardAutocomplete({
 	size = 'small',
 	required,
 	freeSolo = true,
+	dropdownOnly = false,
 	disabled,
 	error,
 	helperText,
@@ -41,12 +44,13 @@ function StandardAutocomplete({
 	onOpen,
 	sx,
 }: StandardAutocompleteProps) {
-	const autocompleteProps: AutocompleteProps<string, false, false, typeof freeSolo> = {
-		freeSolo,
+	const isFreeSolo = dropdownOnly ? false : freeSolo;
+	const autocompleteProps: AutocompleteProps<string, false, false, typeof isFreeSolo> = {
+		freeSolo: isFreeSolo,
 		disabled,
 		onOpen,
 		options,
-		...(freeSolo
+		...(isFreeSolo
 			? {
 					inputValue: value,
 					onInputChange: (_, newValue) => onChange(newValue),
@@ -69,6 +73,10 @@ function StandardAutocomplete({
 				onBlur={(event) => {
 					params.inputProps.onBlur?.(event as React.FocusEvent<HTMLInputElement>);
 					onBlur?.();
+				}}
+				inputProps={{
+					...params.inputProps,
+					...(dropdownOnly ? { readOnly: true } : {}),
 				}}
 			/>
 		),
@@ -101,6 +109,13 @@ function StandardAutocomplete({
 				'& .MuiAutocomplete-popupIndicator': { color: colours.disabledColor },
 				'& .MuiAutocomplete-endAdornment': { opacity: 1 },
 			},
+			...(dropdownOnly
+				? {
+						'& .MuiAutocomplete-input': {
+							cursor: disabled ? 'default' : 'pointer',
+						},
+					}
+				: {}),
 			...sx,
 		},
 	};

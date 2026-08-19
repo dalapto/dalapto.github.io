@@ -10,7 +10,6 @@ import { Recyclotron } from './pages/Projects/Recylotron/Recylotron';
 import { RiseOfNations } from './pages/Projects/RON/Ron';
 import { Analog } from './pages/Writing/Analog/Analog';
 import { Bannjan } from './pages/Writing/Bannjan/Bannjan';
-import { TheToybot } from './pages/Writing/TheToybot/TheToybot';
 import { Writing } from './pages/Writing/Writing';
 import { YouthWork } from './pages/YouthWork/YouthWork';
 import { getRouteData } from './routes-data';
@@ -94,12 +93,6 @@ const writingRoutes: NavRoute[] = [
 		route: '/bannjan',
 		component: Bannjan,
 		...og('/bannjan'),
-	},
-	{
-		label: 'The Toybot',
-		route: '/thetoybot',
-		component: TheToybot,
-		...og('/thetoybot'),
 	},
 ];
 

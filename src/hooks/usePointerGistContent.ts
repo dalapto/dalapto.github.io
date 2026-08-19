@@ -3,7 +3,9 @@ import { useBusy } from '../context/BusyContext';
 import {
 	fetchPointerGistEntries,
 	fetchPublicGistFiles,
+	findPointerGistEntryByFolderName,
 } from '../services/github.service';
+import { filterArticleTextFilenames } from '../utils/article-page-image';
 
 interface PointerGistFile {
 	filename: string;
@@ -29,12 +31,15 @@ function usePointerGistContent(pageKey: string): UsePointerGistContentResult {
 		async function load() {
 			try {
 				const entries = await fetchPointerGistEntries();
-				const entry = entries[pageKey];
-				if (!entry) {
+				const found = findPointerGistEntryByFolderName(entries, pageKey);
+				if (!found) {
 					if (!cancelled) setError(`No gist registered for "${pageKey}"`);
 					return;
 				}
-				const fetched = await fetchPublicGistFiles(entry.id, entry.files);
+				const fetched = await fetchPublicGistFiles(
+					found.entry.id,
+					filterArticleTextFilenames(found.entry.files, found.entry.image),
+				);
 				if (!cancelled) setFiles(fetched);
 			} catch (err) {
 				if (!cancelled)

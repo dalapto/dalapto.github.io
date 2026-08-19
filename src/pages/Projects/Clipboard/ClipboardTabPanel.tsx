@@ -1,3 +1,4 @@
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import UploadIcon from '@mui/icons-material/Upload';
 import { Box } from '@mui/material';
@@ -24,6 +25,8 @@ interface ClipboardTabPanelProps {
 	lastUpdated: Date;
 	/** When provided, an Upload button is added to the start of the toolbar. */
 	onUpload?: () => void;
+	/** When provided, a Paste button is added after Upload in the toolbar. */
+	onPaste?: () => void;
 	/** When provided with footerActions, replaces Clear/Save in the header end. */
 	headerEndActions?: ActionConfig[];
 	footerActions?: HeaderActions;
@@ -38,6 +41,7 @@ function ClipboardTabPanel({
 	hasNoChanges,
 	lastUpdated,
 	onUpload,
+	onPaste,
 	headerEndActions,
 	footerActions,
 	children,
@@ -86,6 +90,18 @@ function ClipboardTabPanel({
 							variant: 'contained' as const,
 							icon: <UploadIcon />,
 							onClick: onUpload,
+						},
+				  ]
+				: []),
+			...(onPaste
+				? [
+						{
+							id: 'paste',
+							label: 'Paste',
+							variant: 'contained' as const,
+							icon: <ContentPasteIcon />,
+							onClick: onPaste,
+							mobileIconOnly: false,
 						},
 				  ]
 				: []),

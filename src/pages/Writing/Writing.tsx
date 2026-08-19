@@ -1,32 +1,74 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { HubPage } from '../../components/layout/HubPage/HubPage';
-import { ImgPaths } from '../../constants/img-paths';
 import { translations } from '../../constants/writing-constants';
+import { useWritingPages } from '../../context/WritingPagesContext';
 import { navRoutes } from '../../routes';
-
-const tileImages: Record<string, string> = {
-	'/analog': ImgPaths.pages.writing.tile.analog,
-	'/bannjan': ImgPaths.pages.writing.tile.bannjan,
-    '/thetoybot': ImgPaths.pages.writing.tile.recs,
-};
+import {
+	isPublicWritingFolder,
+	isStaticWritingFolderKey,
+	staticWritingRouteImages,
+	writingArticleRoute,
+	WRITING_ARTICLE_PARAM,
+} from '../../utils/writing-articles';
+import { ArticlePage } from './ArticlePage';
 
 const tileBgPositions: Record<string, string> = {
 	'/analog': 'center center',
 	'/bannjan': 'center center',
-	'/thetoybot': 'center center',
 };
 
 function Writing() {
-	const writingRoute = navRoutes.find((r) => r.route === '/writing');
-	const pages =
-		writingRoute?.children?.filter((r) => r.label && !r.hide) ?? [];
+	const [searchParams] = useSearchParams();
+	const navigate = useNavigate();
+	const { entries, publicArticles, loading, getArticleImageUrl } =
+		useWritingPages();
+	const article = searchParams.get(WRITING_ARTICLE_PARAM);
+
+	const tileImages = useMemo(() => {
+		const map: Record<string, string> = { ...staticWritingRouteImages };
+		for (const [folderKey, entry] of Object.entries(entries)) {
+			if (isStaticWritingFolderKey(folderKey)) continue;
+			if (!isPublicWritingFolder(folderKey, entry)) continue;
+			const imageUrl = getArticleImageUrl(folderKey);
+			if (imageUrl) {
+				map[writingArticleRoute(folderKey)] = imageUrl;
+			}
+		}
+		return map;
+	}, [entries, getArticleImageUrl]);
+
+	useEffect(() => {
+		if (loading || !article) return;
+
+		const entry = entries[article];
+		if (!isPublicWritingFolder(article, entry)) {
+			navigate('/writing', { replace: true });
+		}
+	}, [article, entries, loading, navigate]);
+
+	if (loading) return null;
+
+	if (article) {
+		const entry = entries[article];
+		if (!isPublicWritingFolder(article, entry)) {
+			return null;
+		}
+
+		return <ArticlePage pageKey={article} />;
+	}
+
+	const staticPages =
+		navRoutes
+			.find((route) => route.route === '/writing')
+			?.children?.filter((route) => route.label && !route.hide) ?? [];
 
 	return (
 		<HubPage
 			title='Writing'
 			ariaLabel='Writing'
 			blurb={translations.writing_blurb}
-			pages={pages}
+			pages={[...staticPages, ...publicArticles]}
 			tileImages={tileImages}
 			tileBgPositions={tileBgPositions}
 		/>
