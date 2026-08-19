@@ -18,6 +18,12 @@ import {
 	parseArticlePageImageRecord,
 	validateArticlePageImageFile,
 } from '../utils/article-page-image';
+import {
+	type PointerGistArticle,
+	mergeArticlesWithGistFilenames,
+	migrateLegacyArticles,
+	renameArticleInList,
+} from '../utils/pointer-gist-articles';
 
 const GITHUB_API_BASE = 'https://api.github.com';
 const GIST_RAW_BASE = 'https://gist.githubusercontent.com';
@@ -26,15 +32,40 @@ const POINTER_GIST_ID = '7d48f1881df7e46bf6e0425b50666131';
 const POINTER_GIST_OWNER = 'dalapto';
 const POINTER_GIST_FILENAME = 'PointerGistIDs.json';
 
+export type { PointerGistArticle } from '../utils/pointer-gist-articles';
+
 /** Shape of each entry in the pointer gist file. */
 export interface PointerGistEntry {
 	id: string;
 	hidden: boolean;
-	files: string[];
+	articles: PointerGistArticle[];
 	/** Filename of the page image stored in the article gist (not a text chapter). */
 	image?: string;
 	/** ISO timestamp — cache-bust token for public raw image URLs after upload/replace. */
 	imageUpdatedAt?: string;
+}
+
+type RawPointerGistEntry = PointerGistEntry & { files?: string[] };
+
+function normalizeStoredPointerGistEntry(
+	raw: RawPointerGistEntry,
+): PointerGistEntry {
+	const { files: _legacyFiles, ...rest } = raw;
+	return {
+		...rest,
+		articles: migrateLegacyArticles(raw),
+	};
+}
+
+function normalizeStoredPointerGistEntries(
+	entries: Record<string, RawPointerGistEntry>,
+): Record<string, PointerGistEntry> {
+	return Object.fromEntries(
+		Object.entries(entries).map(([key, entry]) => [
+			key,
+			normalizeStoredPointerGistEntry(entry),
+		]),
+	);
 }
 
 export function gistRawFileUrl(
@@ -206,20 +237,17 @@ async function listGists(
 
 async function listAllGists(token: string): Promise<Gist[]> {
 	const all: Gist[] = [];
-	let page = 1;
-	while (true) {
+	for (let page = 1; ; page += 1) {
 		const batch = await listGists(token, { perPage: 100, page });
-		if (batch.length === 0) break;
 		all.push(...batch);
-		if (batch.length < 100) break;
-		page += 1;
+		if (batch.length < 100) return all;
 	}
-	return all;
 }
 
 function normalizePointerEntryFromGist(
 	entry: PointerGistEntry,
 	gistFilenames: string[],
+	orderUpdates: PointerGistArticle[] = [],
 ): { entry: PointerGistEntry; orphanImages: string[] } {
 	const gistKeys = new Set(gistFilenames.map((f) => f.trim().toLowerCase()));
 	let image = entry.image?.trim();
@@ -233,7 +261,12 @@ function normalizePointerEntryFromGist(
 	const orphanImages = findOrphanImageFilenames(gistFilenames, image);
 	const next: PointerGistEntry = {
 		...entry,
-		files: filterArticleTextFilenames(gistFilenames, image),
+		articles: mergeArticlesWithGistFilenames(
+			entry.articles,
+			gistFilenames,
+			image,
+			orderUpdates,
+		),
 	};
 
 	if (image) {
@@ -306,13 +339,20 @@ export async function fetchPointerGistEntries(): Promise<
 	const url = `${GIST_RAW_BASE}/${POINTER_GIST_OWNER}/${POINTER_GIST_ID}/raw/${POINTER_GIST_FILENAME}?_=${Date.now()}`;
 	const res = await fetch(url, { cache: 'no-store' });
 	if (!res.ok) throw new Error(`Failed to fetch pointer gist: ${res.status}`);
-	return res.json() as Promise<Record<string, PointerGistEntry>>;
+	const parsed = (await res.json()) as Record<string, RawPointerGistEntry>;
+	return normalizeStoredPointerGistEntries(parsed);
 }
 
 export async function fetchPublicGistFiles(
 	gistId: string,
 	filenames: string[],
 ): Promise<Array<{ filename: string; content: string }>> {
+	const order = new Map(
+		filenames.map((filename, index) => [
+			filename.trim().toLowerCase(),
+			index,
+		]),
+	);
 	const results = await Promise.all(
 		filenames.map(async (filename) => {
 			const url = `${GIST_RAW_BASE}/${POINTER_GIST_OWNER}/${gistId}/raw/${encodeURIComponent(
@@ -324,7 +364,11 @@ export async function fetchPublicGistFiles(
 			return { filename, content: await res.text() };
 		}),
 	);
-	return results.sort((a, b) => a.filename.localeCompare(b.filename));
+	return results.sort(
+		(a, b) =>
+			(order.get(a.filename.trim().toLowerCase()) ?? 0) -
+			(order.get(b.filename.trim().toLowerCase()) ?? 0),
+	);
 }
 
 async function patchPointerGist(
@@ -374,7 +418,7 @@ function dedupePointerGistEntries(
 			continue;
 		}
 		const score = (item: PointerGistEntry) =>
-			(item.image ? 10 : 0) + item.files.length;
+			(item.image ? 10 : 0) + item.articles.length;
 		if (score(entry) > score(existing[1])) {
 			byName.set(nameKey, [key, entry]);
 		}
@@ -401,26 +445,38 @@ async function fetchPointerGistEntriesAuth(
 	const gist = await getGist(token, POINTER_GIST_ID);
 	const file = gist.files[POINTER_GIST_FILENAME];
 	if (!file?.content) throw new Error('Pointer gist file not found or empty');
-	const parsed = JSON.parse(file.content) as Record<string, PointerGistEntry>;
-	return dedupePointerGistEntries(parsed);
+	const parsed = JSON.parse(file.content) as Record<string, RawPointerGistEntry>;
+	return dedupePointerGistEntries(normalizeStoredPointerGistEntries(parsed));
 }
 
-/** Updates the `files` list for a tracked gist, preserving its existing `hidden` value. No-ops silently if the gist isn't tracked. */
-async function syncPointerGistFiles(
+/** Updates the article list for a tracked gist, preserving order where possible. No-ops silently if the gist isn't tracked. */
+async function syncPointerGistArticles(
 	token: string,
 	gistId: string,
 	filenames: string[],
+	options: { renamedFrom?: string; renamedTo?: string } = {},
 ): Promise<void> {
 	const entries = await fetchPointerGistEntriesAuth(token);
 	const key = Object.keys(entries).find((k) => entries[k].id === gistId);
 	if (!key) return;
 	const entry = entries[key];
+	let articles = entry.articles;
+	if (options.renamedFrom && options.renamedTo) {
+		articles = renameArticleInList(
+			articles,
+			options.renamedFrom,
+			options.renamedTo,
+		);
+	}
+	const { entry: normalized } = normalizePointerEntryFromGist(
+		{ ...entry, articles },
+		filenames,
+	);
 	await patchPointerGist(token, {
 		...entries,
 		[key]: {
-			...entry,
+			...normalized,
 			id: gistId,
-			files: filterArticleTextFilenames(filenames, entry.image),
 		},
 	});
 }
@@ -474,7 +530,7 @@ export async function registerPointerGistEntry(
 	)?.[1];
 
 	const draft: PointerGistEntry = {
-		...(existingEntry ?? { id: gistId, hidden, files: [] }),
+		...(existingEntry ?? { id: gistId, hidden, articles: [] }),
 		id: gistId,
 		hidden,
 		...(trimmedImage ? { image: trimmedImage } : {}),
@@ -537,13 +593,14 @@ export async function movePointerGistEntry(
 }
 
 /**
- * Re-fetches the gist's current file list and syncs both `files` and `hidden`
+ * Re-fetches the gist's current file list and syncs both `articles` and `hidden`
  * in the pointer gist entry. No-ops silently if the gist isn't tracked.
  */
 export async function syncPointerGistEntry(
 	token: string,
 	gistId: string,
 	hidden: boolean,
+	orderUpdates: PointerGistArticle[] = [],
 ): Promise<void> {
 	const entries = await fetchPointerGistEntriesAuth(token);
 	const key = Object.keys(entries).find((k) => entries[k].id === gistId);
@@ -552,6 +609,7 @@ export async function syncPointerGistEntry(
 	const { entry: normalized, orphanImages } = normalizePointerEntryFromGist(
 		{ ...entries[key], hidden },
 		Object.keys(gist.files),
+		orderUpdates,
 	);
 	await deleteOrphanImagesFromGist(token, gistId, orphanImages);
 	await patchPointerGist(token, {
@@ -562,7 +620,7 @@ export async function syncPointerGistEntry(
 
 /**
  * Full reconciliation: fetches all user gists and the current pointer gist entries
- * in parallel, then rewrites every tracked entry's `files` list to match the
+ * in parallel, then rewrites every tracked entry's `articles` list to match the
  * actual gist state. Entries whose gist can't be found in the current page are
  * left unchanged. The `hidden` value for the gist being saved is applied; all
  * other entries preserve their existing `hidden` value.
@@ -571,6 +629,7 @@ export async function reconcilePointerGist(
 	token: string,
 	updatedGistId: string,
 	hidden: boolean,
+	orderUpdates: PointerGistArticle[] = [],
 ): Promise<void> {
 	const [entries, gists, freshUpdatedGist] = await Promise.all([
 		fetchPointerGistEntriesAuth(token),
@@ -594,6 +653,7 @@ export async function reconcilePointerGist(
 				hidden: entry.id === updatedGistId ? hidden : entry.hidden,
 			},
 			Object.keys(gist.files),
+			entry.id === updatedGistId ? orderUpdates : [],
 		);
 		await deleteOrphanImagesFromGist(token, entry.id, orphanImages);
 		updated[key] = normalized;
@@ -875,7 +935,7 @@ export async function updateNote(
 			const sourceFilenamesAfterMove = Object.keys(sourceGist.files).filter(
 				(f) => f.toLowerCase() !== filename.toLowerCase(),
 			);
-			await syncPointerGistFiles(
+			await syncPointerGistArticles(
 				token,
 				updatedSource.id,
 				sourceFilenamesAfterMove,
@@ -901,12 +961,12 @@ export async function updateNote(
 		const sourceFilenamesAfterMove = Object.keys(sourceGist.files).filter(
 			(f) => f.toLowerCase() !== filename.toLowerCase(),
 		);
-		await syncPointerGistFiles(
+		await syncPointerGistArticles(
 			token,
 			updatedTarget.id,
 			targetFilenamesAfterMove,
 		).catch((err) => console.warn('Pointer gist sync failed:', err));
-		await syncPointerGistFiles(
+		await syncPointerGistArticles(
 			token,
 			updatedSource.id,
 			sourceFilenamesAfterMove,
@@ -937,9 +997,10 @@ export async function updateNote(
 		const updatedFilenames = Object.keys(sourceGist.files).map((f) =>
 			f.toLowerCase() === filename.toLowerCase() ? newFilename : f,
 		);
-		await syncPointerGistFiles(token, gist.id, updatedFilenames).catch((err) =>
-			console.warn('Pointer gist sync failed:', err),
-		);
+		await syncPointerGistArticles(token, gist.id, updatedFilenames, {
+			renamedFrom: filename,
+			renamedTo: newFilename,
+		}).catch((err) => console.warn('Pointer gist sync failed:', err));
 	}
 	const resultFilename =
 		newFilename.toLowerCase() !== filename.toLowerCase()
@@ -988,7 +1049,7 @@ export async function saveNote(
 	const gist = await updateGist(token, existing.id, {
 		files: { [filename]: { content: input.content } },
 	});
-	await syncPointerGistFiles(token, gist.id, allFilenames).catch((err) =>
+	await syncPointerGistArticles(token, gist.id, allFilenames).catch((err) =>
 		console.warn('Pointer gist sync failed:', err),
 	);
 	const file = gist.files[filename];
@@ -1021,8 +1082,8 @@ export async function deleteNote(
 	}
 
 	await updateGist(token, folderId, { files: { [filename]: null } });
-	await syncPointerGistFiles(token, folderId, remainingFilenames).catch((err) =>
-		console.warn('Pointer gist sync failed:', err),
+	await syncPointerGistArticles(token, folderId, remainingFilenames).catch(
+		(err) => console.warn('Pointer gist sync failed:', err),
 	);
 }
 

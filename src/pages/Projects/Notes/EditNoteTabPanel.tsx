@@ -35,12 +35,19 @@ import type { HeaderActions } from '../../../types/basic.types';
 import type { Folder } from '../../../types/github.types';
 import { filterArticleTextFilenames } from '../../../utils/article-page-image';
 import { getErrorMessage } from '../../../utils/getErrorMessage';
+import {
+	clampOrderInput,
+	findArticleByFilename,
+	formatOrderInput,
+	parseOrderInput,
+} from '../../../utils/pointer-gist-articles';
 import { isStaticWritingFolderKey } from '../../../utils/writing-articles';
 
 type NoteField =
 	| 'articleName'
 	| 'noteName'
 	| 'newArticle'
+	| 'order'
 	| 'newSection'
 	| 'text';
 
@@ -48,6 +55,7 @@ const emptyTouched = {
 	articleName: false,
 	noteName: false,
 	newArticle: false,
+	order: false,
 	newSection: false,
 	text: false,
 };
@@ -96,6 +104,8 @@ function EditNoteTabPanel({
 	const [noteName, setNoteName] = useState('');
 	const [newArticle, setNewArticle] = useState('');
 	const [newSection, setNewSection] = useState('');
+	const [order, setOrder] = useState('');
+	const [committedOrder, setCommittedOrder] = useState('');
 	const [isHidden, setIsHidden] = useState(true);
 	const [committedIsHidden, setCommittedIsHidden] = useState(true);
 	const [text, setText] = useState('');
@@ -168,6 +178,8 @@ function EditNoteTabPanel({
 		setNoteName('');
 		setNewArticle('');
 		setNewSection('');
+		setOrder('');
+		setCommittedOrder('');
 		setText('');
 		setLoadedNote(null);
 		setNoteSelectKey((key) => key + 1);
@@ -175,6 +187,7 @@ function EditNoteTabPanel({
 			...prev,
 			noteName: false,
 			newArticle: false,
+			order: false,
 			newSection: false,
 			text: false,
 		}));
@@ -218,11 +231,23 @@ function EditNoteTabPanel({
 		});
 
 		getNote(githubToken, selectedArticle.id, filename)
-			.then((note) => {
+			.then(async (note) => {
 				if (cancelled || !note) return;
 				const displaySection = noteDisplayName(note.filename);
+				let nextOrder = '';
+				try {
+					const entry = await fetchPointerGistEntryByFolderName(articleName);
+					const article = entry
+						? findArticleByFilename(entry.articles, note.filename)
+						: undefined;
+					nextOrder = formatOrderInput(article?.order);
+				} catch {
+					nextOrder = '';
+				}
 				setNewArticle(articleName);
 				setNewSection(displaySection);
+				setOrder(nextOrder);
+				setCommittedOrder(nextOrder);
 				setText(note.content);
 				setLoadedNote({
 					folderId: selectedArticle.id,
@@ -309,7 +334,6 @@ function EditNoteTabPanel({
 		isHidden,
 		onSaved,
 		pageImageArticleName,
-		registerPointerGistEntry,
 		requestAuth,
 		resetPageImageAfterSave,
 		setBusy,
@@ -348,7 +372,15 @@ function EditNoteTabPanel({
 					isHidden,
 				);
 			}
-			await reconcilePointerGist(githubToken, saved.folderId, isHidden);
+			const parsedOrder = parseOrderInput(order);
+			await reconcilePointerGist(
+				githubToken,
+				saved.folderId,
+				isHidden,
+				parsedOrder === undefined
+					? []
+					: [{ name: newFilename, order: parsedOrder }],
+			);
 			await syncPageImage(saved.folderId, trimmedArticle);
 			showToast(
 				`Updated ${loadedNote.section} successfully.`,
@@ -369,9 +401,11 @@ function EditNoteTabPanel({
 				updatedAt: saved.updatedAt,
 			});
 			setCommittedIsHidden(isHidden);
+			setCommittedOrder(order);
 			setTouched((prev) => ({
 				...prev,
 				newArticle: false,
+				order: false,
 				newSection: false,
 				text: false,
 			}));
@@ -385,11 +419,10 @@ function EditNoteTabPanel({
 		githubToken,
 		isHidden,
 		loadedNote,
-		movePointerGistEntry,
 		newArticle,
 		newSection,
 		onSaved,
-		reconcilePointerGist,
+		order,
 		resetPageImageAfterSave,
 		selectedArticle,
 		setBusy,
@@ -462,8 +495,20 @@ function EditNoteTabPanel({
 			if (!note) return;
 
 			const displaySection = noteDisplayName(note.filename);
+			let nextOrder = '';
+			try {
+				const entry = await fetchPointerGistEntryByFolderName(articleName);
+				const article = entry
+					? findArticleByFilename(entry.articles, note.filename)
+					: undefined;
+				nextOrder = formatOrderInput(article?.order);
+			} catch {
+				nextOrder = '';
+			}
 			setNewArticle(articleName);
 			setNewSection(displaySection);
+			setOrder(nextOrder);
+			setCommittedOrder(nextOrder);
 			setText(note.content);
 			setLoadedNote({
 				folderId: selectedArticle.id,
@@ -476,6 +521,7 @@ function EditNoteTabPanel({
 			setTouched((prev) => ({
 				...prev,
 				newArticle: false,
+				order: false,
 				newSection: false,
 				text: false,
 			}));
@@ -516,8 +562,8 @@ function EditNoteTabPanel({
 		!isSameNoteInTarget &&
 		(targetArticle
 			? filterArticleTextFilenames(targetArticle.noteFilenames).some(
-					(name) => name.toLowerCase() === newFilename.toLowerCase(),
-				)
+				(name) => name.toLowerCase() === newFilename.toLowerCase(),
+			)
 			: false);
 
 	const hasUnsavedChanges =
@@ -525,6 +571,7 @@ function EditNoteTabPanel({
 		(trimmedNewArticle !== loadedNote.articleName ||
 			trimmedNewSection !== loadedNote.section ||
 			text !== loadedNote.text ||
+			order !== committedOrder ||
 			isHidden !== committedIsHidden ||
 			hasPageImageChanges);
 
@@ -554,22 +601,22 @@ function EditNoteTabPanel({
 	const noteNameHelperText = noteNameRequiredError
 		? 'Article is required.'
 		: selectedArticle && noteOptions.length === 0
-		? 'This article has no articles.'
-		: undefined;
+			? 'This article has no articles.'
+			: undefined;
 
 	const newArticleError = newArticleRequiredError;
 	const newArticleHelperText = newArticleRequiredError
 		? 'Article is required.'
 		: isNewArticle
-		? 'New article will be created.'
-		: undefined;
+			? 'New article will be created.'
+			: undefined;
 
 	const newSectionError = isDuplicateNote || newSectionRequiredError;
 	const newSectionHelperText = isDuplicateNote
 		? 'A note with this section already exists in the target article.'
 		: newSectionRequiredError
-		? 'Section is required.'
-		: undefined;
+			? 'Section is required.'
+			: undefined;
 
 	const textHelperText = textRequiredError
 		? 'Note text is required.'
@@ -740,6 +787,24 @@ function EditNoteTabPanel({
 									alignItems: { xs: 'stretch', sm: 'flex-start' },
 								}}
 							>
+								<StandardTextField
+									id='edit-note-order'
+									label='Order'
+									value={order}
+									onChange={(e) => setOrder(clampOrderInput(e.target.value))}
+									onBlur={() => markTouched('order')}
+									inputProps={{
+										inputMode: 'numeric',
+										pattern: '[0-9]*',
+										maxLength: 3,
+									}}
+									sx={{
+										flexShrink: 0,
+										width: { xs: '100%', sm: '4.5rem' },
+										minWidth: 0,
+									}}
+									size='small'
+								/>
 								<StandardTextField
 									id='edit-note-section'
 									label='Section'

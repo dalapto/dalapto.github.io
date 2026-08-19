@@ -5,7 +5,7 @@ import {
 	fetchPublicGistFiles,
 	findPointerGistEntryByFolderName,
 } from '../services/github.service';
-import { filterArticleTextFilenames } from '../utils/article-page-image';
+import { sortArticlesByOrder } from '../utils/pointer-gist-articles';
 
 interface PointerGistFile {
 	filename: string;
@@ -36,9 +36,12 @@ function usePointerGistContent(pageKey: string): UsePointerGistContentResult {
 					if (!cancelled) setError(`No gist registered for "${pageKey}"`);
 					return;
 				}
+				const orderedFilenames = sortArticlesByOrder(found.entry.articles).map(
+					(article) => article.name,
+				);
 				const fetched = await fetchPublicGistFiles(
 					found.entry.id,
-					filterArticleTextFilenames(found.entry.files, found.entry.image),
+					orderedFilenames,
 				);
 				if (!cancelled) setFiles(fetched);
 			} catch (err) {

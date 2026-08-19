@@ -29,11 +29,15 @@ import type { ActionConfig } from '../../../types/basic.types';
 import type { Folder } from '../../../types/github.types';
 import { filterArticleTextFilenames } from '../../../utils/article-page-image';
 import { getErrorMessage } from '../../../utils/getErrorMessage';
+import {
+	clampOrderInput,
+	parseOrderInput,
+} from '../../../utils/pointer-gist-articles';
 import { isStaticWritingFolderKey } from '../../../utils/writing-articles';
 
-type NoteField = 'section' | 'article' | 'text';
+type NoteField = 'order' | 'section' | 'article' | 'text';
 
-const emptyTouched = { section: false, article: false, text: false };
+const emptyTouched = { order: false, section: false, article: false, text: false };
 
 interface CreateNoteTabPanelProps {
 	folders: Folder[];
@@ -53,6 +57,7 @@ function CreateNoteTabPanel({
 	const { githubToken } = useGitHub();
 	const { requestAuth } = useAuthRequest();
 	const [section, setSection] = useState('');
+	const [order, setOrder] = useState('');
 	const [isHidden, setIsHidden] = useState(true);
 	const [text, setText] = useState('');
 	const [article, setArticle] = useState('');
@@ -133,8 +138,8 @@ function CreateNoteTabPanel({
 		noteFilename !== '' &&
 		(selectedArticle
 			? filterArticleTextFilenames(selectedArticle.noteFilenames).some(
-					(name) => name.toLowerCase() === noteFilename.toLowerCase(),
-				)
+				(name) => name.toLowerCase() === noteFilename.toLowerCase(),
+			)
 			: false);
 
 	const canSaveNote =
@@ -199,7 +204,6 @@ function CreateNoteTabPanel({
 		githubToken,
 		isHidden,
 		onSaved,
-		registerPointerGistEntry,
 		requestAuth,
 		resetPageImageAfterSave,
 		selectedArticle,
@@ -235,10 +239,19 @@ function CreateNoteTabPanel({
 				[filename],
 				isHidden,
 			);
-			await reconcilePointerGist(githubToken, saved.folderId, isHidden);
+			const parsedOrder = parseOrderInput(order);
+			await reconcilePointerGist(
+				githubToken,
+				saved.folderId,
+				isHidden,
+				parsedOrder === undefined
+					? []
+					: [{ name: filename, order: parsedOrder }],
+			);
 			await syncPageImage(saved.folderId, articleName);
 			showToast(`Created ${section.trim()} successfully.`, ToastSeverity.SUCCESS);
 			setSection('');
+			setOrder('');
 			setText('');
 			setArticle('');
 			setIsHidden(true);
@@ -256,6 +269,7 @@ function CreateNoteTabPanel({
 		githubToken,
 		isHidden,
 		onSaved,
+		order,
 		requestAuth,
 		resetPageImageAfterSave,
 		section,
@@ -379,6 +393,24 @@ function CreateNoteTabPanel({
 						alignItems: { xs: 'stretch', sm: 'flex-start' },
 					}}
 				>
+					<StandardTextField
+						id='note-order'
+						label='Order'
+						value={order}
+						onChange={(e) => setOrder(clampOrderInput(e.target.value))}
+						onBlur={() => markTouched('order')}
+						inputProps={{
+							inputMode: 'numeric',
+							pattern: '[0-9]*',
+							maxLength: 3,
+						}}
+						sx={{
+							flexShrink: 0,
+							width: { xs: '100%', sm: '4.5rem' },
+							minWidth: 0,
+						}}
+						size='small'
+					/>
 					<StandardTextField
 						id='note-section'
 						label='Section'
