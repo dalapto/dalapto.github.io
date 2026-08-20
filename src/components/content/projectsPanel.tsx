@@ -1,13 +1,13 @@
 import React from 'react';
-import { colors } from '../../constants/colors';
+import { colours } from '../../constants/colours';
 import {
 	formatLink,
 	linkedinProfileLink,
 	projectsLink,
 } from '../../constants/link-constants';
 import type { Image } from '../../types/basic.types';
+import type { JsonTextPanelData } from '../Json/JsonSection/JsonPanel';
 import { PageTile } from '../layout/ResponsiveTile/PageTile';
-import type { JsonTextPanelData } from '../JsonSection/JsonPanel';
 
 const linkedin = formatLink(linkedinProfileLink);
 
@@ -31,7 +31,7 @@ const projectsPanel: JsonTextPanelData = {
 		`...you can explore my ${formatLink(projectsLink)} page.`,
 		'',
 	],
-	contentBackground: colors.primary,
+	contentBackground: colours.primary,
 	contentChildren: projectTile(
 		{ label: projectsLink.text, route: projectsLink.link },
 		{ src: projectsLink.img, alt: projectsLink.text },

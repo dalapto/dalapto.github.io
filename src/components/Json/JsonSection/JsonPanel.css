@@ -1,0 +1,41 @@
+.json-panel {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.json-panel-content-bg {
+	box-sizing: border-box;
+	color: #ecf0f1;
+}
+
+.json-panel-fit-content-outer {
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	margin-inline: auto;
+}
+
+.json-panel-fit-content-inner {
+	max-width: var(--json-panel-max-width, 100%);
+	width: 100%;
+	margin-inline: auto;
+}
+
+.json-panel-fit-content-inner--shrink {
+	min-width: fit-content;
+	width: auto;
+}
+
+@media (max-width: 768px) {
+	.json-panel-content-bg {
+		width: 100%;
+	}
+
+	.json-panel-fit-content-inner,
+	.json-panel-fit-content-inner--shrink {
+		max-width: 100%;
+		width: 100%;
+		min-width: unset;
+		margin-inline: auto;
+	}
+}

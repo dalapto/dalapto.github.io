@@ -38,8 +38,15 @@ export interface TileProps {
 
 function resolveButtonProps(action: TileAction | undefined) {
 	if (!action || action.kind === TileActionKind.None) return {};
-	if (action.kind === TileActionKind.Route) return { component: Link, to: action.to };
-	if (action.kind === TileActionKind.Href) return { component: 'a', href: action.href, target: '_blank', rel: 'noopener noreferrer' };
+	if (action.kind === TileActionKind.Route)
+		return { component: Link, to: action.to };
+	if (action.kind === TileActionKind.Href)
+		return {
+			component: 'a',
+			href: action.href,
+			target: '_blank',
+			rel: 'noopener noreferrer',
+		};
 	if (action.kind === TileActionKind.Click) return { onClick: action.onClick };
 	return {};
 }
@@ -60,7 +67,9 @@ function Tile({
 	onMouseLeave = () => {},
 	ariaLabel,
 }: TileProps) {
-	const [showLabel, setShowLabel] = React.useState<boolean>(!showLabelOnMouseOver);
+	const [showLabel, setShowLabel] = React.useState<boolean>(
+		!showLabelOnMouseOver,
+	);
 
 	function handleMouseOver() {
 		onMouseEnter();
@@ -86,6 +95,8 @@ function Tile({
 		setShowLabel(false);
 	}
 
+	const isFluidWidth = imgWidth === '100%';
+
 	return (
 		<Card
 			className={className}
@@ -104,7 +115,8 @@ function Tile({
 					image={image_path}
 					sx={{
 						width: imgWidth,
-						height: imgHeight,
+						height: isFluidWidth ? 'auto' : imgHeight,
+						aspectRatio: isFluidWidth ? '1 / 1' : undefined,
 						filter: showLabel ? '' : `blur(${blurValue}px)`,
 						opacity: showLabel ? '1' : { opacityValue },
 						transitionDuration: '1s',
@@ -134,5 +146,5 @@ function Tile({
 	);
 }
 
-export type { TileAction };
 export { Tile, TileActionKind };
+export type { TileAction };

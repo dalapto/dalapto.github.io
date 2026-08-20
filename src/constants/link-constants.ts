@@ -1,8 +1,8 @@
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import { LITTER_APP_PATH, RECYCLOTRON_PATH } from './route-paths';
 import { ExternalLink, TooltipLink } from '../types/basic.types';
 import { ImgPaths } from './img-paths';
+import { LITTER_APP_PATH, RECYCLOTRON_PATH } from './route-paths';
 
 /** Encodes a TooltipLink (or plain link) into the <@text@href@img@> format used by FormattedText. */
 function formatLink({
@@ -218,13 +218,18 @@ const externalLinks: ExternalLink[] = [
 ];
 
 const recyclingPollsLink = {
-	text: 'US polls',
+	text: '[Ipsos 2011, Nine in Ten Adults Recycle, but Only Half Do So Daily]',
 	link: 'https://www.ipsos.com/sites/default/files/news_and_polls/2011-07/5285.pdf',
 };
 
 const recyclotronDocsLink = {
 	text: 'git repo',
 	link: 'https://github.com/dalapto/sdp-docs/tree/main',
+};
+
+const recycylotronYoutubeLink = {
+	text: '(video)',
+	link: 'https://www.youtube.com/watch?v=8f7KMetrPWs',
 };
 
 const recyclotronProjectPlanLink = {
@@ -260,11 +265,6 @@ const footerLinks: TooltipLink[] = [
 
 export {
 	androidLink,
-	knnLink,
-	mApLink,
-	machineLearningLink,
-	raspberryPiLink,
-	resNetLink,
 	androidStudioLink,
 	apiLink,
 	aStarLink,
@@ -283,19 +283,25 @@ export {
 	javaLink,
 	javascriptLink,
 	jvmLink,
+	knnLink,
 	kotlinLink,
 	linkedinProfileLink,
 	litterAppGithubLink,
 	litterAppLink,
+	machineLearningLink,
+	mApLink,
 	noSqlLink,
 	pokemonLink,
 	powergrabLink,
 	projectsLink,
-	recylotronLink,
+	raspberryPiLink,
 	recyclingPollsLink,
 	recyclotronDocsLink,
 	recyclotronProjectPlanLink,
 	recyclotronUserGuideLink,
+	recycylotronYoutubeLink,
+	recylotronLink,
+	resNetLink,
 	sdlcLink,
 	soundsnapLink,
 	sqlLink,

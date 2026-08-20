@@ -1,8 +1,8 @@
 import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
 import * as React from 'react';
-import './HamburgerMenu.css';
 import '../../layout/NavBar/NavBar.css';
+import './HamburgerMenu.css';
 
 interface HamburgerMenuProps {
 	handleOpenMenu: (event: React.MouseEvent<HTMLElement>) => void;
@@ -18,7 +18,7 @@ function HamburgerMenu({ handleOpenMenu }: HamburgerMenuProps) {
 			onClick={handleOpenMenu}
 			color='inherit'
 			className='hamburger-menu'
-			sx={{ display: { xs: 'flex-end', md: 'none' } }}
+			sx={{ display: { xs: 'flex', md: 'none' } }}
 		>
 			<MenuIcon />
 		</IconButton>

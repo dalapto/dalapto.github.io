@@ -35,7 +35,9 @@ export const ImgPaths = {
 			tile: {
 				about: `${IMG_ROOT}/pages/home/tile/about.png`,
 				blog: `${IMG_ROOT}/pages/home/tile/blog.png`,
+				youthwork: `${IMG_ROOT}/pages/home/tile/apple.jpeg`,
 				m2: `${IMG_ROOT}/pages/home/tile/m2.png`,
+				writing: `${IMG_ROOT}/pages/home/tile/writing.jpeg`,
 			},
 		},
 
@@ -48,6 +50,12 @@ export const ImgPaths = {
 			wallSmile: `${IMG_ROOT}/pages/about/wall-smile.jpeg`,
 			archMove: `${IMG_ROOT}/pages/about/arch-move.png`,
 			archStill: `${IMG_ROOT}/pages/about/arch-still.jpeg`,
+		},
+
+		clipboard: {
+			graffiti: `${IMG_ROOT}/pages/clipboard/graffiti.jpeg`,
+			floorplan: `${IMG_ROOT}/pages/clipboard/floorplan.jpg`,
+			windowapple: `${IMG_ROOT}/pages/clipboard/windowapple.jpeg`,
 		},
 
 		litter: {
@@ -126,6 +134,7 @@ export const ImgPaths = {
 				model1: `${IMG_ROOT}/pages/recylotron/other/model1.png`,
 				rails: `${IMG_ROOT}/pages/recylotron/other/rails.jpg`,
 				photo2: `${IMG_ROOT}/pages/recylotron/other/photo2.jpg`,
+				feedback: `${IMG_ROOT}/pages/recylotron/other/feedback.jpg`,
 			},
 		},
 
@@ -135,6 +144,14 @@ export const ImgPaths = {
 			music: `${IMG_ROOT}/pages/recommendations/music/`,
 			podcasts: `${IMG_ROOT}/pages/recommendations/podcasts/`,
 			tv: `${IMG_ROOT}/pages/recommendations/tv/`,
+		},
+
+		writing: {
+			tile: {
+				analog: `${IMG_ROOT}/pages/writing/analog.jpeg`,
+				bannjan: `${IMG_ROOT}/pages/writing/bannjan.jpeg`,
+				recs: `${IMG_ROOT}/pages/writing/recs.jpeg`,
+			},
 		},
 	},
 } as const;

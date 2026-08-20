@@ -1,0 +1,13 @@
+.standard-checkbox {
+	margin-left: 0;
+	margin-right: 0;
+	transition: color 0.15s ease-in-out;
+}
+
+.standard-checkbox:hover {
+	color: #ffa865;
+}
+
+.standard-checkbox:hover .MuiCheckbox-root {
+	color: #ffa865;
+}

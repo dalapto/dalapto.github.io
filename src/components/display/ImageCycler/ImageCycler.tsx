@@ -1,4 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Fab } from '@mui/material';
+import NavigateBefore from '@mui/icons-material/NavigateBefore';
+import NavigateNext from '@mui/icons-material/NavigateNext';
 import { Image } from '../../../types/basic.types';
 import { Lightbox } from '../Lightbox/Lightbox';
 import './ImageCycler.css';
@@ -33,27 +36,34 @@ interface CyclerArrowsProps {
 	onNext: () => void;
 }
 
+const fabSx = {
+	bgcolor: 'rgba(0,0,0,0.35)',
+	color: '#fff',
+	boxShadow: 'none',
+	'&:hover': { bgcolor: 'rgba(0,0,0,0.65)' },
+};
+
 function CyclerArrows({ onPrev, onNext }: CyclerArrowsProps) {
 	return (
 		<>
-			<button
+			<Fab
+				size='small'
 				className='image-cycler-arrow image-cycler-arrow--prev'
 				onClick={(e) => { e.stopPropagation(); onPrev(); }}
 				aria-label='Previous image'
+				sx={fabSx}
 			>
-				<svg viewBox='0 0 24 24' width='1.4em' height='1.4em' fill='none' stroke='currentColor' strokeWidth='2.5' strokeLinecap='round' strokeLinejoin='round'>
-					<polyline points='15 18 9 12 15 6' />
-				</svg>
-			</button>
-			<button
+				<NavigateBefore />
+			</Fab>
+			<Fab
+				size='small'
 				className='image-cycler-arrow image-cycler-arrow--next'
 				onClick={(e) => { e.stopPropagation(); onNext(); }}
 				aria-label='Next image'
+				sx={fabSx}
 			>
-				<svg viewBox='0 0 24 24' width='1.4em' height='1.4em' fill='none' stroke='currentColor' strokeWidth='2.5' strokeLinecap='round' strokeLinejoin='round'>
-					<polyline points='9 18 15 12 9 6' />
-				</svg>
-			</button>
+				<NavigateNext />
+			</Fab>
 		</>
 	);
 }

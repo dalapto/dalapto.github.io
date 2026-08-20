@@ -10,7 +10,7 @@
  * in routes.ts.
  */
 
-import { ImgPaths } from "./constants/img-paths";
+import { ImgPaths } from './constants/img-paths';
 
 export const BASE_URL = 'https://dalapto.github.io';
 
@@ -27,7 +27,8 @@ export const routesData: RouteData[] = [
 		path: '/',
 		label: 'Home',
 		ogTitle: 'dalapto | Welcome',
-		ogDescription: 'Personal website — projects, modding, youth work, and more.',
+		ogDescription:
+			'Personal website — projects, modding, youth work, and more.',
 	},
 	{
 		path: '/about/me',
@@ -64,20 +65,57 @@ export const routesData: RouteData[] = [
 		path: '/uni/litterapp',
 		label: 'LitterApp',
 		ogTitle: 'LitterApp | dalapto.github.io',
-		ogDescription: 'Location-based Social Media Android App',
+		ogDescription:
+			'Location-based Social Media Android App - my final year project.',
 		ogImage: ImgPaths.pages.litter.ui.explore,
 	},
 	{
 		path: '/uni/recyclotron',
 		label: 'Recyclotron',
 		ogTitle: 'Recyclotron | dalapto.github.io',
-		ogDescription: 'Auto-recyling Bin',
+		ogDescription: 'Auto-recyling robot project at university.',
 		ogImage: ImgPaths.pages.recylotron.other.photo2,
+	},
+	{
+		path: '/clipboard',
+		label: 'Clipboard',
+		ogTitle: 'Clipboard | dalapto.github.io',
+		ogDescription: 'Save and share media between devices.',
+		ogImage: ImgPaths.pages.clipboard.windowapple,
+	},
+	{
+		path: '/note',
+		label: 'Notes',
+		ogTitle: 'Notes | dalapto.github.io',
+		ogDescription: 'Make notes and blog posts.',
+		ogImage: ImgPaths.pages.clipboard.graffiti,
+	},
+	{
+		path: '/writing',
+		label: 'Writing',
+		ogTitle: 'Writing | dalapto.github.io',
+		ogDescription: 'Want to read something I wrote?',
+		ogImage: ImgPaths.pages.home.tile.writing,
+	},
+	{
+		path: '/analog',
+		label: 'Analog',
+		ogTitle: 'Analog | dalapto.github.io',
+		ogDescription: 'A story about dreams and technology.',
+		ogImage: ImgPaths.pages.writing.tile.analog,
+	},
+	{
+		path: '/bannjan',
+		label: 'Bannjan',
+		ogTitle: 'Bannjan | dalapto.github.io',
+		ogDescription: 'A story about a world where.',
+		ogImage: ImgPaths.pages.writing.tile.bannjan,
 	},
 ];
 
 /** Look up route data by path. Strips trailing slashes so /uni/recyclotron/ matches /uni/recyclotron. */
 export function getRouteData(path: string): RouteData | undefined {
-	const normalised = path.endsWith('/') && path.length > 1 ? path.slice(0, -1) : path;
+	const normalised =
+		path.endsWith('/') && path.length > 1 ? path.slice(0, -1) : path;
 	return routesData.find((r) => r.path === normalised);
 }

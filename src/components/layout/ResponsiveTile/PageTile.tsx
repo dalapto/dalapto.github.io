@@ -15,7 +15,12 @@ interface PageTileProps {
 	disableHoverBackground?: boolean;
 }
 
-function PageTile({ page, image, bgImgPosition, disableHoverBackground }: PageTileProps) {
+function PageTile({
+	page,
+	image,
+	bgImgPosition,
+	disableHoverBackground,
+}: PageTileProps) {
 	const tileKey = page.tileImg as keyof typeof ImgPaths.pages.home.tile;
 	const resolvedImagePath = image?.src ?? ImgPaths.pages.home.tile[tileKey];
 

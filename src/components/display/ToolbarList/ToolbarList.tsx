@@ -9,6 +9,8 @@ interface ToolbarItem {
 	label: string;
 	route?: string;
 	onMouseEnter?: (_event: React.MouseEvent<HTMLElement>) => void;
+	onFocus?: (_event: React.FocusEvent<HTMLElement>) => void;
+	onBlur?: (_event: React.FocusEvent<HTMLElement>) => void;
 	onClick?: (_event: React.MouseEvent<HTMLElement>) => void;
 	onKeyDown?: (_event: React.KeyboardEvent<HTMLElement>) => void;
 	isActive?: boolean;
@@ -62,6 +64,8 @@ function ToolbarItemList({
 					'aria-haspopup': item.ariaHasPopup ? ('true' as const) : undefined,
 					'aria-expanded': item.ariaExpanded,
 					onMouseEnter: item.onMouseEnter,
+					onFocus: item.onFocus,
+					onBlur: item.onBlur,
 					onClick: item.onClick,
 					onKeyDown: item.onKeyDown,
 					sx: buttonSx,

@@ -1,0 +1,96 @@
+.image-upload-dropzone {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.image-upload-dropzone--drag-over .upload-placeholder,
+.image-upload-dropzone--drag-over.image-upload-dropzone--has-previews {
+	border-color: var(--color-secondary);
+	color: var(--color-secondary);
+}
+
+.image-upload-dropzone--drag-over.image-upload-dropzone--has-previews {
+	outline: 2px dashed var(--color-secondary);
+	outline-offset: 4px;
+	border-radius: 0.5rem;
+}
+
+.upload-placeholder {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 2rem;
+	min-height: 40vh;
+	border: 2px dashed var(--color-text);
+	border-radius: 0.5rem;
+	color: var(--color-text);
+	user-select: none;
+	cursor: pointer;
+	transition: border-color 0.15s ease, color 0.15s ease;
+	box-sizing: border-box;
+}
+
+.upload-placeholder:hover,
+.upload-placeholder:focus-visible {
+	border-color: var(--color-secondary);
+	color: var(--color-secondary);
+}
+
+.upload-placeholder:focus-visible {
+	outline: 2px solid var(--color-secondary);
+	outline-offset: 2px;
+}
+
+.image-upload-previews {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin-top: 12px;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.image-upload-preview {
+	position: relative;
+	display: block;
+	width: 100%;
+	background-color: #111;
+}
+
+.image-upload-preview img {
+	width: 100%;
+	height: auto;
+	object-fit: contain;
+	display: block;
+	cursor: zoom-in;
+}
+
+.image-upload-preview .remove-btn {
+	opacity: 1;
+}
+
+/* Only hide until hover on devices with a precise pointer (mouse/trackpad). */
+@media (hover: hover) and (pointer: fine) {
+	.image-upload-preview .remove-btn {
+		opacity: 0;
+		transition: opacity 0.15s ease;
+	}
+
+	.image-upload-preview:hover .remove-btn {
+		opacity: 1;
+	}
+}
+
+/* Touch devices: keep visible and give a larger tap target. */
+@media (hover: none), (pointer: coarse) {
+	.image-upload-preview .remove-btn {
+		opacity: 1;
+		min-width: 36px;
+		min-height: 36px;
+		padding: 6px;
+	}
+}
