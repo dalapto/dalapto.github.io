@@ -1,18 +1,19 @@
 import { LITTER_APP_PATH, RECYCLOTRON_PATH } from './constants/route-paths';
 import { About } from './pages/About/About';
 import { Home } from './pages/Home/Home';
-import { Clipboard } from './pages/Projects/Clipboard/ClipboardPage';
-import { LitterApp } from './pages/Projects/LitterApp/LitterApp';
+import { Clipboard } from './pages/Home/Clipboard/ClipboardPage';
+import { LitterApp } from './pages/About/LitterApp/LitterApp';
 import { Medieval2TotalWar } from './pages/Projects/m2tw/m2tw';
-import { Notes } from './pages/Projects/Notes/Notes';
+import { Notes } from './pages/Home/Notes/Notes';
 import { Projects } from './pages/Projects/Projects';
-import { Recyclotron } from './pages/Projects/Recylotron/Recylotron';
+import { Recyclotron } from './pages/About/Recylotron/Recylotron';
 import { RiseOfNations } from './pages/Projects/RON/Ron';
 import { Analog } from './pages/Writing/Analog/Analog';
 import { Bannjan } from './pages/Writing/Bannjan/Bannjan';
 import { Writing } from './pages/Writing/Writing';
 import { YouthWork } from './pages/YouthWork/YouthWork';
 import { getRouteData } from './routes-data';
+import { CoverLetterGenerator } from './pages/Home/CoverLetterGenerator/CoverLetterGenerator';
 
 /**
  * Interface for a single route or page.
@@ -49,7 +50,13 @@ function og(
 }
 
 const projectsRoutes: NavRoute[] = [
-	{ label: 'Cover Letter Generator', route: '/cover-letter-generator' },
+	{
+		label: 'Cover Letter Generator',
+		route: '/cover-letter-generator',
+		// component: CoverLetterGenerator,
+		...og('/cover-letter-generator'),
+		hide: true,
+	},
 	{
 		label: 'Clipboard',
 		route: '/clipboard',

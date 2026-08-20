@@ -4,9 +4,12 @@
 	align-items: center;
 	justify-content: center;
 	text-decoration: none;
-	transition: transform var(--transition-fast) ease-in-out;
 	cursor: pointer;
 	padding: 4px;
+}
+
+.icon-button-link svg {
+	transition: transform var(--transition-fast) ease-in-out;
 }
 
 .icon-button-link::after {
@@ -26,8 +29,14 @@
 .icon-button-link:hover,
 .icon-button-link:focus,
 .icon-button-link:focus-visible {
-	transform: scale(1.1);
 	outline: none;
+	text-decoration: none;
+}
+
+.icon-button-link:hover svg,
+.icon-button-link:focus svg,
+.icon-button-link:focus-visible svg {
+	transform: scale(1.1);
 }
 
 .icon-button-link:hover::after,
@@ -37,6 +46,6 @@
 	transform-origin: left;
 }
 
-.icon-button-link:active {
+.icon-button-link:active svg {
 	transform: scale(0.95);
 }

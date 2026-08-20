@@ -26,6 +26,7 @@ interface StoredFile {
 
 interface FileUploadHandle {
 	trigger: () => void;
+	download: () => Promise<void>;
 	getPreviews: () => FilePreview[];
 	getSaveItems: () => StorageSaveItem[];
 	commitSavedFilenames: (filenames: string[]) => void;
@@ -56,6 +57,46 @@ function getKind(file: File): FilePreview['kind'] {
 	)
 		return 'text';
 	return 'other';
+}
+
+function textMimeTypeForName(name: string): string {
+	return name.toLowerCase().endsWith('.json') ? 'application/json' : 'text/plain';
+}
+
+async function downloadPreview(preview: FilePreview): Promise<void> {
+	const link = document.createElement('a');
+	link.download = preview.name;
+
+	if (
+		preview.kind === 'text' &&
+		!preview.content.startsWith('data:') &&
+		!preview.content.startsWith('http')
+	) {
+		const blob = new Blob([preview.content], {
+			type: textMimeTypeForName(preview.name),
+		});
+		const url = URL.createObjectURL(blob);
+		link.href = url;
+		link.click();
+		URL.revokeObjectURL(url);
+		return;
+	}
+
+	if (preview.content.startsWith('data:')) {
+		link.href = preview.content;
+		link.click();
+		return;
+	}
+
+	const response = await fetch(preview.content);
+	if (!response.ok) {
+		throw new Error(`Failed to download file (${response.status})`);
+	}
+	const blob = await response.blob();
+	const url = URL.createObjectURL(blob);
+	link.href = url;
+	link.click();
+	URL.revokeObjectURL(url);
 }
 
 async function loadPreviewFromStoredFile(
@@ -93,6 +134,11 @@ const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(
 
 		useImperativeHandle(ref, () => ({
 			trigger: () => fileInputRef.current?.click(),
+			download: async () => {
+				for (const preview of previewsRef.current) {
+					await downloadPreview(preview);
+				}
+			},
 			getPreviews: () => previewsRef.current,
 			getSaveItems: () =>
 				previewsRef.current.map((preview) => ({

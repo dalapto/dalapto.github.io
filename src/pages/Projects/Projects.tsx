@@ -1,14 +1,21 @@
 import React, { useEffect } from 'react';
 import { HubPage } from '../../components/layout/HubPage/HubPage';
 import { ImgPaths } from '../../constants/img-paths';
-import { translations } from '../../constants/projects-constants';
 import { useBackground } from '../../context/BackgroundContext';
 import { navRoutes } from '../../routes';
+
+const translations = {
+	projects_blurb: [
+		'',
+		'Making things is fun.',
+		`Check below what I've tinkered to my own ends.`,
+		'',
+	],
+};
 
 const tileImages: Record<string, string> = {
 	'/m2tw': ImgPaths.pages.home.tile.m2,
 	'/ron': ImgPaths.bg.m2,
-	'/cover-letter-generator': ImgPaths.pages.home.tile.m2,
 };
 
 const tileBgPositions: Record<string, string> = {

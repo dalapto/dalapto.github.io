@@ -1,6 +1,7 @@
 import { EditNote } from '@mui/icons-material';
 import AssignmentOutlined from '@mui/icons-material/AssignmentOutlined';
 import HomeIcon from '@mui/icons-material/Home';
+import AssignmentIndOutlined from '@mui/icons-material/AssignmentIndOutlined';
 import { useMediaQuery } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -36,13 +37,18 @@ interface NavBarProps {
 const sx = {
 	homeIconGroup: { display: 'flex', mr: 3 },
 	spacer: { flexGrow: 0.75 },
-	externalLinksGroup: {
-		display: { xs: 'none', md: 'flex' },
+	toolAndExternalLinksGroup: {
+		display: 'flex',
+		alignItems: 'center',
 		gap: 1,
-		ml: 2,
+		ml: 'auto',
 		mr: 1,
 	},
-	mobileAuthGroup: { display: { xs: 'flex', sm: 'none' }, ml: 'auto', mr: 0.5 },
+	externalLinksGroup: {
+		display: 'flex',
+		gap: 1,
+	},
+	mobileAuthGroup: { display: { xs: 'flex', sm: 'none' }, },
 } satisfies Record<string, SxProps<Theme>>;
 
 function NavBar({ currentPage, navRoutes }: NavBarProps) {
@@ -53,6 +59,8 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 	const { requestAuth } = useAuthRequest();
 	const isClipboardPage = currentPage === '/clipboard';
 	const isNotesPage = currentPage === '/note';
+	const isCoverLetterGeneratorPage = currentPage === '/cover-letter-generator';
+	const showAuthIcon = isCoverLetterGeneratorPage || isNotesPage || isClipboardPage;
 	const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 	const [menuAnchor, setMenuAnchor] = React.useState<HTMLElement | null>(null);
 	const [menuItems, setMenuItems] = React.useState<NavRoute[]>([]);
@@ -282,30 +290,41 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 						/>
 					)}
 
-					<Box sx={sx.externalLinksGroup}>
-						{externalLinks.map((link, index) => (
+					{isMobile && showAuthIcon && (
+						<Box sx={sx.mobileAuthGroup}>
+							<AuthIconButton
+								inline
+								user={isNotesPage ? githubUser : user}
+								authLoading={isNotesPage ? githubAuthLoading : authLoading}
+								onClick={requestAuth}
+							/>
+						</Box>
+					)}
+
+					<Box sx={sx.toolAndExternalLinksGroup}>
+						{(
 							<IconButtonLink
-								key={index}
-								href={link.href}
-								icon={link.icon}
-								ariaLabel={link.label}
+								to='/cover-letter-generator'
+								icon={AssignmentIndOutlined}
+								ariaLabel='Cover Letter Generator'
 								style={{ color: colours.text }}
 							/>
-						))}
-					</Box>
+						)}
+						<Box sx={sx.externalLinksGroup}>
+							{externalLinks.map((link, index) => (
+								<IconButtonLink
+									key={index}
+									href={link.href}
+									icon={link.icon}
+									ariaLabel={link.label}
+									style={{ color: colours.text }}
+								/>
+							))}
+						</Box>
 
-				{isMobile && (isClipboardPage || isNotesPage) && (
-					<Box sx={sx.mobileAuthGroup}>
-						<AuthIconButton
-							inline
-							user={isNotesPage ? githubUser : user}
-							authLoading={isNotesPage ? githubAuthLoading : authLoading}
-							onClick={requestAuth}
-						/>
-					</Box>
-				)}
 
-					<HamburgerMenu handleOpenMenu={(e) => openMenu(e, hamburgerItems)} />
+						<HamburgerMenu handleOpenMenu={(e) => openMenu(e, hamburgerItems)} />
+					</Box>
 				</Toolbar>
 			</Container>
 		</AppBar>

@@ -14,6 +14,12 @@ import { ImageCycler } from '../../display/ImageCycler/ImageCycler';
 import { Lightbox } from '../../display/Lightbox/Lightbox';
 import './ImageUpload.css';
 import type { StorageSaveItem } from '../../../supabase/supabase-utils';
+import {
+	getImageFilesFromDataTransfer,
+	imageSourceToPngBlob,
+	readImagesFromClipboard,
+	writePngToClipboard,
+} from '../../../utils/clipboard-image-helpers';
 
 type ImagePreviewItem = {
 	src: string;
@@ -34,6 +40,7 @@ interface ImageUploadProps {
 interface ImageUploadHandle {
 	trigger: () => void;
 	addFiles: (files: File[]) => void;
+	copyToClipboard: () => Promise<void>;
 	pasteFromClipboard: () => Promise<void>;
 	getPreviews: () => string[];
 	getSaveItems: () => StorageSaveItem[];
@@ -43,22 +50,6 @@ interface ImageUploadHandle {
 
 function isImageFile(file: File): boolean {
 	return file.type.startsWith('image/');
-}
-
-function getImageFilesFromDataTransfer(data: DataTransfer | null): File[] {
-	if (!data) {
-		return [];
-	}
-
-	const fromFiles = Array.from(data.files).filter(isImageFile);
-	if (fromFiles.length > 0) {
-		return fromFiles;
-	}
-
-	return Array.from(data.items)
-		.filter((item) => item.kind === 'file' && item.type.startsWith('image/'))
-		.map((item) => item.getAsFile())
-		.filter((file): file is File => file !== null);
 }
 
 const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
@@ -108,22 +99,7 @@ const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
 
 		const pasteFromClipboard = useCallback(async () => {
 			try {
-				const clipboardItems = await navigator.clipboard.read();
-				const files: File[] = [];
-
-				for (const item of clipboardItems) {
-					for (const type of item.types) {
-						if (!type.startsWith('image/')) {
-							continue;
-						}
-
-						const blob = await item.getType(type);
-						const extension = type.split('/')[1] ?? 'png';
-						files.push(
-							new File([blob], `pasted-image.${extension}`, { type }),
-						);
-					}
-				}
+				const files = await readImagesFromClipboard();
 
 				if (files.length === 0) {
 					showToast('No image found on clipboard.', ToastSeverity.WARNING);
@@ -136,11 +112,35 @@ const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
 			}
 		}, [addImageFiles, showToast]);
 
+		const copyToClipboard = useCallback(async () => {
+			const currentItems = itemsRef.current;
+			if (currentItems.length === 0) {
+				showToast('No image to copy.', ToastSeverity.WARNING);
+				return;
+			}
+
+			const lastAdded = currentItems[currentItems.length - 1];
+
+			try {
+				const pngBlob = await imageSourceToPngBlob(lastAdded);
+				await writePngToClipboard(pngBlob);
+				if (currentItems.length > 1) {
+					showToast(
+						'Only the most recently added image was copied.',
+						ToastSeverity.INFO,
+					);
+				}
+			} catch {
+				showToast('Could not copy image to clipboard.', ToastSeverity.WARNING);
+			}
+		}, [showToast]);
+
 		useImperativeHandle(
 			ref,
 			() => ({
 				trigger: () => fileInputRef.current?.click(),
 				addFiles: addImageFiles,
+				copyToClipboard,
 				pasteFromClipboard,
 				getPreviews: () => itemsRef.current.map((item) => item.src),
 				getSaveItems: () =>
@@ -162,7 +162,7 @@ const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
 					setItems([]);
 				},
 			}),
-			[addImageFiles, pasteFromClipboard],
+			[addImageFiles, copyToClipboard, pasteFromClipboard],
 		);
 
 		const initialKey = initialImages

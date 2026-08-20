@@ -18,7 +18,7 @@ function HamburgerMenu({ handleOpenMenu }: HamburgerMenuProps) {
 			onClick={handleOpenMenu}
 			color='inherit'
 			className='hamburger-menu'
-			sx={{ display: { xs: 'flex-end', md: 'none' }, ml: 'auto' }}
+			sx={{ display: { xs: 'flex', md: 'none' } }}
 		>
 			<MenuIcon />
 		</IconButton>

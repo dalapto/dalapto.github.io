@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { HubPage } from '../../components/layout/HubPage/HubPage';
-import { translations } from '../../constants/writing-constants';
 import { useWritingPages } from '../../context/WritingPagesContext';
 import { navRoutes } from '../../routes';
 import {
@@ -12,6 +11,13 @@ import {
 	WRITING_ARTICLE_PARAM,
 } from '../../utils/writing-articles';
 import { ArticlePage } from './ArticlePage';
+
+const translations = {
+	writing_blurb: [
+		'Want to read something I wrote?',
+		'Pick something to read below.',
+	],
+};
 
 const tileBgPositions: Record<string, string> = {
 	'/analog': 'center center',
