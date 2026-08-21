@@ -310,7 +310,7 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 								style={{ color: colours.text }}
 							/>
 						)}
-						<Box sx={sx.externalLinksGroup}>
+						{!isMobile && (<Box sx={sx.externalLinksGroup}>
 							{externalLinks.map((link, index) => (
 								<IconButtonLink
 									key={index}
@@ -320,7 +320,7 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 									style={{ color: colours.text }}
 								/>
 							))}
-						</Box>
+						</Box>)}
 
 
 						<HamburgerMenu handleOpenMenu={(e) => openMenu(e, hamburgerItems)} />
