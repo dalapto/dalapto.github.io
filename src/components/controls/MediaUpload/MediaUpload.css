@@ -1,0 +1,121 @@
+.media-upload-dropzone {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.media-upload-dropzone--drag-over .upload-placeholder,
+.media-upload-dropzone--drag-over.media-upload-dropzone--has-previews {
+	border-color: var(--color-secondary);
+	color: var(--color-secondary);
+}
+
+.media-upload-dropzone--drag-over.media-upload-dropzone--has-previews {
+	outline: 2px dashed var(--color-secondary);
+	outline-offset: 4px;
+	border-radius: 0.5rem;
+}
+
+.media-upload-previews {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin-top: 12px;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+/* Image and video tiles. */
+.media-upload-tile {
+	position: relative;
+	display: block;
+	width: 100%;
+	background-color: #111;
+}
+
+.media-upload-tile img {
+	width: 100%;
+	height: auto;
+	object-fit: contain;
+	display: block;
+	cursor: zoom-in;
+}
+
+.media-upload-tile .media-upload-remove-btn {
+	position: absolute;
+	top: 4px;
+	right: 4px;
+	background: rgba(0, 0, 0, 0.5);
+	border-radius: 50%;
+	color: white;
+}
+
+/* Audio rows. */
+.media-upload-audio {
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	overflow: hidden;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.media-upload-audio-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 6px 10px;
+	background: rgba(0, 0, 0, 0.05);
+}
+
+.media-upload-audio-name {
+	font-size: 0.85rem;
+	font-weight: 500;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.media-upload-audio .audio-player {
+	padding: 8px;
+	box-sizing: border-box;
+}
+
+.media-upload-remove-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	padding: 2px;
+	border: none;
+	background: none;
+	color: inherit;
+	cursor: pointer;
+}
+
+.media-upload-tile .media-upload-remove-btn {
+	opacity: 1;
+}
+
+/* Only hide until hover on devices with a precise pointer (mouse/trackpad). */
+@media (hover: hover) and (pointer: fine) {
+	.media-upload-tile .media-upload-remove-btn {
+		opacity: 0;
+		transition: opacity 0.15s ease;
+	}
+
+	.media-upload-tile:hover .media-upload-remove-btn,
+	.media-upload-tile:focus-within .media-upload-remove-btn {
+		opacity: 1;
+	}
+}
+
+/* Touch devices: keep visible and give a larger tap target. */
+@media (hover: none), (pointer: coarse) {
+	.media-upload-remove-btn {
+		min-width: 36px;
+		min-height: 36px;
+		padding: 6px;
+	}
+}

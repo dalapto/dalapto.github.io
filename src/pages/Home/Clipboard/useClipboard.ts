@@ -1,7 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { FileUploadHandle } from '../../../components/controls/FileUpload/FileUpload';
-import type { ImageUploadHandle } from '../../../components/controls/ImageUpload/ImageUpload';
-import type { StoredFile, StoredImage } from '../../../types/upload.types';
+import type { MediaUploadHandle } from '../../../components/controls/MediaUpload/MediaUpload';
+import {
+	formatMegabytes,
+	getPendingUploadBytes,
+	MAX_UPLOAD_TOTAL_BYTES,
+} from '../../../constants/upload-types';
+import type {
+	StorageSaveItem,
+	StoredFile,
+	StoredMedia,
+} from '../../../types/upload.types';
 import { useAuthRequest } from '../../../context/AuthRequestContext';
 import { useBusy } from '../../../context/BusyContext';
 import { useSupabase } from '../../../context/SupabaseContext';
@@ -20,12 +29,13 @@ import {
 	getClipboardErrorMessage,
 	parseTimestamp,
 	toStoredFiles,
-	toStoredImages,
+	toStoredMedia,
 } from '../../../utils/clipboard-helpers';
 
+// The media tab keeps the 'image' id: it is persisted in clipboard.last_tab.
 const TAB_LABELS: Record<TabId, string> = {
 	text: 'Text',
-	image: 'Image',
+	image: 'Media',
 	file: 'File',
 };
 
@@ -37,7 +47,7 @@ function useClipboard() {
 	const [lastTab, setLastTab] = useState<TabId>('text');
 	const [textContent, setTextContent] = useState('');
 	const [savedTextContent, setSavedTextContent] = useState('');
-	const [loadedImages, setLoadedImages] = useState<StoredImage[]>([]);
+	const [loadedMedia, setLoadedMedia] = useState<StoredMedia[]>([]);
 	const [loadedFiles, setLoadedFiles] = useState<StoredFile[]>([]);
 	const [lastUpdatedFile, setLastUpdatedFile] = useState(new Date(0));
 	const [lastUpdatedImage, setLastUpdatedImage] = useState(new Date(0));
@@ -46,7 +56,7 @@ function useClipboard() {
 	const [fileRevision, setFileRevision] = useState(0);
 	const [hasImageContent, setHasImageContent] = useState(false);
 	const [hasFileContent, setHasFileContent] = useState(false);
-	const imageUploadRef = useRef<ImageUploadHandle>(null);
+	const mediaUploadRef = useRef<MediaUploadHandle>(null);
 	const fileUploadRef = useRef<FileUploadHandle>(null);
 	const pendingSaveRef = useRef<{
 		tab: TabId;
@@ -101,15 +111,15 @@ function useClipboard() {
 				setLastUpdatedFile(parseTimestamp(row.file_last_updated));
 				setImageRevision(0);
 				setFileRevision(0);
-				const images = toStoredImages(row.image_filename);
+				const media = toStoredMedia(row.image_filename);
 				const files = toStoredFiles(row.file_filename);
-				setLoadedImages(images);
+				setLoadedMedia(media);
 				setLoadedFiles(files);
-				setHasImageContent(images.length > 0);
+				setHasImageContent(media.length > 0);
 				setHasFileContent(files.length > 0);
 
 				if (!row.file_filename) fileUploadRef.current?.reset();
-				if (!row.image_filename) imageUploadRef.current?.reset();
+				if (!row.image_filename) mediaUploadRef.current?.reset();
 			} finally {
 				if (!options?.silent) {
 					setBusy(false);
@@ -174,10 +184,27 @@ function useClipboard() {
 		});
 	}
 
+	/** Shows an error toast and returns true if the new files exceed the per-save limit. */
+	function exceedsUploadLimit(items: StorageSaveItem[]): boolean {
+		const bytes = getPendingUploadBytes(items);
+		if (bytes <= MAX_UPLOAD_TOTAL_BYTES) return false;
+
+		showToast(
+			`New files total ${formatMegabytes(bytes)}, over the ${formatMegabytes(MAX_UPLOAD_TOTAL_BYTES)} limit. Remove some and try again.`,
+			ToastSeverity.ERROR,
+		);
+		return true;
+	}
+
 	async function saveImage() {
+		// Checked up front so an oversized save never prompts sign-in or uploads.
+		if (exceedsUploadLimit(mediaUploadRef.current?.getSaveItems() ?? [])) {
+			return;
+		}
+
 		await withSave('image', async () => {
 			const now = new Date().toISOString();
-			const saveItems = imageUploadRef.current?.getSaveItems() ?? [];
+			const saveItems = mediaUploadRef.current?.getSaveItems() ?? [];
 			const imageFilenames = await saveClipboardStorage({
 				bucket: 'clipboard-images',
 				column: 'image_filename',
@@ -190,16 +217,20 @@ function useClipboard() {
 			setImageRevision(0);
 
 			if (imageFilenames) {
-				imageUploadRef.current?.commitSavedFilenames(
+				mediaUploadRef.current?.commitSavedFilenames(
 					splitStorageFilenames(imageFilenames),
 				);
 			} else {
-				imageUploadRef.current?.reset();
+				mediaUploadRef.current?.reset();
 			}
 		});
 	}
 
 	async function saveFile() {
+		if (exceedsUploadLimit(fileUploadRef.current?.getSaveItems() ?? [])) {
+			return;
+		}
+
 		await withSave('file', async () => {
 			const now = new Date().toISOString();
 			const saveItems = fileUploadRef.current?.getSaveItems() ?? [];
@@ -228,7 +259,7 @@ function useClipboard() {
 	function onImageChange() {
 		setImageRevision((n) => n + 1);
 		setHasImageContent(
-			(imageUploadRef.current?.getPreviews()?.length ?? 0) > 0,
+			(mediaUploadRef.current?.getPreviews()?.length ?? 0) > 0,
 		);
 	}
 
@@ -242,8 +273,8 @@ function useClipboard() {
 	}
 
 	function clearImage() {
-		imageUploadRef.current?.reset();
-		setLoadedImages([]);
+		mediaUploadRef.current?.reset();
+		setLoadedMedia([]);
 		setHasImageContent(false);
 		setImageRevision((n) => n + 1);
 	}
@@ -274,13 +305,13 @@ function useClipboard() {
 		hasNoImageChanges,
 		hasNoTextChanges,
 		hasTextContent: textContent.length > 0,
-		imageUploadRef,
+		mediaUploadRef,
 		lastTab,
 		lastUpdatedFile,
 		lastUpdatedImage,
 		lastUpdatedText,
 		loadedFiles,
-		loadedImages,
+		loadedMedia,
 		textContent,
 		cancelPendingSave,
 		flushPendingSave,

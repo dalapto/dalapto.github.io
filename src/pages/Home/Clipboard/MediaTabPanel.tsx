@@ -1,37 +1,37 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import React from 'react';
-import type { ImageUploadHandle } from '../../../components/controls/ImageUpload/ImageUpload';
-import { ImageUpload } from '../../../components/controls/ImageUpload/ImageUpload';
+import type { MediaUploadHandle } from '../../../components/controls/MediaUpload/MediaUpload';
+import { MediaUpload } from '../../../components/controls/MediaUpload/MediaUpload';
 import { useSupabase } from '../../../context/SupabaseContext';
 import { downloadClipboardImage } from '../../../services/clipboard.service';
 import type { HeaderActions } from '../../../types/basic.types';
-import type { StoredImage } from '../../../types/upload.types';
+import type { StoredMedia } from '../../../types/upload.types';
 import { ClipboardTabPanel } from './ClipboardTabPanel';
 
-interface ImageTabPanelProps {
-	imageUploadRef: React.RefObject<ImageUploadHandle>;
-	initialImages: StoredImage[];
-	onImageChange: () => void;
-	lastUpdatedImage: Date;
+interface MediaTabPanelProps {
+	mediaUploadRef: React.RefObject<MediaUploadHandle>;
+	initialMedia: StoredMedia[];
+	onMediaChange: () => void;
+	lastUpdatedMedia: Date;
 	hasContent: boolean;
-	hasNoImageChanges: boolean;
+	hasNoMediaChanges: boolean;
 	onClear: () => void;
 	onSave: () => void;
 	onRefresh: () => void;
 }
 
-function ImageTabPanel({
-	imageUploadRef,
-	initialImages,
-	onImageChange,
-	lastUpdatedImage,
+function MediaTabPanel({
+	mediaUploadRef,
+	initialMedia,
+	onMediaChange,
+	lastUpdatedMedia,
 	hasContent,
-	hasNoImageChanges,
+	hasNoMediaChanges,
 	onClear,
 	onSave,
 	onRefresh,
-}: ImageTabPanelProps) {
+}: MediaTabPanelProps) {
 	const { user } = useSupabase();
 
 	// onSave() asks for sign-in itself when needed (and resumes the save after).
@@ -45,7 +45,7 @@ function ImageTabPanel({
 			label: 'Copy',
 			variant: 'outlined' as const,
 			icon: <ContentCopyIcon />,
-			onClick: () => void imageUploadRef.current?.copyToClipboard(),
+			onClick: () => void mediaUploadRef.current?.copyToClipboard(),
 			disabled: !hasContent,
 		},
 		{
@@ -53,7 +53,7 @@ function ImageTabPanel({
 			label: 'Paste',
 			variant: 'contained' as const,
 			icon: <ContentPasteIcon />,
-			onClick: () => void imageUploadRef.current?.pasteFromClipboard(),
+			onClick: () => void mediaUploadRef.current?.pasteFromClipboard(),
 			mobileIconOnly: false,
 		},
 	];
@@ -72,7 +72,7 @@ function ImageTabPanel({
 				label: 'Save',
 				variant: 'contained',
 				onClick: handleSave,
-				disabled: user ? hasNoImageChanges : !hasContent,
+				disabled: user ? hasNoMediaChanges : !hasContent,
 			},
 		],
 	};
@@ -83,20 +83,20 @@ function ImageTabPanel({
 			onClear={onClear}
 			onSave={onSave}
 			hasContent={hasContent}
-			hasNoChanges={hasNoImageChanges}
-			lastUpdated={lastUpdatedImage}
-			onUpload={() => imageUploadRef.current?.trigger()}
+			hasNoChanges={hasNoMediaChanges}
+			lastUpdated={lastUpdatedMedia}
+			onUpload={() => mediaUploadRef.current?.trigger()}
 			headerEndActions={headerEndActions}
 			footerActions={footerActions}
 		>
-			<ImageUpload
-				ref={imageUploadRef}
-				initialImages={initialImages}
-				onChange={onImageChange}
+			<MediaUpload
+				ref={mediaUploadRef}
+				initialMedia={initialMedia}
+				onChange={onMediaChange}
 				loadStoredImage={downloadClipboardImage}
 			/>
 		</ClipboardTabPanel>
 	);
 }
 
-export { ImageTabPanel };
+export { MediaTabPanel };

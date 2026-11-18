@@ -7,7 +7,7 @@ import {
 	getStoragePublicUrl,
 	splitStorageFilenames,
 } from '../supabase/supabase-utils';
-import type { StoredFile, StoredImage } from '../types/upload.types';
+import type { StoredFile, StoredMedia } from '../types/upload.types';
 
 export type TabId = 'text' | 'image' | 'file';
 
@@ -28,10 +28,12 @@ export function parseTimestamp(value: string | null | undefined): Date {
 	return value ? new Date(value) : new Date(0);
 }
 
-export function toStoredImages(filenamesCsv: string | null): StoredImage[] {
+/** Media tab items (images, audio, video), stored in the `clipboard-images` bucket. */
+export function toStoredMedia(filenamesCsv: string | null): StoredMedia[] {
 	return splitStorageFilenames(filenamesCsv).map((storageFilename) => ({
 		storageFilename,
 		url: getStoragePublicUrl('clipboard-images', storageFilename),
+		name: displayNameFromStorageFilename(storageFilename),
 	}));
 }
 
@@ -50,6 +52,22 @@ const CLIPBOARD_ERROR_MESSAGES: Record<string, string> = {
 		'Storage permission denied. Run supabase/clipboard-policies.sql in the Supabase SQL editor (creates buckets + RLS policies).',
 };
 
+/** Storage refuses files over the bucket's size limit or outside its allowed MIME types. */
+function getRejectedUploadMessage(error: {
+	message?: string;
+	statusCode?: string | number;
+}): string | null {
+	const status = String(error.statusCode ?? '');
+	const message = error.message ?? '';
+	if (status === '413' || /maximum allowed size|too large/i.test(message)) {
+		return 'File is too large for the storage bucket. Raise the bucket size limit in Supabase or upload a smaller file.';
+	}
+	if (status === '415' || /mime type .* not supported/i.test(message)) {
+		return "This file type isn't allowed by the storage bucket. Add it to the bucket's allowed MIME types in Supabase.";
+	}
+	return null;
+}
+
 export function getClipboardErrorMessage(
 	error: unknown,
 	fallback = 'Something went wrong. Please try again.',
@@ -59,6 +77,8 @@ export function getClipboardErrorMessage(
 	if (typeof error === 'string' && error.trim()) return error.trim();
 
 	if (isSupabaseLikeError(error)) {
+		const rejected = getRejectedUploadMessage(error);
+		if (rejected) return rejected;
 		return formatSupabaseError(error, CLIPBOARD_ERROR_MESSAGES) ?? fallback;
 	}
 

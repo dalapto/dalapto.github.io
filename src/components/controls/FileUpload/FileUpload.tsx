@@ -1,6 +1,7 @@
 import CloseIcon from '@mui/icons-material/Close';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { FILE_UPLOAD } from '../../../constants/upload-types';
 import './FileUpload.css';
 import { PdfPreview } from './PdfPreview';
 import {
@@ -212,7 +213,7 @@ const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(
 				<input
 					ref={fileInputRef}
 					type='file'
-					accept='.pdf,.doc,.docx,.txt,.json,application/pdf,text/plain,application/json'
+					accept={FILE_UPLOAD.accept}
 					multiple
 					hidden
 					aria-hidden='true'
@@ -226,6 +227,11 @@ const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(
 					>
 						<InsertDriveFileOutlinedIcon sx={{ fontSize: 48 }} />
 						<span style={{ fontSize: '0.875rem' }}>Upload files</span>
+						<span
+							style={{ fontSize: '0.75rem', opacity: 0.75, textAlign: 'center' }}
+						>
+							{FILE_UPLOAD.hint}
+						</span>
 					</div>
 				)}
 				{previews.length > 0 && (

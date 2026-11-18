@@ -8,6 +8,7 @@ import {
 	useRef,
 	useState,
 } from 'react';
+import { IMAGE_UPLOAD } from '../../../constants/upload-types';
 import { ToastSeverity, useToast } from '../../../context/ToastProvider';
 import {
 	useStorageItemList,
@@ -252,7 +253,7 @@ const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
 				<input
 					ref={fileInputRef}
 					type='file'
-					accept='image/*'
+					accept={IMAGE_UPLOAD.accept}
 					multiple
 					hidden
 					aria-hidden='true'
@@ -264,7 +265,7 @@ const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
 						className='upload-placeholder'
 						tabIndex={0}
 						role='button'
-						aria-label='Upload, drag and drop, or paste an image'
+						aria-label={`Upload, drag and drop, or paste an image. Accepted: ${IMAGE_UPLOAD.hint}`}
 						onClick={() => fileInputRef.current?.click()}
 						onKeyDown={(e) => {
 							if (e.key === 'Enter' || e.key === ' ') {
@@ -276,6 +277,11 @@ const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
 						<ImageOutlinedIcon sx={{ fontSize: 48 }} />
 						<span style={{ fontSize: '0.875rem' }}>
 							Upload, drag &amp; drop, or paste an image
+						</span>
+						<span
+							style={{ fontSize: '0.75rem', opacity: 0.75, textAlign: 'center' }}
+						>
+							{IMAGE_UPLOAD.hint}
 						</span>
 					</div>
 				)}

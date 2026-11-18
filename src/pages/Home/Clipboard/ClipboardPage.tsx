@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { AuthIconButton } from '../../../components/auth/AuthIconButton';
 import { SupabaseAuthModal } from '../../../components/auth/SupabaseAuthModal';
 import type { FileUploadHandle } from '../../../components/controls/FileUpload/FileUpload';
-import type { ImageUploadHandle } from '../../../components/controls/ImageUpload/ImageUpload';
+import type { MediaUploadHandle } from '../../../components/controls/MediaUpload/MediaUpload';
 import { LoadingOverlay } from '../../../components/display/LoadingOverlay/LoadingOverlay';
 import { JsonSection } from '../../../components/Json/JsonSection/JsonSection';
 import { TabbedPanel } from '../../../components/Json/JsonTabs/TabbedPanel';
@@ -13,7 +13,7 @@ import { busyTitle, useBusy } from '../../../context/BusyContext';
 import { useSupabase } from '../../../context/SupabaseContext';
 import type { JsonTab } from '../../../types/basic.types';
 import { FileTabPanel } from './FileTabPanel';
-import { ImageTabPanel } from './ImageTabPanel';
+import { MediaTabPanel } from './MediaTabPanel';
 import { TextTabPanel } from './TextTabPanel';
 import { useClipboard } from './useClipboard';
 
@@ -40,13 +40,13 @@ function Clipboard() {
 		hasNoImageChanges,
 		hasNoTextChanges,
 		hasTextContent,
-		imageUploadRef,
+		mediaUploadRef,
 		lastTab,
 		lastUpdatedFile,
 		lastUpdatedImage,
 		lastUpdatedText,
 		loadedFiles,
-		loadedImages,
+		loadedMedia,
 		textContent,
 		cancelPendingSave,
 		clearFile,
@@ -100,16 +100,17 @@ function Clipboard() {
 			),
 		},
 		{
+			// Keeps the 'image' id: it is persisted in clipboard.last_tab.
 			id: 'image',
-			label: 'Image',
+			label: 'Media',
 			content: (
-				<ImageTabPanel
-					imageUploadRef={imageUploadRef as React.RefObject<ImageUploadHandle>}
-					initialImages={loadedImages}
-					onImageChange={onImageChange}
-					lastUpdatedImage={lastUpdatedImage}
+				<MediaTabPanel
+					mediaUploadRef={mediaUploadRef as React.RefObject<MediaUploadHandle>}
+					initialMedia={loadedMedia}
+					onMediaChange={onImageChange}
+					lastUpdatedMedia={lastUpdatedImage}
 					hasContent={hasImageContent}
-					hasNoImageChanges={hasNoImageChanges}
+					hasNoMediaChanges={hasNoImageChanges}
 					onClear={clearImage}
 					onSave={saveImage}
 					onRefresh={refreshClipboard}
