@@ -10,9 +10,6 @@
     ]
   },
   "include": [
-    "vite.config.ts",
-    "scripts",
-    "src/routes-data.ts",
-    "src/constants/img-paths.ts"
+    "vite.config.ts"
   ]
 }

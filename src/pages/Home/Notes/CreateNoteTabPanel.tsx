@@ -15,6 +15,7 @@ import { useAuthRequest } from '../../../context/AuthRequestContext';
 import { useBusy } from '../../../context/BusyContext';
 import { useGitHub } from '../../../context/GitHubContext';
 import { ToastSeverity } from '../../../context/ToastProvider';
+import { useUnsavedChanges } from '../../../context/UnsavedChangesContext';
 import { useTextClipboard } from '../../../hooks/useTextClipboard';
 import { usePageImageField } from '../../../hooks/usePageImageField';
 import {
@@ -152,6 +153,10 @@ function CreateNoteTabPanel({
 		!!selectedArticle &&
 		hasPageImageChanges &&
 		!isNewArticle;
+
+	const hasUnsavedChanges =
+		!!section.trim() || !!text.trim() || hasPageImageChanges;
+	useUnsavedChanges(hasUnsavedChanges, 'Notes (Create)');
 
 	const syncPageImage = useCallback(
 		async (folderId: string, articleName: string) => {

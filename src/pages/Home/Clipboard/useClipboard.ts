@@ -11,6 +11,7 @@ import { useAuthRequest } from '../../../context/AuthRequestContext';
 import { useBusy } from '../../../context/BusyContext';
 import { useSupabase } from '../../../context/SupabaseContext';
 import { ToastSeverity, useToast } from '../../../context/ToastProvider';
+import { useUnsavedChanges } from '../../../context/UnsavedChangesContext';
 import { saveClipboardRow } from '../../../services/clipboard.service';
 import {
 	splitStorageFilenames,
@@ -64,6 +65,16 @@ function useClipboard() {
 	const hasNoTextChanges = textContent === savedTextContent;
 	const hasNoImageChanges = imageRevision === 0;
 	const hasNoFileChanges = fileRevision === 0;
+
+	const dirtyTabs = [
+		!hasNoTextChanges && TAB_LABELS.text,
+		!hasNoImageChanges && TAB_LABELS.image,
+		!hasNoFileChanges && TAB_LABELS.file,
+	].filter(Boolean);
+	useUnsavedChanges(
+		dirtyTabs.length > 0,
+		`Clipboard (${dirtyTabs.join(', ')})`,
+	);
 
 	const loadClipboard = useCallback(
 		async (options?: { silent?: boolean }) => {

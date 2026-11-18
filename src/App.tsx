@@ -11,6 +11,7 @@ import { BusyProvider } from './context/BusyContext';
 import { GitHubProvider } from './context/GitHubContext';
 import { SupabaseProvider } from './context/SupabaseContext';
 import { ToastProvider } from './context/ToastProvider';
+import { UnsavedChangesProvider } from './context/UnsavedChangesContext';
 import {
 	useWritingPages,
 	WritingPagesProvider,
@@ -165,7 +166,9 @@ function App() {
 						<BusyProvider initialBusy>
 							<ToastProvider>
 								<WritingPagesProvider>
-									<AppInner />
+									<UnsavedChangesProvider>
+										<AppInner />
+									</UnsavedChangesProvider>
 								</WritingPagesProvider>
 							</ToastProvider>
 						</BusyProvider>

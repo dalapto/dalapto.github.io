@@ -18,6 +18,7 @@ import { useAuthRequest } from '../../../context/AuthRequestContext';
 import { useBusy } from '../../../context/BusyContext';
 import { useGitHub } from '../../../context/GitHubContext';
 import { ToastSeverity } from '../../../context/ToastProvider';
+import { useUnsavedChanges } from '../../../context/UnsavedChangesContext';
 import { useTextClipboard } from '../../../hooks/useTextClipboard';
 import { usePageImageField } from '../../../hooks/usePageImageField';
 import {
@@ -574,6 +575,9 @@ function EditNoteTabPanel({
 			order !== committedOrder ||
 			isHidden !== committedIsHidden ||
 			hasPageImageChanges);
+
+	// Also covers a page-image change made without a loaded note.
+	useUnsavedChanges(hasUnsavedChanges || hasPageImageChanges, 'Notes (Edit)');
 
 	const canSaveNote =
 		loadedNote !== null &&
