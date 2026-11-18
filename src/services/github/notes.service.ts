@@ -111,6 +111,10 @@ export interface UpdateNoteInput {
 	newFolder?: string;
 }
 
+/**
+ * Writes the note's gist file(s) — content, rename, or move to another article.
+ * Does not touch the Writing index: follow with commitArticleToPointer().
+ */
 export async function updateNote(
 	token: string,
 	input: UpdateNoteInput,
@@ -140,17 +144,9 @@ export async function updateNote(
 				files: { [newFilename]: { content: input.content } },
 				isSecret: true, // always create secret gists
 			});
-			const updatedSource = await updateGist(token, input.folderId, {
+			await updateGist(token, input.folderId, {
 				files: { [filename]: null },
 			});
-			const sourceFilenamesAfterMove = Object.keys(sourceGist.files).filter(
-				(f) => f.toLowerCase() !== filename.toLowerCase(),
-			);
-			await syncPointerGistArticles(
-				token,
-				updatedSource.id,
-				sourceFilenamesAfterMove,
-			).catch((err) => console.warn('Pointer gist sync failed:', err));
 			return {
 				folderId: gist.id,
 				filename: newFilename,
@@ -162,26 +158,9 @@ export async function updateNote(
 		const updatedTarget = await updateGist(token, targetGist.id, {
 			files: { [newFilename]: { content: input.content } },
 		});
-		const updatedSource = await updateGist(token, input.folderId, {
+		await updateGist(token, input.folderId, {
 			files: { [filename]: null },
 		});
-		const targetFilenamesAfterMove = [
-			...Object.keys(targetGist.files),
-			newFilename,
-		];
-		const sourceFilenamesAfterMove = Object.keys(sourceGist.files).filter(
-			(f) => f.toLowerCase() !== filename.toLowerCase(),
-		);
-		await syncPointerGistArticles(
-			token,
-			updatedTarget.id,
-			targetFilenamesAfterMove,
-		).catch((err) => console.warn('Pointer gist sync failed:', err));
-		await syncPointerGistArticles(
-			token,
-			updatedSource.id,
-			sourceFilenamesAfterMove,
-		).catch((err) => console.warn('Pointer gist sync failed:', err));
 
 		return {
 			folderId: updatedTarget.id,
@@ -204,15 +183,6 @@ export async function updateNote(
 	}
 
 	const gist = await updateGist(token, input.folderId, { files });
-	if (newFilename.toLowerCase() !== filename.toLowerCase()) {
-		const updatedFilenames = Object.keys(sourceGist.files).map((f) =>
-			f.toLowerCase() === filename.toLowerCase() ? newFilename : f,
-		);
-		await syncPointerGistArticles(token, gist.id, updatedFilenames, {
-			renamedFrom: filename,
-			renamedTo: newFilename,
-		}).catch((err) => console.warn('Pointer gist sync failed:', err));
-	}
 	const resultFilename =
 		newFilename.toLowerCase() !== filename.toLowerCase()
 			? newFilename
@@ -227,6 +197,10 @@ export async function updateNote(
 	};
 }
 
+/**
+ * Creates a note (and its article gist if new). Does not touch the Writing
+ * index: follow with commitArticleToPointer().
+ */
 export async function saveNote(
 	token: string,
 	input: SaveNoteInput,
@@ -255,14 +229,9 @@ export async function saveNote(
 		};
 	}
 
-
-	const allFilenames = [...Object.keys(existing.files), filename];
 	const gist = await updateGist(token, existing.id, {
 		files: { [filename]: { content: input.content } },
 	});
-	await syncPointerGistArticles(token, gist.id, allFilenames).catch((err) =>
-		console.warn('Pointer gist sync failed:', err),
-	);
 	const file = gist.files[filename];
 	return {
 		folderId: gist.id,

@@ -51,7 +51,8 @@ export const routesData: RouteData[] = [
 		path: '/writing',
 		label: 'Writing',
 		ogTitle: 'Writing | dalapto.github.io',
-		ogDescription: 'Writing and articles.',
+		ogDescription: 'Want to read something I wrote?',
+		ogImage: ImgPaths.pages.home.tile.writing,
 	},
 	{
 		path: '/m2tw',
@@ -89,13 +90,6 @@ export const routesData: RouteData[] = [
 		ogTitle: 'Notes | dalapto.github.io',
 		ogDescription: 'Make notes and blog posts.',
 		ogImage: ImgPaths.pages.clipboard.graffiti,
-	},
-	{
-		path: '/writing',
-		label: 'Writing',
-		ogTitle: 'Writing | dalapto.github.io',
-		ogDescription: 'Want to read something I wrote?',
-		ogImage: ImgPaths.pages.home.tile.writing,
 	},
 	{
 		path: '/analog',

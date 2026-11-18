@@ -14,6 +14,7 @@ import {
 	deleteOrphanImagesFromGist,
 	getGist,
 	githubFetch,
+	GitHubApiError,
 	listAllGists,
 } from './github-api';
 import {
@@ -73,7 +74,7 @@ export function findPointerGistEntryByFolderName(
 	return { key, entry: entries[key] };
 }
 
-export function normalizePointerEntryFromGist(
+function normalizePointerEntryFromGist(
 	entry: PointerGistEntry,
 	gistFilenames: string[],
 	orderUpdates: PointerGistArticle[] = [],
@@ -234,7 +235,7 @@ type PointerEntries = Record<string, PointerGistEntry>;
  * Return `null` from `mutate` to skip the write. Must not be called from inside
  * another mutation (the queue would wait on itself).
  */
-export async function mutatePointerGist(
+async function mutatePointerGist(
 	token: string,
 	mutate: (entries: PointerEntries) => PointerEntries | null,
 ): Promise<boolean> {
@@ -254,7 +255,7 @@ export async function mutatePointerGist(
 	});
 }
 
-export function findPointerKeyByGistId(
+function findPointerKeyByGistId(
 	entries: PointerEntries,
 	gistId: string,
 ): string | undefined {
@@ -272,30 +273,23 @@ async function deleteOrphanImagesByGist(
 	);
 }
 
-/** Pure: entries with `gistId` (re)registered under `folderName`. */
+/** Pure: entries with `gistId` (re)registered under `folderName`, keeping its articles/order/image. */
 function withRegisteredEntry(
 	entries: PointerEntries,
 	gistId: string,
 	folderName: string,
 	hidden: boolean,
-	gistFilenames: string[],
-	image?: string,
 ): PointerEntries {
-	const trimmedImage = image?.trim();
 	const existingEntry = Object.values(entries).find((entry) => entry.id === gistId);
-
-	const draft: PointerGistEntry = {
-		...(existingEntry ?? { id: gistId, hidden, articles: [] }),
+	const entry: PointerGistEntry = {
+		...(existingEntry ?? { id: gistId, articles: [] }),
 		id: gistId,
 		hidden,
-		...(trimmedImage ? { image: trimmedImage } : {}),
 	};
-
-	const { entry: normalized } = normalizePointerEntryFromGist(draft, gistFilenames);
 	const withoutGist = Object.fromEntries(
-		Object.entries(entries).filter(([, entry]) => entry.id !== gistId),
+		Object.entries(entries).filter(([, other]) => other.id !== gistId),
 	);
-	return { ...withoutGist, [folderName.trim()]: normalized };
+	return { ...withoutGist, [folderName.trim()]: entry };
 }
 
 /** Updates the article list for a tracked gist, preserving order where possible. No-ops silently if the gist isn't tracked. */
@@ -303,22 +297,12 @@ export async function syncPointerGistArticles(
 	token: string,
 	gistId: string,
 	filenames: string[],
-	options: { renamedFrom?: string; renamedTo?: string } = {},
 ): Promise<void> {
 	await mutatePointerGist(token, (entries) => {
 		const key = findPointerKeyByGistId(entries, gistId);
 		if (!key) return null;
-		const entry = entries[key];
-		let articles = entry.articles;
-		if (options.renamedFrom && options.renamedTo) {
-			articles = renameArticleInList(
-				articles,
-				options.renamedFrom,
-				options.renamedTo,
-			);
-		}
 		const { entry: normalized } = normalizePointerEntryFromGist(
-			{ ...entry, articles },
+			entries[key],
 			filenames,
 		);
 		return { ...entries, [key]: { ...normalized, id: gistId } };
@@ -338,104 +322,120 @@ export async function removePointerGistEntry(
 	});
 }
 
+/** Page-image fields for the saved article (from uploadArticlePageImage). `image: undefined` = removed. */
+export interface PointerImageChange {
+	image?: string;
+	imageUpdatedAt?: string;
+}
+
+/** Everything one article save needs to record in the Writing index. */
+export interface ArticleCommit {
+	/** Gist the article's sections now live in. */
+	gistId: string;
+	/** Article name — the pointer key. */
+	folderName: string;
+	hidden: boolean;
+	/** Explicit section orders to apply (e.g. from the Order field). */
+	orderUpdates?: PointerGistArticle[];
+	/** A section file renamed within the same gist — keeps its order. */
+	rename?: { from: string; to: string };
+	/** Page-image change from uploadArticlePageImage(); omit when unchanged. */
+	imageChange?: PointerImageChange;
+}
+
 /**
- * Registers a gist in the pointer gist file under `folderName`, or updates its
- * existing entry (keeping its articles/order) and moves it to that key.
+ * Of the gists the index tracks but the listing didn't return, which are
+ * confirmed deleted (404)? Any other failure keeps the entry, to be safe.
  */
-export async function registerPointerGistEntry(
+async function findDeletedGistIds(
 	token: string,
-	gistId: string,
-	folderName: string,
-	_filenames: string[],
-	hidden: boolean,
-	image?: string,
-): Promise<void> {
-	const gistFilenames = Object.keys((await getGist(token, gistId)).files);
-	await mutatePointerGist(token, (entries) =>
-		withRegisteredEntry(entries, gistId, folderName, hidden, gistFilenames, image),
+	trackedIds: string[],
+	listed: Map<string, Gist>,
+): Promise<Set<string>> {
+	const missing = [...new Set(trackedIds)].filter((id) => !listed.has(id));
+	const deleted = await Promise.all(
+		missing.map(async (id) => {
+			try {
+				await getGist(token, id);
+				return null;
+			} catch (error) {
+				return error instanceof GitHubApiError && error.status === 404 ? id : null;
+			}
+		}),
 	);
+	return new Set(deleted.filter((id): id is string => id !== null));
 }
 
 /**
- * Moves or consolidates a pointer gist entry to a new folder name,
- * removing duplicate keys that reference the same gist ID.
+ * Records one article save in the Writing index with a **single** write:
+ *  - registers/moves the saved gist under `folderName` with `hidden`
+ *  - applies the page-image change, section rename and order updates
+ *  - re-syncs every entry's article list with its gist's actual files
+ *  - drops entries whose gist no longer exists (404)
+ * Orphaned page images are deleted after the write succeeds.
  */
-export async function movePointerGistEntry(
+export async function commitArticleToPointer(
 	token: string,
-	gistId: string,
-	oldFolderName: string,
-	newFolderName: string,
-	hidden: boolean,
+	commit: ArticleCommit,
 ): Promise<void> {
-	const gistFilenames = Object.keys((await getGist(token, gistId)).files);
-	const trimmedNew = newFolderName.trim();
-	const trimmedOld = oldFolderName.trim();
+	const { gistId, folderName, hidden, orderUpdates = [], rename, imageChange } =
+		commit;
 
-	await mutatePointerGist(token, (entries) => {
-		const existing =
-			Object.values(entries).find((entry) => entry.id === gistId) ??
-			entries[trimmedOld];
-
-		if (!existing) {
-			return withRegisteredEntry(
-				entries,
-				gistId,
-				trimmedNew,
-				hidden,
-				gistFilenames,
-			);
-		}
-
-		const { entry: normalized } = normalizePointerEntryFromGist(
-			{ ...existing, hidden },
-			gistFilenames,
-		);
-		const withoutGist = Object.fromEntries(
-			Object.entries(entries).filter(([, entry]) => entry.id !== gistId),
-		);
-		return { ...withoutGist, [trimmedNew]: normalized };
-	});
-}
-
-/**
- * Full reconciliation: fetches all user gists, then rewrites every tracked
- * entry's `articles` list to match the actual gist state. Entries whose gist
- * can't be found are left unchanged. The `hidden` value for the gist being
- * saved is applied; all other entries preserve their existing `hidden` value.
- * Orphaned page images are deleted after the pointer write succeeds.
- */
-export async function reconcilePointerGist(
-	token: string,
-	updatedGistId: string,
-	hidden: boolean,
-	orderUpdates: PointerGistArticle[] = [],
-): Promise<void> {
-	const [gists, freshUpdatedGist] = await Promise.all([
+	// Network reads first — the mutation below must be pure (it may re-run).
+	const [gists, savedGist, trackedBefore] = await Promise.all([
 		listAllGists(token),
-		getGist(token, updatedGistId),
+		getGist(token, gistId),
+		fetchPointerGistEntriesAuth(token),
 	]);
 	const gistMap = new Map(gists.map((g) => [g.id, g]));
-	gistMap.set(updatedGistId, freshUpdatedGist);
+	gistMap.set(gistId, savedGist);
+	const deletedIds = await findDeletedGistIds(
+		token,
+		Object.values(trackedBefore).map((entry) => entry.id),
+		gistMap,
+	);
+
 	let orphansByGist = new Map<string, string[]>();
 
 	const written = await mutatePointerGist(token, (entries) => {
 		orphansByGist = new Map();
+		const registered = withRegisteredEntry(entries, gistId, folderName, hidden);
 		const updated: PointerEntries = {};
 
-		for (const [key, entry] of Object.entries(entries)) {
+		for (const [key, entry] of Object.entries(registered)) {
+			if (deletedIds.has(entry.id)) continue;
+
 			const gist = gistMap.get(entry.id);
 			if (!gist) {
 				updated[key] = entry;
 				continue;
 			}
 
+			let draft = entry;
+			if (entry.id === gistId) {
+				draft = { ...entry };
+				if (rename) {
+					draft.articles = renameArticleInList(
+						draft.articles,
+						rename.from,
+						rename.to,
+					);
+				}
+				if (imageChange) {
+					if (imageChange.image) {
+						draft.image = imageChange.image;
+						draft.imageUpdatedAt = imageChange.imageUpdatedAt;
+					} else {
+						delete draft.image;
+						delete draft.imageUpdatedAt;
+					}
+				}
+			}
+
 			const { entry: normalized, orphanImages } = normalizePointerEntryFromGist(
-				{
-					...entry,
-					hidden: entry.id === updatedGistId ? hidden : entry.hidden,
-				},
+				draft,
 				Object.keys(gist.files),
-				entry.id === updatedGistId ? orderUpdates : [],
+				entry.id === gistId ? orderUpdates : [],
 			);
 			if (orphanImages.length > 0) orphansByGist.set(entry.id, orphanImages);
 			updated[key] = normalized;

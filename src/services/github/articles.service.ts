@@ -8,19 +8,11 @@ import {
 	parseArticlePageImageRecord,
 	validateArticlePageImageFile,
 } from '../../utils/article-page-image';
-import {
-	deleteOrphanImagesFromGist,
-	findGistFileByFilename,
-	getGist,
-	updateGist,
-} from './github-api';
+import { findGistFileByFilename, getGist, updateGist } from './github-api';
 import { GIST_RAW_BASE, POINTER_GIST_OWNER } from './config';
-import {
-	type PointerGistEntry,
-	fetchPointerGistEntriesAuth,
-	findPointerKeyByGistId,
-	mutatePointerGist,
-	normalizePointerEntryFromGist,
+import type {
+	PointerGistEntry,
+	PointerImageChange,
 } from './pointer-gist.service';
 
 // Public article content (text + page images) and page-image upload.
@@ -123,36 +115,32 @@ export async function fetchPublicGistFiles(
 	);
 }
 
-interface ArticlePageImageInput {
+export interface ArticlePageImageInput {
 	/** New image file to upload. */
 	file?: File;
-	/** When true, removes the current page image from the gist and pointer entry. */
+	/** When true, removes the current page image from the gist. */
 	remove?: boolean;
 }
 
 /**
- * Uploads, replaces, or removes the page image for a tracked article gist.
+ * Uploads, replaces, or removes the page image *file* in an article gist.
  * Images are stored as `page-image.json` (base64 JSON text) because the gist
  * HTTP API cannot persist binary files.
+ *
+ * Does not touch the Writing index: pass the returned change to
+ * commitArticleToPointer() so the index is written once per save.
+ * Returns `undefined` when there is nothing to change.
  */
-export async function syncArticlePageImage(
+export async function uploadArticlePageImage(
 	token: string,
 	gistId: string,
 	input: ArticlePageImageInput,
-): Promise<void> {
-	if (!input.file && !input.remove) return;
+): Promise<PointerImageChange | undefined> {
+	if (!input.file && !input.remove) return undefined;
 
 	if (input.file) {
 		const validationError = validateArticlePageImageFile(input.file);
 		if (validationError) throw new Error(validationError);
-	}
-
-	const notRegisteredMessage =
-		'Article is not registered in the pointer gist. Save a note first or register the article.';
-	// Early check so nothing is uploaded for an unregistered article.
-	const entriesBefore = await fetchPointerGistEntriesAuth(token);
-	if (!findPointerKeyByGistId(entriesBefore, gistId)) {
-		throw new Error(notRegisteredMessage);
 	}
 
 	const gistBefore = await getGist(token, gistId);
@@ -176,7 +164,6 @@ export async function syncArticlePageImage(
 				filesPatch[name] = null;
 			}
 		}
-		nextImage = undefined;
 	} else if (input.file) {
 		const record = await encodeArticlePageImageFile(input.file);
 		for (const name of currentFilenames) {
@@ -198,40 +185,14 @@ export async function syncArticlePageImage(
 		gist = await updateGist(token, gistId, { files: filesPatch });
 	}
 
-	const remainingFilenames = Object.values(gist.files)
-		.filter(Boolean)
-		.map((file) => file.filename);
-	if (remainingFilenames.length === 0) {
+	if (Object.values(gist.files).filter(Boolean).length === 0) {
 		throw new Error('Cannot remove the last file from an article gist.');
 	}
-
 	if (nextImage && !findGistFileByFilename(gist.files, nextImage)) {
 		throw new Error('Uploaded image file missing from gist.');
 	}
 
-	// The image upload is done; now apply it to the *latest* pointer entry.
-	let orphanImages: string[] = [];
-	const written = await mutatePointerGist(token, (entries) => {
-		orphanImages = [];
-		const key = findPointerKeyByGistId(entries, gistId);
-		if (!key) throw new Error(notRegisteredMessage);
-
-		const entryForNormalize: PointerGistEntry = { ...entries[key] };
-		if (nextImage) {
-			entryForNormalize.image = nextImage;
-			entryForNormalize.imageUpdatedAt = gist.updated_at;
-		} else {
-			delete entryForNormalize.image;
-			delete entryForNormalize.imageUpdatedAt;
-		}
-
-		const result = normalizePointerEntryFromGist(
-			entryForNormalize,
-			remainingFilenames,
-		);
-		orphanImages = result.orphanImages;
-		return { ...entries, [key]: result.entry };
-	});
-
-	if (written) await deleteOrphanImagesFromGist(token, gistId, orphanImages);
+	return nextImage
+		? { image: nextImage, imageUpdatedAt: gist.updated_at }
+		: { image: undefined };
 }

@@ -22,20 +22,16 @@ import { HiddenCheckbox } from './HiddenCheckbox';
 import { useTextClipboard } from '../../../hooks/useTextClipboard';
 import { usePageImageField } from '../../../hooks/usePageImageField';
 import { usePointerGistHidden } from '../../../hooks/usePointerGistHidden';
-import {
-	syncArticlePageImage,
-} from '../../../services/github/articles.service';
+import { uploadArticlePageImage } from '../../../services/github/articles.service';
 import {
 	deleteNote,
 	getNote,
 	updateNote,
 } from '../../../services/github/notes.service';
 import {
+	commitArticleToPointer,
 	fetchPointerGistEntryByFolderNameAuth,
 	isPointerGistFolder,
-	movePointerGistEntry,
-	reconcilePointerGist,
-	registerPointerGistEntry,
 } from '../../../services/github/pointer-gist.service';
 import type { HeaderActions } from '../../../types/basic.types';
 import type { Folder } from '../../../types/github.types';
@@ -293,12 +289,13 @@ function EditNoteTabPanel({
 			item.name.toLowerCase() === pageImageArticleName.trim().toLowerCase(),
 	);
 
-	const syncPageImage = useCallback(
+	/** Uploads the page-image file change (if any); the index is updated by the commit. */
+	const uploadPageImage = useCallback(
 		async (folderId: string, targetArticle: string) => {
 			if (!hasPageImageChanges || isStaticWritingFolderKey(targetArticle)) {
-				return;
+				return undefined;
 			}
-			await syncArticlePageImage(githubToken!, folderId, {
+			return uploadArticlePageImage(githubToken!, folderId, {
 				file: pendingPageImageFile ?? undefined,
 				remove: pageImageRemoved && !pendingPageImageFile,
 			});
@@ -314,10 +311,11 @@ function EditNoteTabPanel({
 	const performSavePageImageOnly = useCallback(async () => {
 		// Never write `hidden` while it's unknown — that could unpublish the article.
 		if (visibilityUnknown) return;
-		if (!githubToken || !imageTargetFolder || !hasPageImageChanges) {
+		if (!githubToken) {
 			requestAuth();
 			return;
 		}
+		if (!imageTargetFolder || !hasPageImageChanges) return;
 
 		const targetArticle = pageImageArticleName.trim();
 		setBusy(true, {
@@ -326,14 +324,16 @@ function EditNoteTabPanel({
 			operation: 'save',
 		});
 		try {
-			await registerPointerGistEntry(
-				githubToken,
+			const imageChange = await uploadPageImage(
 				imageTargetFolder.id,
 				targetArticle,
-				filterArticleTextFilenames(imageTargetFolder.noteFilenames),
-				isHidden,
 			);
-			await syncPageImage(imageTargetFolder.id, targetArticle);
+			await commitArticleToPointer(githubToken, {
+				gistId: imageTargetFolder.id,
+				folderName: targetArticle,
+				hidden: isHidden,
+				imageChange,
+			});
 			showToast('Page image saved.', ToastSeverity.SUCCESS);
 			markHiddenCommitted(isHidden);
 			resetPageImageAfterSave();
@@ -356,7 +356,7 @@ function EditNoteTabPanel({
 		resetPageImageAfterSave,
 		setBusy,
 		showToast,
-		syncPageImage,
+		uploadPageImage,
 		visibilityUnknown,
 	]);
 
@@ -384,25 +384,25 @@ function EditNoteTabPanel({
 					newFilename !== loadedNote.filename ? newFilename : undefined,
 				newFolder: isArticleMove ? trimmedArticle : undefined,
 			});
-			if (isArticleMove) {
-				await movePointerGistEntry(
-					githubToken,
-					saved.folderId,
-					loadedNote.articleName,
-					trimmedArticle,
-					isHidden,
-				);
-			}
+			const imageChange = await uploadPageImage(saved.folderId, trimmedArticle);
 			const parsedOrder = parseOrderInput(order);
-			await reconcilePointerGist(
-				githubToken,
-				saved.folderId,
-				isHidden,
-				parsedOrder === undefined
-					? []
-					: [{ name: newFilename, order: parsedOrder }],
-			);
-			await syncPageImage(saved.folderId, trimmedArticle);
+			const isRename =
+				!isArticleMove &&
+				newFilename.toLowerCase() !== loadedNote.filename.toLowerCase();
+			// One index write for the whole save (move/rename/order/hidden/image).
+			await commitArticleToPointer(githubToken, {
+				gistId: saved.folderId,
+				folderName: trimmedArticle,
+				hidden: isHidden,
+				orderUpdates:
+					parsedOrder === undefined
+						? []
+						: [{ name: newFilename, order: parsedOrder }],
+				rename: isRename
+					? { from: loadedNote.filename, to: newFilename }
+					: undefined,
+				imageChange,
+			});
 			showToast(
 				`Updated ${loadedNote.section} successfully.`,
 				ToastSeverity.SUCCESS,
@@ -449,8 +449,8 @@ function EditNoteTabPanel({
 		selectedArticle,
 		setBusy,
 		showToast,
-		syncPageImage,
 		text,
+		uploadPageImage,
 		visibilityUnknown,
 	]);
 
@@ -641,9 +641,9 @@ function EditNoteTabPanel({
 		: undefined;
 
 	const noteNameHelperText = noteNameRequiredError
-		? 'Article is required.'
+		? 'Section is required.'
 		: selectedArticle && noteOptions.length === 0
-			? 'This article has no articles.'
+			? 'This article has no sections.'
 			: undefined;
 
 	const newArticleError = newArticleRequiredError;

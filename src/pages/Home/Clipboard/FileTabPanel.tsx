@@ -5,7 +5,6 @@ import type {
 	StoredFile,
 } from '../../../components/controls/FileUpload/FileUpload';
 import { FileUpload } from '../../../components/controls/FileUpload/FileUpload';
-import { useAuthRequest } from '../../../context/AuthRequestContext';
 import { useSupabase } from '../../../context/SupabaseContext';
 import { ToastSeverity, useToast } from '../../../context/ToastProvider';
 import type { HeaderActions } from '../../../types/basic.types';
@@ -35,13 +34,10 @@ function FileTabPanel({
 	onRefresh,
 }: FileTabPanelProps) {
 	const { user } = useSupabase();
-	const { requestAuth } = useAuthRequest();
 	const { showToast } = useToast();
 
+	// onSave() asks for sign-in itself when needed (and resumes the save after).
 	function handleSave() {
-		if (!user) {
-			requestAuth();
-		}
 		void onSave();
 	}
 

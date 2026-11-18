@@ -18,14 +18,11 @@ import { useUnsavedChanges } from '../../../context/UnsavedChangesContext';
 import { useTextClipboard } from '../../../hooks/useTextClipboard';
 import { usePageImageField } from '../../../hooks/usePageImageField';
 import { usePointerGistHidden } from '../../../hooks/usePointerGistHidden';
-import {
-	syncArticlePageImage,
-} from '../../../services/github/articles.service';
+import { uploadArticlePageImage } from '../../../services/github/articles.service';
 import { saveNote } from '../../../services/github/notes.service';
 import {
+	commitArticleToPointer,
 	isPointerGistFolder,
-	reconcilePointerGist,
-	registerPointerGistEntry,
 } from '../../../services/github/pointer-gist.service';
 import type { ActionConfig } from '../../../types/basic.types';
 import type { Folder } from '../../../types/github.types';
@@ -151,10 +148,13 @@ function CreateNoteTabPanel({
 		!!section.trim() || !!text.trim() || hasPageImageChanges;
 	useUnsavedChanges(hasUnsavedChanges, 'Notes (Create)');
 
-	const syncPageImage = useCallback(
+	/** Uploads the page-image file change (if any); the index is updated by the commit. */
+	const uploadPageImage = useCallback(
 		async (folderId: string, articleName: string) => {
-			if (!hasPageImageChanges || isStaticWritingFolderKey(articleName)) return;
-			await syncArticlePageImage(githubToken!, folderId, {
+			if (!hasPageImageChanges || isStaticWritingFolderKey(articleName)) {
+				return undefined;
+			}
+			return uploadArticlePageImage(githubToken!, folderId, {
 				file: pendingPageImageFile ?? undefined,
 				remove: pageImageRemoved && !pendingPageImageFile,
 			});
@@ -168,10 +168,11 @@ function CreateNoteTabPanel({
 	);
 
 	const performSaveImageOnly = useCallback(async () => {
-		if (!githubToken || !selectedArticle || !canSaveImageOnly) {
+		if (!githubToken) {
 			requestAuth();
 			return;
 		}
+		if (!selectedArticle || !canSaveImageOnly) return;
 
 		const articleName = selectedArticle.name;
 		setBusy(true, {
@@ -180,14 +181,13 @@ function CreateNoteTabPanel({
 			operation: 'save',
 		});
 		try {
-			await registerPointerGistEntry(
-				githubToken,
-				selectedArticle.id,
-				articleName,
-				filterArticleTextFilenames(selectedArticle.noteFilenames),
-				isHidden,
-			);
-			await syncPageImage(selectedArticle.id, articleName);
+			const imageChange = await uploadPageImage(selectedArticle.id, articleName);
+			await commitArticleToPointer(githubToken, {
+				gistId: selectedArticle.id,
+				folderName: articleName,
+				hidden: isHidden,
+				imageChange,
+			});
 			showToast('Page image saved.', ToastSeverity.SUCCESS);
 			resetPageImageAfterSave();
 			onSaved();
@@ -207,7 +207,7 @@ function CreateNoteTabPanel({
 		selectedArticle,
 		setBusy,
 		showToast,
-		syncPageImage,
+		uploadPageImage,
 	]);
 
 	const performSave = useCallback(async () => {
@@ -232,23 +232,18 @@ function CreateNoteTabPanel({
 				filename,
 				content: text,
 			});
-			await registerPointerGistEntry(
-				githubToken,
-				saved.folderId,
-				articleName,
-				[filename],
-				isHidden,
-			);
+			const imageChange = await uploadPageImage(saved.folderId, articleName);
 			const parsedOrder = parseOrderInput(order);
-			await reconcilePointerGist(
-				githubToken,
-				saved.folderId,
-				isHidden,
-				parsedOrder === undefined
-					? []
-					: [{ name: filename, order: parsedOrder }],
-			);
-			await syncPageImage(saved.folderId, articleName);
+			await commitArticleToPointer(githubToken, {
+				gistId: saved.folderId,
+				folderName: articleName,
+				hidden: isHidden,
+				orderUpdates:
+					parsedOrder === undefined
+						? []
+						: [{ name: filename, order: parsedOrder }],
+				imageChange,
+			});
 			showToast(`Created ${section.trim()} successfully.`, ToastSeverity.SUCCESS);
 			setSection('');
 			setOrder('');
@@ -276,8 +271,8 @@ function CreateNoteTabPanel({
 		setBusy,
 		setIsHidden,
 		showToast,
-		syncPageImage,
 		text,
+		uploadPageImage,
 		visibilityUnknown,
 	]);
 

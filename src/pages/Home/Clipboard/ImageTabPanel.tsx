@@ -6,7 +6,6 @@ import type {
 	StoredImage,
 } from '../../../components/controls/ImageUpload/ImageUpload';
 import { ImageUpload } from '../../../components/controls/ImageUpload/ImageUpload';
-import { useAuthRequest } from '../../../context/AuthRequestContext';
 import { useSupabase } from '../../../context/SupabaseContext';
 import type { HeaderActions } from '../../../types/basic.types';
 import { ClipboardTabPanel } from './ClipboardTabPanel';
@@ -35,12 +34,9 @@ function ImageTabPanel({
 	onRefresh,
 }: ImageTabPanelProps) {
 	const { user } = useSupabase();
-	const { requestAuth } = useAuthRequest();
 
+	// onSave() asks for sign-in itself when needed (and resumes the save after).
 	function handleSave() {
-		if (!user) {
-			requestAuth();
-		}
 		void onSave();
 	}
 

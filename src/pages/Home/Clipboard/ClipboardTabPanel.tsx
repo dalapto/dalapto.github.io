@@ -7,7 +7,6 @@ import {
 	ActionToolbar,
 	FormPanel,
 } from '../../../components/layout/FormPanel/FormPanel';
-import { useAuthRequest } from '../../../context/AuthRequestContext';
 import { useSupabase } from '../../../context/SupabaseContext';
 import type { ActionConfig, HeaderActions } from '../../../types/basic.types';
 import {
@@ -47,12 +46,9 @@ function ClipboardTabPanel({
 	children,
 }: ClipboardTabPanelProps) {
 	const { user } = useSupabase();
-	const { requestAuth } = useAuthRequest();
 
+	// onSave() asks for sign-in itself when needed (and resumes the save after).
 	function handleSave() {
-		if (!user) {
-			requestAuth();
-		}
 		void onSave();
 	}
 

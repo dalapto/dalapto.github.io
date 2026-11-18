@@ -90,44 +90,64 @@ type StorageSaveItem = {
 	pendingFile?: File;
 };
 
-async function syncStorageFiles({
-	bucket,
-	savedFilenamesCsv,
-	items,
-}: {
-	bucket: string;
-	savedFilenamesCsv: string | null;
-	items: StorageSaveItem[];
-}) {
-	const savedFilenames = splitStorageFilenames(savedFilenamesCsv);
-
-	if (items.length === 0) {
-		await Promise.all(
-			savedFilenames.map((filename) => removeFromBucket(bucket, filename)),
-		);
-		return null;
-	}
-
-	const nextFilenames: string[] = [];
+/**
+ * Uploads every pending file in `items` (in parallel) and returns the full
+ * ordered filename list to store, plus which files were newly uploaded (so a
+ * caller can roll them back if the row save fails). Deletes nothing.
+ */
+async function uploadStorageItems(
+	bucket: string,
+	items: StorageSaveItem[],
+): Promise<{ filenamesCsv: string | null; uploaded: string[] }> {
 	let uploadIndex = 0;
-
-	for (const item of items) {
+	const planned = items.map((item) => {
 		if (item.pendingFile) {
-			const filename = clipboardFilename(item.pendingFile, uploadIndex++);
-			await uploadToBucket(bucket, filename, item.pendingFile);
-			nextFilenames.push(filename);
-		} else if (item.storageFilename) {
-			nextFilenames.push(item.storageFilename);
+			return {
+				filename: clipboardFilename(item.pendingFile, uploadIndex++),
+				file: item.pendingFile,
+			};
 		}
+		return { filename: item.storageFilename, file: undefined };
+	});
+
+	const uploads = planned.filter(
+		(p): p is { filename: string; file: File } => !!p.file && !!p.filename,
+	);
+	const results = await Promise.allSettled(
+		uploads.map((p) => uploadToBucket(bucket, p.filename, p.file)),
+	);
+	const uploaded = uploads
+		.filter((_, i) => results[i].status === 'fulfilled')
+		.map((p) => p.filename);
+
+	const failed = results.find(
+		(r): r is PromiseRejectedResult => r.status === 'rejected',
+	);
+	if (failed) {
+		// Don't leave half an upload batch behind.
+		await removeFromBucketBestEffort(bucket, uploaded);
+		throw failed.reason;
 	}
 
-	const toRemove = savedFilenames.filter(
-		(filename) => !nextFilenames.includes(filename),
+	const filenames = planned
+		.map((p) => p.filename)
+		.filter((name): name is string => !!name);
+	return { filenamesCsv: joinStorageFilenames(filenames), uploaded };
+}
+
+/** Deletes files, logging (not throwing) on failure — for cleanup after a successful save. */
+async function removeFromBucketBestEffort(bucket: string, filenames: string[]) {
+	const results = await Promise.allSettled(
+		filenames.map((filename) => removeFromBucket(bucket, filename)),
 	);
-
-	await Promise.all(toRemove.map((filename) => removeFromBucket(bucket, filename)));
-
-	return joinStorageFilenames(nextFilenames);
+	results.forEach((result, i) => {
+		if (result.status === 'rejected') {
+			console.warn(
+				`Cleanup: couldn't remove "${filenames[i]}" from "${bucket}"`,
+				result.reason,
+			);
+		}
+	});
 }
 
 function clipboardFilename(file: File, index = 0) {
@@ -195,9 +215,10 @@ export {
 	isSupabaseLikeError,
 	joinStorageFilenames,
 	removeFromBucket,
+	removeFromBucketBestEffort,
 	splitStorageFilenames,
-	syncStorageFiles,
 	throwIfSupabaseError,
+	uploadStorageItems,
 	uploadToBucket,
 };
 export type { StorageSaveItem, SupabaseLikeError };

@@ -14,6 +14,16 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { BASE_URL, routesData, type RouteData } from '../src/routes-data.js';
 
+// Fail the build on duplicate paths: the app would use the first entry while
+// the generated HTML (link previews) silently used the last.
+const seenPaths = new Set<string>();
+for (const { path } of routesData) {
+	if (seenPaths.has(path)) {
+		throw new Error(`Duplicate route path in src/routes-data.ts: ${path}`);
+	}
+	seenPaths.add(path);
+}
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const distDir = join(__dirname, '..', 'dist');
 const template = readFileSync(join(distDir, 'index.html'), 'utf-8');

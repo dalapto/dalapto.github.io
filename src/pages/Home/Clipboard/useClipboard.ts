@@ -12,11 +12,13 @@ import { useBusy } from '../../../context/BusyContext';
 import { useSupabase } from '../../../context/SupabaseContext';
 import { ToastSeverity, useToast } from '../../../context/ToastProvider';
 import { useUnsavedChanges } from '../../../context/UnsavedChangesContext';
-import { saveClipboardRow } from '../../../services/clipboard.service';
+import {
+	saveClipboardRow,
+	saveClipboardStorage,
+} from '../../../services/clipboard.service';
 import {
 	splitStorageFilenames,
 	supabase,
-	syncStorageFiles,
 } from '../../../supabase/supabase-utils';
 import type { ClipboardRow, TabId } from '../../../utils/clipboard-helpers';
 import {
@@ -40,12 +42,6 @@ function useClipboard() {
 	const [lastTab, setLastTab] = useState<TabId>('text');
 	const [textContent, setTextContent] = useState('');
 	const [savedTextContent, setSavedTextContent] = useState('');
-	const [savedImageFilenames, setSavedImageFilenames] = useState<string | null>(
-		null,
-	);
-	const [savedFileFilenames, setSavedFileFilenames] = useState<string | null>(
-		null,
-	);
 	const [loadedImages, setLoadedImages] = useState<StoredImage[]>([]);
 	const [loadedFiles, setLoadedFiles] = useState<StoredFile[]>([]);
 	const [lastUpdatedFile, setLastUpdatedFile] = useState(new Date(0));
@@ -109,8 +105,6 @@ function useClipboard() {
 				setLastUpdatedText(parseTimestamp(row.text_last_updated));
 				setLastUpdatedImage(parseTimestamp(row.image_last_updated));
 				setLastUpdatedFile(parseTimestamp(row.file_last_updated));
-				setSavedImageFilenames(row.image_filename);
-				setSavedFileFilenames(row.file_filename);
 				setImageRevision(0);
 				setFileRevision(0);
 				const images = toStoredImages(row.image_filename);
@@ -191,19 +185,13 @@ function useClipboard() {
 		await withSave('image', async () => {
 			const now = new Date().toISOString();
 			const saveItems = imageUploadRef.current?.getSaveItems() ?? [];
-			const imageFilenames = await syncStorageFiles({
+			const imageFilenames = await saveClipboardStorage({
 				bucket: 'clipboard-images',
-				savedFilenamesCsv: savedImageFilenames,
+				column: 'image_filename',
 				items: saveItems,
+				updates: { last_tab: 'image', image_last_updated: now },
 			});
 
-			await saveClipboardRow({
-				last_tab: 'image',
-				image_filename: imageFilenames,
-				image_last_updated: now,
-			});
-
-			setSavedImageFilenames(imageFilenames);
 			setLastUpdatedImage(new Date(now));
 			setLastTab('image');
 			setImageRevision(0);
@@ -222,19 +210,13 @@ function useClipboard() {
 		await withSave('file', async () => {
 			const now = new Date().toISOString();
 			const saveItems = fileUploadRef.current?.getSaveItems() ?? [];
-			const fileFilenames = await syncStorageFiles({
+			const fileFilenames = await saveClipboardStorage({
 				bucket: 'clipboard-files',
-				savedFilenamesCsv: savedFileFilenames,
+				column: 'file_filename',
 				items: saveItems,
+				updates: { last_tab: 'file', file_last_updated: now },
 			});
 
-			await saveClipboardRow({
-				last_tab: 'file',
-				file_filename: fileFilenames,
-				file_last_updated: now,
-			});
-
-			setSavedFileFilenames(fileFilenames);
 			setLastUpdatedFile(new Date(now));
 			setLastTab('file');
 			setFileRevision(0);

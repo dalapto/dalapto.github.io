@@ -1,7 +1,6 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import { StandardTextArea } from '../../../components/controls/StandardTextArea/StandardTextArea';
-import { useAuthRequest } from '../../../context/AuthRequestContext';
 import { useSupabase } from '../../../context/SupabaseContext';
 import { useTextClipboard } from '../../../hooks/useTextClipboard';
 import type { HeaderActions } from '../../../types/basic.types';
@@ -30,12 +29,9 @@ function TextTabPanel({
 }: TextTabPanelProps) {
 	const { copy, paste } = useTextClipboard(textContent, onTextChange);
 	const { user } = useSupabase();
-	const { requestAuth } = useAuthRequest();
 
+	// onSave() asks for sign-in itself when needed (and resumes the save after).
 	function handleSave() {
-		if (!user) {
-			requestAuth();
-		}
 		void onSave();
 	}
 
