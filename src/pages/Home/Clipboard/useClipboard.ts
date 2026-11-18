@@ -85,7 +85,6 @@ function useClipboard() {
 
 				if (error) {
 					if (error.code !== 'PGRST116') {
-						console.error(error);
 						showToast(
 							getClipboardErrorMessage(error),
 							ToastSeverity.ERROR,
@@ -139,7 +138,6 @@ function useClipboard() {
 				ToastSeverity.SUCCESS,
 			);
 		} catch (error) {
-			console.error(error);
 			showToast(getClipboardErrorMessage(error), ToastSeverity.ERROR, error);
 		} finally {
 			setBusy(false);

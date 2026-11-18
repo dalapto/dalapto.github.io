@@ -6,6 +6,7 @@ import {
 	findPointerGistEntryByFolderName,
 } from '../services/github/pointer-gist.service';
 import { sortArticlesByOrder } from '../utils/pointer-gist-articles';
+import { logErrorDetails } from '../utils/getErrorMessage';
 
 interface PointerGistFile {
 	filename: string;
@@ -45,6 +46,7 @@ function usePointerGistContent(pageKey: string): UsePointerGistContentResult {
 				);
 				if (!cancelled) setFiles(fetched);
 			} catch (err) {
+				logErrorDetails(err, 'Load article content');
 				if (!cancelled)
 					setError(
 						err instanceof Error ? err.message : 'Failed to load content',

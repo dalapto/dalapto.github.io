@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useCallback, useContext, useRef, useState } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import { Image } from '../types/basic.types';
 
 interface BackgroundConfig {
@@ -30,14 +30,17 @@ interface ScrollObserverOptions {
 	priority?: number;
 }
 
-interface BackgroundContextValue {
-	background: BackgroundConfig | null;
+/** Stable setters — consumers of these never re-render when the background changes. */
+interface BackgroundActions {
 	setBackground: (config: BackgroundConfig | null, opts?: SetBackgroundOptions) => void;
 	registerScrollElement: (el: Element, config: BackgroundConfig, opts?: ScrollObserverOptions) => void;
 	unregisterScrollElement: (el: Element) => void;
 }
 
-const BackgroundContext = createContext<BackgroundContextValue | null>(null);
+// Split so that scroll/hover background changes only re-render the components
+// that draw the background, not every page that merely sets it.
+const BackgroundActionsContext = createContext<BackgroundActions | null>(null);
+const BackgroundStateContext = createContext<BackgroundConfig | null>(null);
 
 function observerKey(opts: ScrollObserverOptions): string {
 	const margin = opts.rootMargin ?? '-35% 0px -35% 0px';
@@ -157,18 +160,31 @@ function BackgroundProvider({ children }: { children: ReactNode }) {
 		}
 	}, []);
 
+	const actions = useMemo<BackgroundActions>(
+		() => ({ setBackground, registerScrollElement, unregisterScrollElement }),
+		[setBackground, registerScrollElement, unregisterScrollElement],
+	);
+
 	return (
-		<BackgroundContext.Provider value={{ background, setBackground, registerScrollElement, unregisterScrollElement }}>
-			{children}
-		</BackgroundContext.Provider>
+		<BackgroundActionsContext.Provider value={actions}>
+			<BackgroundStateContext.Provider value={background}>
+				{children}
+			</BackgroundStateContext.Provider>
+		</BackgroundActionsContext.Provider>
 	);
 }
 
-function useBackground() {
-	const ctx = useContext(BackgroundContext);
+/** Setters for the app background. Stable — does not re-render on background changes. */
+function useBackground(): BackgroundActions {
+	const ctx = useContext(BackgroundActionsContext);
 	if (!ctx) throw new Error('useBackground must be used within a BackgroundProvider');
 	return ctx;
 }
 
-export { BackgroundProvider, useBackground };
+/** The current background. Re-renders on every change — use only where it is drawn. */
+function useCurrentBackground(): BackgroundConfig | null {
+	return useContext(BackgroundStateContext);
+}
+
+export { BackgroundProvider, useBackground, useCurrentBackground };
 export type { BackgroundConfig, ScrollObserverOptions, SetBackgroundOptions };

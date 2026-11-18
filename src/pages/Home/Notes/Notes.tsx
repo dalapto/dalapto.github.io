@@ -49,7 +49,6 @@ function Notes() {
 		setFoldersLoading(true);
 		loadFolders(githubToken)
 			.catch((error) => {
-				console.error(error);
 				showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 			})
 			.finally(() => setFoldersLoading(false));
@@ -70,7 +69,6 @@ function Notes() {
 			await loadFolders(githubToken);
 			await refreshWritingPages();
 		} catch (error) {
-			console.error(error);
 			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		} finally {
 			setFoldersLoading(false);

@@ -22,6 +22,7 @@ import {
 	removePointerGistEntry,
 	syncPointerGistArticles,
 } from './pointer-gist.service';
+import { logErrorDetails } from '../../utils/getErrorMessage';
 
 // Notes CRUD: one folder (article) = one gist, one note (section) = one file.
 
@@ -44,9 +45,11 @@ export async function listFolders(
 ): Promise<Folder[]> {
 	const [gists, entries] = await Promise.all([
 		listAllGists(token),
-		fetchPointerGistEntriesAuth(token).catch(
-			() => ({} as Record<string, PointerGistEntry>),
-		),
+		fetchPointerGistEntriesAuth(token).catch((error: unknown) => {
+			// Still list the gists; they just show without Writing-index names.
+			logErrorDetails(error, 'Read Writing index for folder list');
+			return {} as Record<string, PointerGistEntry>;
+		}),
 	]);
 
 	const trackedIds = new Set(Object.values(entries).map((entry) => entry.id));

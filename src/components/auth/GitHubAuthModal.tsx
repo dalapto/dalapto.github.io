@@ -31,7 +31,6 @@ function GitHubAuthModal({
 			await signIn(token.trim());
 			showToast('Signed in successfully.', ToastSeverity.SUCCESS);
 		} catch (error) {
-			console.error(error);
 			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		}
 	}

@@ -8,6 +8,7 @@ import {
 	useState,
 } from 'react';
 import { supabase } from '../supabase/supabase-utils';
+import { logErrorDetails } from '../utils/getErrorMessage';
 
 interface SupabaseContextValue {
 	user: User | null;
@@ -25,10 +26,18 @@ function SupabaseProvider({ children }: { children: ReactNode }) {
 	const [authLoading, setAuthLoading] = useState(true);
 
 	useEffect(() => {
-		supabase.auth.getSession().then(({ data }) => {
-			setSession(data.session);
-			setAuthLoading(false);
-		});
+		supabase.auth
+			.getSession()
+			.then(({ data, error }) => {
+				if (error) logErrorDetails(error, 'Restore Supabase session');
+				setSession(data.session);
+			})
+			.catch((error: unknown) => {
+				// Treat as signed out rather than leaving auth "loading" forever.
+				logErrorDetails(error, 'Restore Supabase session');
+				setSession(null);
+			})
+			.finally(() => setAuthLoading(false));
 
 		const {
 			data: { subscription },

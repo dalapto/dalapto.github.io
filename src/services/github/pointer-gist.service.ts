@@ -3,6 +3,7 @@ import {
 	findOrphanImageFilenames,
 	findPageImageFilename,
 } from '../../utils/article-page-image';
+import { fetchWithTimeout } from '../../utils/fetch-with-timeout';
 import {
 	type PointerGistArticle,
 	mergeArticlesWithGistFilenames,
@@ -113,7 +114,7 @@ export async function fetchPointerGistEntries(): Promise<
 	Record<string, PointerGistEntry>
 > {
 	const url = `${GIST_RAW_BASE}/${POINTER_GIST_OWNER}/${POINTER_GIST_ID}/raw/${POINTER_GIST_FILENAME}?_=${Date.now()}`;
-	const res = await fetch(url, { cache: 'no-store' });
+	const res = await fetchWithTimeout(url, { cache: 'no-store' });
 	if (!res.ok) throw new Error(`Failed to fetch pointer gist: ${res.status}`);
 	const parsed = (await res.json()) as Record<string, RawPointerGistEntry>;
 	return normalizeStoredPointerGistEntries(parsed);

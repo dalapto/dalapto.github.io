@@ -192,7 +192,6 @@ function CreateNoteTabPanel({
 			resetPageImageAfterSave();
 			onSaved();
 		} catch (error) {
-			console.error(error);
 			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		} finally {
 			setBusy(false);
@@ -254,7 +253,6 @@ function CreateNoteTabPanel({
 			resetPageImageAfterSave();
 			onSaved();
 		} catch (error) {
-			console.error(error);
 			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		} finally {
 			setBusy(false);

@@ -36,7 +36,7 @@ import {
 import type { HeaderActions } from '../../../types/basic.types';
 import type { Folder } from '../../../types/github.types';
 import { filterArticleTextFilenames } from '../../../utils/article-page-image';
-import { getErrorMessage } from '../../../utils/getErrorMessage';
+import { getErrorMessage, logErrorDetails } from '../../../utils/getErrorMessage';
 import {
 	clampOrderInput,
 	findArticleByFilename,
@@ -244,7 +244,8 @@ function EditNoteTabPanel({
 						? findArticleByFilename(entry.articles, note.filename)
 						: undefined;
 					nextOrder = formatOrderInput(article?.order);
-				} catch {
+				} catch (error) {
+					logErrorDetails(error, 'Load section order');
 					nextOrder = '';
 				}
 				setNewArticle(articleName);
@@ -263,7 +264,6 @@ function EditNoteTabPanel({
 			})
 			.catch((error) => {
 				if (!cancelled) {
-					console.error(error);
 					showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 				}
 			})
@@ -339,7 +339,6 @@ function EditNoteTabPanel({
 			resetPageImageAfterSave();
 			await onSaved();
 		} catch (error) {
-			console.error(error);
 			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		} finally {
 			setBusy(false);
@@ -431,7 +430,6 @@ function EditNoteTabPanel({
 				text: false,
 			}));
 		} catch (error) {
-			console.error(error);
 			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		} finally {
 			setBusy(false);
@@ -493,7 +491,6 @@ function EditNoteTabPanel({
 			clearSelectedNote();
 			await onSaved();
 		} catch (error) {
-			console.error(error);
 			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		} finally {
 			setBusy(false);
@@ -539,7 +536,8 @@ function EditNoteTabPanel({
 					? findArticleByFilename(entry.articles, note.filename)
 					: undefined;
 				nextOrder = formatOrderInput(article?.order);
-			} catch {
+			} catch (error) {
+				logErrorDetails(error, 'Load section order');
 				nextOrder = '';
 			}
 			setNewArticle(articleName);
@@ -563,7 +561,6 @@ function EditNoteTabPanel({
 				text: false,
 			}));
 		} catch (error) {
-			console.error(error);
 			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		} finally {
 			setBusy(false);

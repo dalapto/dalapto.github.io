@@ -12,6 +12,7 @@ import {
 	ARTICLE_PAGE_IMAGE_FILENAME,
 	validateArticlePageImageFile,
 } from '../utils/article-page-image';
+import { logErrorDetails } from '../utils/getErrorMessage';
 
 function usePageImageField(
 	articleName: string,
@@ -83,7 +84,8 @@ function usePageImageField(
 				}
 				objectUrlRef.current = url ?? null;
 				setPreviewUrl(url ?? null);
-			} catch {
+			} catch (error) {
+				logErrorDetails(error, 'Load page image');
 				if (!cancelled) {
 					revokeObjectUrl();
 					setCommittedImageFilename(null);

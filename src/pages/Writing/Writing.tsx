@@ -27,9 +27,19 @@ const tileBgPositions: Record<string, string> = {
 function Writing() {
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
-	const { entries, publicArticles, loading, getArticleImageUrl } =
-		useWritingPages();
+	const {
+		entries,
+		publicArticles,
+		loading,
+		getArticleImageUrl,
+		requestArticleImages,
+	} = useWritingPages();
 	const article = searchParams.get(WRITING_ARTICLE_PARAM);
+
+	// Article page images (hub tiles + article backgrounds) are only needed here.
+	useEffect(() => {
+		requestArticleImages();
+	}, [requestArticleImages]);
 
 	const tileImages = useMemo(() => {
 		const map: Record<string, string> = { ...staticWritingRouteImages };

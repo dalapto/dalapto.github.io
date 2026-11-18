@@ -8,7 +8,9 @@ import {
 	useState,
 } from 'react';
 import './FileUpload.css';
+import { PdfPreview } from './PdfPreview';
 import type { StorageSaveItem } from '../../../supabase/supabase-utils';
+import { logErrorDetails } from '../../../utils/getErrorMessage';
 
 type FilePreview = {
 	name: string;
@@ -177,7 +179,8 @@ const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(
 					previewsRef.current = loaded;
 					setPreviews(loaded);
 				})
-				.catch(() => {
+				.catch((error: unknown) => {
+					logErrorDetails(error, 'Load file previews');
 					if (cancelled) return;
 					const fallback = initialFiles.map((file) => ({
 						name: file.name,
@@ -264,11 +267,10 @@ const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(
 									</button>
 								</div>
 								{preview.kind === 'pdf' && (
-									<iframe
+									<PdfPreview
 										src={preview.content}
-										title={preview.name}
+										name={preview.name}
 										className='file-upload-iframe'
-										allowFullScreen={true}
 									/>
 								)}
 								{preview.kind === 'text' && (

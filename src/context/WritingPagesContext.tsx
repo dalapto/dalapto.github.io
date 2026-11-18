@@ -21,6 +21,7 @@ import {
 	isPublicWritingFolder,
 	writingArticleRoute,
 } from '../utils/writing-articles';
+import { logErrorDetails } from '../utils/getErrorMessage';
 
 interface WritingPagesContextValue {
 	entries: Record<string, PointerGistEntry>;
@@ -28,6 +29,8 @@ interface WritingPagesContextValue {
 	loading: boolean;
 	error: string | null;
 	getArticleImageUrl: (folderKey: string) => string | undefined;
+	/** Start loading article page images. Call from pages that show them. */
+	requestArticleImages: () => void;
 	refreshWritingPages: () => Promise<void>;
 }
 
@@ -51,36 +54,71 @@ function WritingPagesProvider({ children }: { children: React.ReactNode }) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const imageUrlsRef = useRef<Record<string, string>>({});
+	const entriesRef = useRef<Record<string, PointerGistEntry> | null>(null);
+	// Only the newest refresh may commit; an older, slower one is ignored.
+	const latestRefresh = useRef(0);
+	// Images are only downloaded once a page that shows them asks for them.
+	const imagesWanted = useRef(false);
+	const imagesLoadedFor = useRef(-1);
 
-	const revokeImageUrls = useCallback((urls: Record<string, string>) => {
-		for (const url of Object.values(urls)) {
-			URL.revokeObjectURL(url);
-		}
-	}, []);
+	/** Load page images for one refresh's entries, committing each as it arrives. */
+	const loadArticleImages = useCallback(
+		(fetched: Record<string, PointerGistEntry>, refreshId: number) => {
+			if (imagesLoadedFor.current === refreshId) return;
+			imagesLoadedFor.current = refreshId;
+
+			// Drop images for articles that are gone or no longer have one.
+			const kept: Record<string, string> = {};
+			for (const [key, url] of Object.entries(imageUrlsRef.current)) {
+				if (fetched[key]?.image?.trim()) kept[key] = url;
+				else URL.revokeObjectURL(url);
+			}
+			imageUrlsRef.current = kept;
+			setImageUrls(kept);
+
+			for (const [folderKey, entry] of Object.entries(fetched)) {
+				if (!entry.image?.trim()) continue;
+				void createArticlePageImageObjectUrl(entry).then((url) => {
+					if (!url) return;
+					if (refreshId !== latestRefresh.current) {
+						URL.revokeObjectURL(url);
+						return;
+					}
+					const previous = imageUrlsRef.current[folderKey];
+					imageUrlsRef.current = { ...imageUrlsRef.current, [folderKey]: url };
+					setImageUrls(imageUrlsRef.current);
+					if (previous) URL.revokeObjectURL(previous);
+				});
+			}
+		},
+		[],
+	);
 
 	const refreshWritingPages = useCallback(async () => {
+		const refreshId = ++latestRefresh.current;
 		try {
 			const fetched = await fetchPointerGistEntries();
-			const nextUrls: Record<string, string> = {};
-			await Promise.all(
-				Object.entries(fetched).map(async ([folderKey, entry]) => {
-					if (!entry.image?.trim()) return;
-					const url = await createArticlePageImageObjectUrl(entry);
-					if (url) nextUrls[folderKey] = url;
-				}),
-			);
-			revokeImageUrls(imageUrlsRef.current);
-			imageUrlsRef.current = nextUrls;
-			setImageUrls(nextUrls);
+			if (refreshId !== latestRefresh.current) return;
+			entriesRef.current = fetched;
 			setEntries(fetched);
 			setError(null);
+			if (imagesWanted.current) loadArticleImages(fetched, refreshId);
 		} catch (err) {
+			if (refreshId !== latestRefresh.current) return;
+			logErrorDetails(err, 'Load Writing index');
 			setError(
 				err instanceof Error ? err.message : 'Failed to load writing pages',
 			);
 			throw err;
 		}
-	}, [revokeImageUrls]);
+	}, [loadArticleImages]);
+
+	const requestArticleImages = useCallback(() => {
+		imagesWanted.current = true;
+		if (entriesRef.current) {
+			loadArticleImages(entriesRef.current, latestRefresh.current);
+		}
+	}, [loadArticleImages]);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -103,10 +141,12 @@ function WritingPagesProvider({ children }: { children: React.ReactNode }) {
 
 	useEffect(
 		() => () => {
-			revokeImageUrls(imageUrlsRef.current);
+			for (const url of Object.values(imageUrlsRef.current)) {
+				URL.revokeObjectURL(url);
+			}
 			imageUrlsRef.current = {};
 		},
-		[revokeImageUrls],
+		[],
 	);
 
 	const publicArticles = useMemo(
@@ -132,9 +172,18 @@ function WritingPagesProvider({ children }: { children: React.ReactNode }) {
 			loading,
 			error,
 			getArticleImageUrl,
+			requestArticleImages,
 			refreshWritingPages,
 		}),
-		[entries, publicArticles, loading, error, getArticleImageUrl, refreshWritingPages],
+		[
+			entries,
+			publicArticles,
+			loading,
+			error,
+			getArticleImageUrl,
+			requestArticleImages,
+			refreshWritingPages,
+		],
 	);
 
 	return (

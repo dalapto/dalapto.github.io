@@ -1,10 +1,9 @@
+import { lazy } from 'react';
 import { LITTER_APP_PATH, RECYCLOTRON_PATH } from './constants/route-paths';
 import { About } from './pages/About/About';
 import { Home } from './pages/Home/Home';
-import { Clipboard } from './pages/Home/Clipboard/ClipboardPage';
 import { LitterApp } from './pages/About/LitterApp/LitterApp';
 import { Medieval2TotalWar } from './pages/Projects/m2tw/m2tw';
-import { Notes } from './pages/Home/Notes/Notes';
 import { Projects } from './pages/Projects/Projects';
 import { Recyclotron } from './pages/About/Recylotron/Recylotron';
 import { RiseOfNations } from './pages/Projects/RON/Ron';
@@ -13,6 +12,18 @@ import { Bannjan } from './pages/Writing/Bannjan/Bannjan';
 import { Writing } from './pages/Writing/Writing';
 import { YouthWork } from './pages/YouthWork/YouthWork';
 import { getRouteData } from './routes-data';
+
+// Owner-only tools: split into their own chunks so public visitors never
+// download the editor or the gist/Supabase write paths. Rendered under the
+// <Suspense> in App.tsx.
+const Clipboard = lazy(() =>
+	import('./pages/Home/Clipboard/ClipboardPage').then((m) => ({
+		default: m.Clipboard,
+	})),
+);
+const Notes = lazy(() =>
+	import('./pages/Home/Notes/Notes').then((m) => ({ default: m.Notes })),
+);
 
 /**
  * Interface for a single route or page.

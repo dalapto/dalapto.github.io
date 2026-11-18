@@ -8,6 +8,8 @@ import {
 	parseArticlePageImageRecord,
 	validateArticlePageImageFile,
 } from '../../utils/article-page-image';
+import { fetchWithTimeout } from '../../utils/fetch-with-timeout';
+import { logErrorDetails } from '../../utils/getErrorMessage';
 import { findGistFileByFilename, getGist, updateGist } from './github-api';
 import { GIST_RAW_BASE, POINTER_GIST_OWNER } from './config';
 import type {
@@ -48,13 +50,13 @@ export async function createArticlePageImageObjectUrl(
 
 			if (file.raw_url) {
 				return objectUrlFromRawResponse(
-					await fetch(file.raw_url, { cache: 'no-store' }),
+					await fetchWithTimeout(file.raw_url, { cache: 'no-store' }),
 				);
 			}
 		}
 
 		return objectUrlFromRawResponse(
-			await fetch(
+			await fetchWithTimeout(
 				gistRawFileUrl(
 					entry.id,
 					filename,
@@ -63,7 +65,9 @@ export async function createArticlePageImageObjectUrl(
 				{ cache: 'no-store' },
 			),
 		);
-	} catch {
+	} catch (error) {
+		// No image is a valid outcome for the caller; keep the reason visible.
+		logErrorDetails(error, `Load page image for gist ${entry.id}`);
 		return undefined;
 	}
 }
@@ -102,7 +106,7 @@ export async function fetchPublicGistFiles(
 			const url = `${GIST_RAW_BASE}/${POINTER_GIST_OWNER}/${gistId}/raw/${encodeURIComponent(
 				filename,
 			)}`;
-			const res = await fetch(url);
+			const res = await fetchWithTimeout(url);
 			if (!res.ok)
 				throw new Error(`Failed to fetch ${filename}: ${res.status}`);
 			return { filename, content: await res.text() };

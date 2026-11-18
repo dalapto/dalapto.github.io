@@ -1,4 +1,5 @@
 import type { GitHubUser, ListFoldersOptions } from '../../types/github.types';
+import { fetchWithTimeout } from '../../utils/fetch-with-timeout';
 import { GITHUB_API_BASE } from './config';
 
 // Low-level GitHub REST client and gist helpers. No pointer-gist or notes logic.
@@ -34,31 +35,73 @@ export class GitHubApiError extends Error {
 	}
 }
 
+/** "resets at 14:05" from GitHub's rate-limit headers, when it is a rate limit. */
+function rateLimitMessage(res: Response): string | undefined {
+	if (res.status !== 403 && res.status !== 429) return undefined;
+
+	const retryAfter = Number(res.headers.get('retry-after'));
+	if (retryAfter > 0) {
+		return `GitHub rate limit reached — try again in ${Math.ceil(retryAfter / 60)} min.`;
+	}
+	if (res.headers.get('x-ratelimit-remaining') !== '0') return undefined;
+
+	const reset = Number(res.headers.get('x-ratelimit-reset'));
+	const at = reset
+		? new Date(reset * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+		: undefined;
+	return `GitHub rate limit reached${at ? ` — resets at ${at}` : ''}.`;
+}
+
+async function toGitHubApiError(res: Response, path: string): Promise<GitHubApiError> {
+	const rateLimited = rateLimitMessage(res);
+	if (rateLimited) return new GitHubApiError(rateLimited, res.status);
+
+	const detail = (await res.text().catch(() => '')).slice(0, 300);
+	return new GitHubApiError(
+		`GitHub API error: ${res.status} ${path}${detail ? ` — ${detail}` : ''}`,
+		res.status,
+	);
+}
+
+/**
+ * Authenticated GitHub REST call. Times out after 15s. GETs (safe to repeat)
+ * are retried once on a network error, timeout or 5xx; writes never are.
+ */
 export async function githubFetch<T>(
 	token: string,
 	path: string,
 	init?: RequestInit,
 ): Promise<T> {
-	const res = await fetch(`${GITHUB_API_BASE}${path}`, {
-		// GitHub sends `Cache-Control: max-age=60`; without this a read straight
-		// after a write can return the pre-save gist from the browser cache.
-		cache: 'no-store',
-		...init,
-		headers: {
-			Authorization: `Bearer ${token}`,
-			Accept: 'application/vnd.github+json',
-			...init?.headers,
-		},
-	});
-	if (!res.ok) {
-		const detail = (await res.text().catch(() => '')).slice(0, 300);
-		throw new GitHubApiError(
-			`GitHub API error: ${res.status} ${path}${detail ? ` — ${detail}` : ''}`,
-			res.status,
-		);
+	const isRetryable = (init?.method ?? 'GET').toUpperCase() === 'GET';
+	const maxAttempts = isRetryable ? 2 : 1;
+
+	for (let attempt = 1; ; attempt += 1) {
+		const canRetry = attempt < maxAttempts;
+		let res: Response;
+		try {
+			res = await fetchWithTimeout(`${GITHUB_API_BASE}${path}`, {
+				// GitHub sends `Cache-Control: max-age=60`; without this a read straight
+				// after a write can return the pre-save gist from the browser cache.
+				cache: 'no-store',
+				...init,
+				headers: {
+					Authorization: `Bearer ${token}`,
+					Accept: 'application/vnd.github+json',
+					...init?.headers,
+				},
+			});
+		} catch (error) {
+			if (canRetry) continue; // network error or timeout
+			throw error;
+		}
+
+		if (res.ok) {
+			if (res.status === 204) return undefined as T;
+			return res.json() as Promise<T>;
+		}
+		if (res.status >= 500 && canRetry) continue;
+		throw await toGitHubApiError(res, path);
 	}
-	if (res.status === 204) return undefined as T;
-	return res.json() as Promise<T>;
 }
 
 async function listGists(

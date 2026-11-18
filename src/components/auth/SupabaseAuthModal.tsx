@@ -27,7 +27,6 @@ function SupabaseAuthModal({
 			await signInWithPassword(email.trim(), password);
 			showToast('Signed in successfully.', ToastSeverity.SUCCESS);
 		} catch (error) {
-			console.error(error);
 			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		}
 	}
@@ -38,7 +37,6 @@ function SupabaseAuthModal({
 			showToast('Signed out successfully.', ToastSeverity.INFO);
 			onClose();
 		} catch (error) {
-			console.error(error);
 			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
 		}
 	}

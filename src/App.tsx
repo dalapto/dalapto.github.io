@@ -1,12 +1,17 @@
 import { animated, useTransition } from '@react-spring/web';
-import { useEffect, useMemo, useRef } from 'react';
+import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { Route, Routes, useLocation } from 'react-router';
 import './App.css';
+import { ErrorBoundary } from './components/display/ErrorBoundary/ErrorBoundary';
 import { PageInConstruction } from './components/display/PageInConstruction/PageInConstruction';
 import { FooterBar } from './components/layout/FooterBar/FooterBar';
 import { NavBar } from './components/layout/NavBar/NavBar';
 import { AuthRequestProvider } from './context/AuthRequestContext';
-import { BackgroundProvider, useBackground } from './context/BackgroundContext';
+import {
+	BackgroundProvider,
+	useBackground,
+	useCurrentBackground,
+} from './context/BackgroundContext';
 import { BusyProvider } from './context/BusyContext';
 import { GitHubProvider } from './context/GitHubContext';
 import { SupabaseProvider } from './context/SupabaseContext';
@@ -42,7 +47,7 @@ function useNavRoutesWithWriting(): NavRoute[] {
 }
 
 function AppBackground() {
-	const { background } = useBackground();
+	const background = useCurrentBackground();
 
 	const transitions = useTransition(background, {
 		keys: (bg) => bg?.image.src ?? 'none',
@@ -137,18 +142,23 @@ function AppInner() {
 			<div className='routes-container'>
 				{transitions((style, loc) => (
 					<animated.div style={style} className='page-transition-wrapper'>
-						<Routes location={loc}>
-							{flattenRoutes(navRoutes).map((r) => {
-								const Page = r.component;
-								return (
-									<Route
-										key={r.route}
-										path={r.route}
-										element={Page ? <Page /> : <PageInConstruction />}
-									/>
-								);
-							})}
-						</Routes>
+						{/* Keyed by path so a crashed page recovers on navigation; nav and footer stay up. */}
+						<ErrorBoundary key={loc.pathname} context='Page'>
+							<Suspense fallback={null}>
+								<Routes location={loc}>
+									{flattenRoutes(navRoutes).map((r) => {
+										const Page = r.component;
+										return (
+											<Route
+												key={r.route}
+												path={r.route}
+												element={Page ? <Page /> : <PageInConstruction />}
+											/>
+										);
+									})}
+								</Routes>
+							</Suspense>
+						</ErrorBoundary>
 					</animated.div>
 				))}
 			</div>
