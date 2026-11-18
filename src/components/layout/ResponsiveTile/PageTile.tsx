@@ -1,4 +1,3 @@
-import React from 'react';
 import { ImgPaths } from '../../../constants/img-paths';
 import { NavRoute } from '../../../routes';
 import { Image } from '../../../types/basic.types';

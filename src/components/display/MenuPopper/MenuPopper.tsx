@@ -1,10 +1,10 @@
 import { Box, Fade, MenuItem, Popper } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import * as React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useClickOutside } from '../../../hooks/useClickOutside';
 import { NavRoute } from '../../../routes';
 import '../../layout/NavBar/NavBar.css';
+import React from 'react';
 
 interface MenuPopperProps {
 	anchorElement: Element | HTMLElement;
@@ -167,4 +167,5 @@ const MenuPopper = React.forwardRef<MenuPopperHandle, MenuPopperProps>(
 		);
 	},
 );
-export { MenuPopper, MenuPopperHandle };
+export { MenuPopper };
+export type { MenuPopperHandle }

@@ -1,4 +1,3 @@
-import React from 'react';
 import projectsPanel from '../../../components/content/projectsPanel';
 import type { JsonImageTextPanel } from '../../../components/Json/JsonSection/JsonPanel';
 import { JsonSection } from '../../../components/Json/JsonSection/JsonSection';

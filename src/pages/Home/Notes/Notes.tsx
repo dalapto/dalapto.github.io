@@ -1,5 +1,5 @@
 import { Box, useMediaQuery, useTheme } from '@mui/material';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AuthIconButton } from '../../../components/auth/AuthIconButton';
 import { GitHubAuthModal } from '../../../components/auth/GitHubAuthModal';
 import { LoadingOverlay } from '../../../components/display/LoadingOverlay/LoadingOverlay';

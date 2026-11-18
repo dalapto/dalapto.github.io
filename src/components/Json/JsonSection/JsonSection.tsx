@@ -1,11 +1,11 @@
 import React, { ReactElement, useEffect, useRef } from 'react';
-import { BackgroundConfig } from '../../../context/BackgroundContext.tsx';
-import { useBackground } from '../../../context/BackgroundContext.tsx';
+import { BackgroundConfig } from '../../../context/BackgroundContext';
+import { useBackground } from '../../../context/BackgroundContext';
 import './JsonSection.css';
 import { Image } from '../../../types/basic.types';
-import { ParallaxCanvas } from '../../display/ParallaxCanvas/ParallaxCanvas.tsx';
-import { JsonPanelData } from './JsonPanel.tsx';
-import { JsonSectionItem } from './JsonSectionItem.tsx';
+import { ParallaxCanvas } from '../../display/ParallaxCanvas/ParallaxCanvas';
+import { JsonPanelData } from './JsonPanel';
+import { JsonSectionItem } from './JsonSectionItem';
 
 interface JsonSectionBackground {
 	image: Image;

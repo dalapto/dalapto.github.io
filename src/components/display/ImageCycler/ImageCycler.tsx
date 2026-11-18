@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Fab } from '@mui/material';
 import NavigateBefore from '@mui/icons-material/NavigateBefore';
 import NavigateNext from '@mui/icons-material/NavigateNext';
@@ -133,66 +133,66 @@ function ImageCycler({
 
 	return (
 		<>
-		<div
-			className='image-cycler'
-			onMouseEnter={handleMouseEnter}
-			onMouseLeave={handleMouseLeave}
-		>
-		<div
-			className='image-cycler-media'
-			style={{ minHeight, cursor: lightbox ? 'zoom-in' : undefined }}
-			onClick={lightbox ? () => setLightboxOpen(true) : undefined}
-		>
-			{images.map((img, i) => (
-				<img
-					key={img.src}
-					src={img.src}
-					alt={img.alt}
-					className='image-cycler-img'
-					style={{
-						opacity: i === index ? 1 : 0,
-						transition: `opacity ${fade}ms ease-in-out`,
-						objectFit,
-						objectPosition,
-					}}
-				/>
-			))}
-		{showArrows && images.length > 1 && (
-			<CyclerArrows onPrev={goPrev} onNext={goNext} />
-		)}
-		</div>
-			<div className='image-cycler-footer'>
-				{activeCaption && (
-					<span key={index} className='image-cycler-caption'>
-						{activeCaption}
-					</span>
-				)}
-				{showDots && images.length > 1 && (
-					<div className='image-cycler-dots'>
-						{images.map((img, i) => (
-							<button
-								key={img.src}
-								className={`image-cycler-dot${i === index ? ' image-cycler-dot--active' : ''}`}
-								onClick={() => goTo(i)}
-								aria-label={`Go to image ${i + 1}`}
-								aria-current={i === index}
-							/>
-						))}
-					</div>
-				)}
+			<div
+				className='image-cycler'
+				onMouseEnter={handleMouseEnter}
+				onMouseLeave={handleMouseLeave}
+			>
+				<div
+					className='image-cycler-media'
+					style={{ minHeight, cursor: lightbox ? 'zoom-in' : undefined }}
+					onClick={lightbox ? () => setLightboxOpen(true) : undefined}
+				>
+					{images.map((img, i) => (
+						<img
+							key={img.src}
+							src={img.src}
+							alt={img.alt}
+							className='image-cycler-img'
+							style={{
+								opacity: i === index ? 1 : 0,
+								transition: `opacity ${fade}ms ease-in-out`,
+								objectFit,
+								objectPosition,
+							}}
+						/>
+					))}
+					{showArrows && images.length > 1 && (
+						<CyclerArrows onPrev={goPrev} onNext={goNext} />
+					)}
+				</div>
+				<div className='image-cycler-footer'>
+					{activeCaption && (
+						<span key={index} className='image-cycler-caption'>
+							{activeCaption}
+						</span>
+					)}
+					{showDots && images.length > 1 && (
+						<div className='image-cycler-dots'>
+							{images.map((img, i) => (
+								<button
+									key={img.src}
+									className={`image-cycler-dot${i === index ? ' image-cycler-dot--active' : ''}`}
+									onClick={() => goTo(i)}
+									aria-label={`Go to image ${i + 1}`}
+									aria-current={i === index}
+								/>
+							))}
+						</div>
+					)}
+				</div>
 			</div>
-		</div>
-	{lightbox && (
-	<Lightbox open={lightboxOpen} onClose={() => setLightboxOpen(false)}>
-		<ImageCycler
-			images={images}
-			interval={0}
-			objectFit='contain'
-			minHeight='75vh'
-			initialIndex={index}
-		/>
-	</Lightbox>
-	)}
+			{lightbox && (
+				<Lightbox open={lightboxOpen} onClose={() => setLightboxOpen(false)}>
+					<ImageCycler
+						images={images}
+						interval={0}
+						objectFit='contain'
+						minHeight='75vh'
+						initialIndex={index}
+					/>
+				</Lightbox>
+			)}
 		</>
 	);
 }

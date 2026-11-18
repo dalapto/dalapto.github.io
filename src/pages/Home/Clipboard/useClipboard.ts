@@ -269,14 +269,13 @@ function useClipboard() {
 		setFileRevision((n) => n + 1);
 	}
 
+	const userId = user?.id;
+
 	useEffect(() => {
 		if (authLoading) return;
-		if (user) {
-			void loadClipboard();
-		} else {
-			setBusy(false);
-		}
-	}, [authLoading, user, loadClipboard, setBusy]);
+		if (userId) void loadClipboard();
+		else setBusy(false);
+	}, [authLoading, userId, loadClipboard, setBusy]);
 
 	return {
 		fileUploadRef,

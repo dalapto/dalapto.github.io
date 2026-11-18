@@ -1,7 +1,6 @@
-import React from 'react';
-import { Image } from '../../../types/basic.types.ts';
+import { Image } from '../../../types/basic.types';
 import '../../layout/ImageHeader/ImageHeader.css';
-import { ImageHeader } from '../../layout/ImageHeader/ImageHeader.tsx';
+import { ImageHeader } from '../../layout/ImageHeader/ImageHeader';
 
 interface JsonHeaderProps {
 	/** When omitted, a plain text header is rendered instead of an image header. */

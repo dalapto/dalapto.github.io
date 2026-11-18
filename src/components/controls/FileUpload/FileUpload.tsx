@@ -1,6 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
-import React, {
+import {
 	forwardRef,
 	useEffect,
 	useImperativeHandle,

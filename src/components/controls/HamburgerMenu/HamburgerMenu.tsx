@@ -1,6 +1,5 @@
 import MenuIcon from '@mui/icons-material/Menu';
 import IconButton from '@mui/material/IconButton';
-import * as React from 'react';
 import '../../layout/NavBar/NavBar.css';
 import './HamburgerMenu.css';
 

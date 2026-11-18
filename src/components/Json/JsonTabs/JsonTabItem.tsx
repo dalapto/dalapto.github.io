@@ -28,4 +28,5 @@ function JsonTabItem({ label, id, icon, ...rest }: JsonTabItemProps) {
 	);
 }
 
-export { JsonTabItem, JsonTabItemProps };
+export { JsonTabItem };
+export type { JsonTabItemProps };

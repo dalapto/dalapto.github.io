@@ -2,8 +2,8 @@ import { Button, Card, CardMedia, Fade } from '@mui/material';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import * as React from 'react';
 import { Link } from 'react-router-dom';
+import React from 'react';
 import './Tile.css';
 
 enum TileActionKind {
@@ -63,8 +63,8 @@ function Tile({
 	backgroundColour = 'rgba(0,0,0,0)',
 	showLabelOnMouseOver = false,
 	action,
-	onMouseEnter = () => {},
-	onMouseLeave = () => {},
+	onMouseEnter = () => { },
+	onMouseLeave = () => { },
 	ariaLabel,
 }: TileProps) {
 	const [showLabel, setShowLabel] = React.useState<boolean>(

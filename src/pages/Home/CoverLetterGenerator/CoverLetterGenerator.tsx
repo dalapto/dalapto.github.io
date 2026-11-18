@@ -1,5 +1,4 @@
 import { Box, useMediaQuery, useTheme } from '@mui/material';
-import React from 'react';
 import { JsonSection } from '../../../components/Json/JsonSection/JsonSection';
 import { colours } from '../../../constants/colours';
 import { CoverLetterForm } from './CoverLetterForm';

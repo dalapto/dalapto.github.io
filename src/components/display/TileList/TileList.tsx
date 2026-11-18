@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { Tile, TileActionKind } from '../Tile/Tile';
 
 interface TileListProps {
@@ -56,8 +55,8 @@ function TileList({
 							backgroundColour={backgroundColour}
 							showLabelOnMouseOver={showLabelOnMouseOver}
 							className={''}
-					action={{ kind: TileActionKind.Href, href: link }}
-						ariaLabel={text}
+							action={{ kind: TileActionKind.Href, href: link }}
+							ariaLabel={text}
 						/>
 					);
 				})}

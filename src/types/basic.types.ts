@@ -48,7 +48,11 @@ interface ActionConfig {
 
 type HeaderActions =
 	| ActionConfig[]
-	| { start?: ActionConfig[]; startSecondary?: ActionConfig[]; end?: ActionConfig[] };
+	| {
+			start?: ActionConfig[];
+			startSecondary?: ActionConfig[];
+			end?: ActionConfig[];
+	  };
 
 function resolveHeaderActions(h?: HeaderActions): {
 	start: ActionConfig[];
@@ -64,13 +68,13 @@ function resolveHeaderActions(h?: HeaderActions): {
 	};
 }
 
-export {
+export { resolveHeaderActions };
+export type {
 	ExternalLink,
 	Image,
 	ProjectPanel,
 	TooltipLink,
-	resolveHeaderActions,
-	type ActionConfig,
-	type HeaderActions,
-	type JsonTab,
+	ActionConfig,
+	HeaderActions,
+	JsonTab,
 };

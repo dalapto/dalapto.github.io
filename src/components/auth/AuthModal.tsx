@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ActionConfig } from '../../types/basic.types';
 import { FormPanel } from '../layout/FormPanel/FormPanel';
 import { StandardModal } from '../layout/StandardModal/StandardModal';

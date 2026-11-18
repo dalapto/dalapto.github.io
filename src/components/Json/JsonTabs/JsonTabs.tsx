@@ -1,5 +1,5 @@
 import { Tabs, useMediaQuery, useTheme } from '@mui/material';
-import * as React from 'react';
+import React from 'react';
 import { colours } from '../../../constants/colours';
 import type { JsonTab } from '../../../types/basic.types';
 import { JsonTabItem } from './JsonTabItem';

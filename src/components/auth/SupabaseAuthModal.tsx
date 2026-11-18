@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { colours } from '../../constants/colours';
 import { useSupabase } from '../../context/SupabaseContext';
 import { ToastSeverity, useToast } from '../../context/ToastProvider';

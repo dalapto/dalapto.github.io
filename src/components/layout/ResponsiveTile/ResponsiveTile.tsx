@@ -1,5 +1,4 @@
 import { Grid } from '@mui/material';
-import React from 'react';
 import type { BackgroundConfig } from '../../../context/BackgroundContext';
 import { useHoverBackground } from '../../../hooks/useHoverBackground';
 import { useScrollBackground } from '../../../hooks/useScrollBackground';

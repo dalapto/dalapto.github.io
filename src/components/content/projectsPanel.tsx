@@ -1,4 +1,3 @@
-import React from 'react';
 import { colours } from '../../constants/colours';
 import {
 	formatLink,

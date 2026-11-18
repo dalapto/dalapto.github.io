@@ -1,5 +1,5 @@
 import { FormControl, FormHelperText } from '@mui/material';
-import React, { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import './StandardTextArea.css';
 
 interface StandardTextAreaProps {

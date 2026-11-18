@@ -1,5 +1,4 @@
 import { Tooltip } from '@mui/material';
-import * as React from 'react';
 import { SmartLink } from '../SmartLink/SmartLink';
 
 interface TooltipLinkProps {
@@ -50,4 +49,5 @@ function TooltipLink({
 	);
 }
 
-export { TooltipLink, TooltipLinkProps };
+export { TooltipLink };
+export type { TooltipLinkProps };

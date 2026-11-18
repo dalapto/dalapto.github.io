@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { colours } from '../../../constants/colours';
 import { useTabState } from '../../../hooks/useTabState';
 import type { JsonTab } from '../../../types/basic.types';

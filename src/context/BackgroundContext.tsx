@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useCallback, useContext, useRef, useState } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useRef, useState } from 'react';
 import { Image } from '../types/basic.types';
 
 interface BackgroundConfig {

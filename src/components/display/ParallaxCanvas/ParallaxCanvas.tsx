@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 import { useBackground } from '../../../context/BackgroundContext';
 import { Image } from '../../../types/basic.types';
 import './ParallaxCanvas.css';

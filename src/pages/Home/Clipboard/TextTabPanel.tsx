@@ -1,6 +1,5 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
-import React from 'react';
 import { StandardTextArea } from '../../../components/controls/StandardTextArea/StandardTextArea';
 import { useAuthRequest } from '../../../context/AuthRequestContext';
 import { useSupabase } from '../../../context/SupabaseContext';

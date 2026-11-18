@@ -13,7 +13,6 @@ import { Bannjan } from './pages/Writing/Bannjan/Bannjan';
 import { Writing } from './pages/Writing/Writing';
 import { YouthWork } from './pages/YouthWork/YouthWork';
 import { getRouteData } from './routes-data';
-import { CoverLetterGenerator } from './pages/Home/CoverLetterGenerator/CoverLetterGenerator';
 
 /**
  * Interface for a single route or page.
@@ -155,4 +154,5 @@ const navRoutes: NavRoute[] = [
 	},
 ];
 
-export { litterAppRoute, NavRoute, navRoutes, recyclotronRoute };
+export { litterAppRoute, navRoutes, recyclotronRoute };
+export type { NavRoute };

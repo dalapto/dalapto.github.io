@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { Image } from '../../../types/basic.types';
 import { Lightbox } from '../Lightbox/Lightbox';
 import './ImageTextLayout.css';
@@ -27,9 +27,9 @@ type ImageTextLayoutProps = {
 	/** When true and an image is provided, clicking the image opens it full-size in a lightbox. */
 	zoomable?: boolean;
 } & (
-	| { image: Image; imageSlot?: never }
-	| { image?: never; imageSlot: ReactNode }
-);
+		| { image: Image; imageSlot?: never }
+		| { image?: never; imageSlot: ReactNode }
+	);
 
 /**
  * Responsive two-column layout: image left, text right.
@@ -108,22 +108,22 @@ function ImageTextLayout({
 							)}
 						</figcaption>
 					</div>
-				<div className='image-column'>
-					{imageSlot ?? imageEl}
-					{imageCaption && (
-						<figcaption className='image-caption'>{imageCaption}</figcaption>
-					)}
-				</div>
-			</>
-		) : (
+					<div className='image-column'>
+						{imageSlot ?? imageEl}
+						{imageCaption && (
+							<figcaption className='image-caption'>{imageCaption}</figcaption>
+						)}
+					</div>
+				</>
+			) : (
 				<>
-				<div className='image-column'>
-					{imageSlot ?? imageEl}
-					{imageCaption && (
-						<figcaption className='image-caption'>{imageCaption}</figcaption>
-					)}
-				</div>
-				<div className='text-column'>
+					<div className='image-column'>
+						{imageSlot ?? imageEl}
+						{imageCaption && (
+							<figcaption className='image-caption'>{imageCaption}</figcaption>
+						)}
+					</div>
+					<div className='text-column'>
 						<figcaption>
 							{children}
 							{additionalContent && (

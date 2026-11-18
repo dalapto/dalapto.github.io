@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { HubPage } from '../../components/layout/HubPage/HubPage';
 import { ImgPaths } from '../../constants/img-paths';
 import { useBackground } from '../../context/BackgroundContext';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { SwapText } from '../../components/display/SwapText/SwapText';
 import { HubPage } from '../../components/layout/HubPage/HubPage';
 import { translations, welcomes } from '../../constants/home-constants';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { PageInConstruction } from '../../../components/display/PageInConstruction/PageInConstruction';
 
 function Medieval2TotalWar() {

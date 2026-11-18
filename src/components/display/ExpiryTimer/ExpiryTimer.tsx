@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function formatDuration(ms: number): string {
 	const totalSeconds = Math.floor(ms / 1000);

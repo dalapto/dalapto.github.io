@@ -89,4 +89,5 @@ function ToolbarItemList({
 	);
 }
 
-export { ToolbarItem, ToolbarItemList };
+export { ToolbarItemList };
+export type { ToolbarItem };

@@ -1,5 +1,5 @@
 import { animated, useTransition } from '@react-spring/web';
-import React, { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Route, Routes, useLocation } from 'react-router';
 import './App.css';
 import { PageInConstruction } from './components/display/PageInConstruction/PageInConstruction';

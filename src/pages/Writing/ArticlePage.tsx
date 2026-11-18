@@ -1,4 +1,3 @@
-import React from 'react';
 import { LoadingOverlay } from '../../components/display/LoadingOverlay/LoadingOverlay';
 import { TextList } from '../../components/display/TextList/TextList';
 import { JsonHeader } from '../../components/Json/JsonSection/JsonHeader';

@@ -1,5 +1,4 @@
 import { Button, ButtonProps } from '@mui/material';
-import React from 'react';
 import { colours } from '../../../constants/colours';
 
 type ButtonColor = 'danger' | 'success' | 'warning' | 'info';

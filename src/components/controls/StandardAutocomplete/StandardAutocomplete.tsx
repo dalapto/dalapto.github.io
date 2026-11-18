@@ -4,7 +4,6 @@ import {
 	type SxProps,
 	type Theme,
 } from '@mui/material';
-import React from 'react';
 import { colours } from '../../../constants/colours';
 import { StandardTextField } from '../StandardTextField/StandardTextField';
 

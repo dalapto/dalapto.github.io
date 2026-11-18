@@ -1,6 +1,4 @@
-import * as React from 'react';
-import { useMemo } from 'react';
-
+import React, { useMemo } from 'react';
 /**
  * Get a random integer between a minimum and maximum value
  * @param min - The minimum value

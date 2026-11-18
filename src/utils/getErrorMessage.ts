@@ -1,4 +1,7 @@
-import { formatSupabaseError, isSupabaseLikeError } from '../supabase/supabase-utils';
+import {
+	formatSupabaseError,
+	isSupabaseLikeError,
+} from '../supabase/supabase-utils';
 
 function logErrorDetails(error: unknown, context?: string) {
 	const label = context ? `[${context}]` : '[Error]';
@@ -29,7 +32,7 @@ function reportError(
 function getErrorMessage(
 	error: unknown,
 	fallback = 'Something went wrong. Please try again.',
-) {
+): string {
 	if (!error) return fallback;
 
 	if (typeof error === 'string' && error.trim()) return error.trim();

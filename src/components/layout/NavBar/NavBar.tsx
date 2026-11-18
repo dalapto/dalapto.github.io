@@ -331,4 +331,5 @@ function NavBar({ currentPage, navRoutes }: NavBarProps) {
 	);
 }
 
-export { NavBar, NavItem };
+export { NavBar };
+export type { NavItem };

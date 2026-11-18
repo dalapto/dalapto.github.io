@@ -1,7 +1,7 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import { Box } from '@mui/material';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { StandardCheckbox } from '../../../components/controls/StandardCheckbox/StandardCheckbox';
 import { StandardTextArea } from '../../../components/controls/StandardTextArea/StandardTextArea';
 import { StandardTextField } from '../../../components/controls/StandardTextField/StandardTextField';

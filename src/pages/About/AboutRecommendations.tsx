@@ -1,4 +1,3 @@
-import React from 'react';
 import { ImageTextLayout } from '../../components/display/ImageTextLayout/ImageTextLayout';
 import { TileList } from '../../components/display/TileList/TileList';
 import { ImgPaths } from '../../constants/img-paths';

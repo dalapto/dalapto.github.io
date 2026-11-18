@@ -1,6 +1,6 @@
 import CloseIcon from '@mui/icons-material/Close';
 import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
-import React, {
+import {
 	forwardRef,
 	useCallback,
 	useEffect,
@@ -180,7 +180,7 @@ const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
 			}));
 			itemsRef.current = next;
 			setItems(next);
-		}, [initialKey]);
+		}, [initialKey, initialImages]);
 
 		useEffect(() => {
 			function onPaste(e: ClipboardEvent) {

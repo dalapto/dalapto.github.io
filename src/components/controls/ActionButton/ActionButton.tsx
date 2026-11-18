@@ -1,5 +1,4 @@
 import { Box, useMediaQuery, useTheme } from '@mui/material';
-import React from 'react';
 import type { ActionConfig } from '../../../types/basic.types';
 import type { ButtonColor } from '../StandardButton/StandardButton';
 import { StandardButton } from '../StandardButton/StandardButton';

@@ -2,7 +2,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import UploadIcon from '@mui/icons-material/Upload';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Box } from '@mui/material';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import type { Image } from '../../../types/basic.types';
 import { ImageCycler } from '../../display/ImageCycler/ImageCycler';
 import { Lightbox } from '../../display/Lightbox/Lightbox';

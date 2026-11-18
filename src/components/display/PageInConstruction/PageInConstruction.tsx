@@ -1,5 +1,4 @@
 import { Alert } from '@mui/material';
-import * as React from 'react';
 import { useEffect } from 'react';
 import { useBackground } from '../../../context/BackgroundContext';
 import { Image } from '../../../types/basic.types';

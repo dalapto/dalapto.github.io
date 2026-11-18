@@ -1,7 +1,6 @@
 import AppBar from '@mui/material/AppBar';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
-import * as React from 'react';
 import { footerLinks } from '../../../constants/link-constants';
 import { TooltipLink } from '../../display/TooltipLink/TooltipLink';
 import './FooterBar.css';
@@ -42,6 +41,7 @@ function FooterBar({ copyrightText }: FooterBarProps) {
 					{tooltipTextList}
 				</Typography>
 			</Container>
+			{copyrightText}
 		</AppBar>
 	);
 }

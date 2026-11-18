@@ -1,6 +1,5 @@
 import CloseIcon from '@mui/icons-material/Close';
 import { Dialog, DialogContent, IconButton } from '@mui/material';
-import React from 'react';
 
 interface LightboxProps {
 	open: boolean;

@@ -1,5 +1,4 @@
 import { Box } from '@mui/material';
-import React from 'react';
 import { ExpiryTimer } from '../../../components/display/ExpiryTimer/ExpiryTimer';
 import { CLIPBOARD_TTL_MS } from '../../../constants/clipboard-ttl';
 

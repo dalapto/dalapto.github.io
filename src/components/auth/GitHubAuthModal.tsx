@@ -1,6 +1,6 @@
 import GitHubIcon from '@mui/icons-material/GitHub';
 import { Box, Link, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { colours } from '../../constants/colours';
 import { useGitHub } from '../../context/GitHubContext';
 import { ToastSeverity, useToast } from '../../context/ToastProvider';

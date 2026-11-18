@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { HubPage } from '../../components/layout/HubPage/HubPage';
 import { useWritingPages } from '../../context/WritingPagesContext';

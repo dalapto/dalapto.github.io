@@ -2,7 +2,6 @@ import {
 	TextField as MuiTextField,
 	type TextFieldProps as MuiTextFieldProps,
 } from '@mui/material';
-import React from 'react';
 import { colours } from '../../../constants/colours';
 
 function StandardTextField({ InputLabelProps, sx, ...rest }: MuiTextFieldProps) {
