@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 
 import { createClient } from '@supabase/supabase-js';
+import type { StorageSaveItem } from '../types/upload.types';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -85,11 +86,6 @@ function joinStorageFilenames(filenames: string[]): string | null {
 	return filenames.join(STORAGE_FILENAME_SEPARATOR);
 }
 
-type StorageSaveItem = {
-	storageFilename?: string;
-	pendingFile?: File;
-};
-
 /**
  * Uploads every pending file in `items` (in parallel) and returns the full
  * ordered filename list to store, plus which files were newly uploaded (so a
@@ -159,60 +155,9 @@ function displayNameFromStorageFilename(filename: string) {
 	return filename.replace(/^clipboard-\d+-\d+-/, '').replace(/^clipboard-\d+-/, '');
 }
 
-type SupabaseLikeError = {
-	message?: string;
-	details?: string;
-	hint?: string;
-	code?: string;
-	statusCode?: string | number;
-};
-
-const GENERIC_CODE_MESSAGES: Record<string, string> = {
-	PGRST301: 'Permission denied by row-level security.',
-	'42501': 'Permission denied. Check your Supabase RLS policies.',
-};
-
-function isSupabaseLikeError(error: unknown): error is SupabaseLikeError {
-	return typeof error === 'object' && error !== null && 'message' in error;
-}
-
-function formatSupabaseError(
-	error: SupabaseLikeError,
-	codeMessages: Record<string, string> = {},
-): string | null {
-	if (
-		error.message?.includes('row-level security') ||
-		error.statusCode === 403 ||
-		error.statusCode === '403'
-	) {
-		return (
-			codeMessages['403'] ??
-			'Permission denied. Check your Supabase RLS and storage policies.'
-		);
-	}
-
-	const merged = { ...GENERIC_CODE_MESSAGES, ...codeMessages };
-	const friendly = error.code ? merged[error.code] : undefined;
-	if (friendly) return friendly;
-
-	const parts: string[] = [];
-
-	if (error.message?.trim()) parts.push(error.message.trim());
-	if (error.details?.trim()) parts.push(error.details.trim());
-	if (error.hint?.trim()) parts.push(error.hint.trim());
-	if (error.code && !parts.some((part) => part.includes(error.code!))) {
-		parts.push(`(${error.code})`);
-	}
-	if (error.statusCode) parts.push(`HTTP ${error.statusCode}`);
-
-	return parts.length > 0 ? parts.join(' — ') : null;
-}
-
 export {
 	displayNameFromStorageFilename,
-	formatSupabaseError,
 	getStoragePublicUrl,
-	isSupabaseLikeError,
 	joinStorageFilenames,
 	removeFromBucket,
 	removeFromBucketBestEffort,
@@ -221,4 +166,3 @@ export {
 	uploadStorageItems,
 	uploadToBucket,
 };
-export type { StorageSaveItem, SupabaseLikeError };

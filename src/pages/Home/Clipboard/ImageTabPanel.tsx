@@ -1,13 +1,12 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import React from 'react';
-import type {
-	ImageUploadHandle,
-	StoredImage,
-} from '../../../components/controls/ImageUpload/ImageUpload';
+import type { ImageUploadHandle } from '../../../components/controls/ImageUpload/ImageUpload';
 import { ImageUpload } from '../../../components/controls/ImageUpload/ImageUpload';
 import { useSupabase } from '../../../context/SupabaseContext';
+import { downloadClipboardImage } from '../../../services/clipboard.service';
 import type { HeaderActions } from '../../../types/basic.types';
+import type { StoredImage } from '../../../types/upload.types';
 import { ClipboardTabPanel } from './ClipboardTabPanel';
 
 interface ImageTabPanelProps {
@@ -94,6 +93,7 @@ function ImageTabPanel({
 				ref={imageUploadRef}
 				initialImages={initialImages}
 				onChange={onImageChange}
+				loadStoredImage={downloadClipboardImage}
 			/>
 		</ClipboardTabPanel>
 	);

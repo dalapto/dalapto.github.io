@@ -1,7 +1,3 @@
-import { supabase } from '../supabase/supabase-utils';
-
-const CLIPBOARD_IMAGES_BUCKET = 'clipboard-images';
-
 /** A previewed image that can originate from an upload, data URL, or Supabase storage. */
 export interface ClipboardImageSource {
 	src: string;
@@ -74,11 +70,13 @@ async function blobToPngBlob(blob: Blob): Promise<Blob> {
 
 /**
  * Resolves a preview item to a PNG blob, preferring the most direct source to
- * avoid CORS issues: the pending upload, then a data URL, then a Supabase
- * download, then a network fetch, and finally a canvas re-render as a last resort.
+ * avoid CORS issues: the pending upload, then a data URL, then
+ * `loadStoredImage` (e.g. a storage download), then a network fetch, and
+ * finally a canvas re-render as a last resort.
  */
 export async function imageSourceToPngBlob(
 	source: ClipboardImageSource,
+	loadStoredImage?: (storageFilename: string) => Promise<Blob | null>,
 ): Promise<Blob> {
 	if (source.pendingFile) {
 		return blobToPngBlob(source.pendingFile);
@@ -88,12 +86,12 @@ export async function imageSourceToPngBlob(
 		return blobToPngBlob(dataUrlToBlob(source.src));
 	}
 
-	if (source.storageFilename) {
-		const { data, error } = await supabase.storage
-			.from(CLIPBOARD_IMAGES_BUCKET)
-			.download(source.storageFilename);
-		if (!error && data) {
-			return blobToPngBlob(data);
+	if (source.storageFilename && loadStoredImage) {
+		const stored = await loadStoredImage(source.storageFilename).catch(
+			() => null,
+		);
+		if (stored) {
+			return blobToPngBlob(stored);
 		}
 	}
 

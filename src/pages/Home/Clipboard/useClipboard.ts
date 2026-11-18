@@ -1,12 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type {
-	FileUploadHandle,
-	StoredFile,
-} from '../../../components/controls/FileUpload/FileUpload';
-import type {
-	ImageUploadHandle,
-	StoredImage,
-} from '../../../components/controls/ImageUpload/ImageUpload';
+import type { FileUploadHandle } from '../../../components/controls/FileUpload/FileUpload';
+import type { ImageUploadHandle } from '../../../components/controls/ImageUpload/ImageUpload';
+import type { StoredFile, StoredImage } from '../../../types/upload.types';
 import { useAuthRequest } from '../../../context/AuthRequestContext';
 import { useBusy } from '../../../context/BusyContext';
 import { useSupabase } from '../../../context/SupabaseContext';

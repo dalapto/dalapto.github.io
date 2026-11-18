@@ -9,7 +9,7 @@ import {
 } from 'react';
 import './FileUpload.css';
 import { PdfPreview } from './PdfPreview';
-import type { StorageSaveItem } from '../../../supabase/supabase-utils';
+import type { StorageSaveItem, StoredFile } from '../../../types/upload.types';
 import { logErrorDetails } from '../../../utils/getErrorMessage';
 
 type FilePreview = {
@@ -19,12 +19,6 @@ type FilePreview = {
 	storageFilename?: string;
 	pendingFile?: File;
 };
-
-interface StoredFile {
-	url: string;
-	name: string;
-	storageFilename: string;
-}
 
 interface FileUploadHandle {
 	trigger: () => void;
@@ -160,20 +154,28 @@ const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(
 				previewsRef.current = [];
 				setPreviews([]);
 			},
-		}));
+		}),
+		// Everything above reads refs or stable setters, so the handle never changes.
+		[]);
 
+		// `initialFiles` defaults to a new [] each render, so reload on the list of
+		// stored filenames rather than the array identity, reading the latest
+		// array from a ref.
+		const initialFilesRef = useRef(initialFiles);
+		initialFilesRef.current = initialFiles;
 		const initialKey = initialFiles
 			.map((file) => file.storageFilename)
 			.join(',');
 
 		useEffect(() => {
-			if (initialFiles.length === 0) {
+			const files = initialFilesRef.current;
+			if (files.length === 0) {
 				return;
 			}
 
 			let cancelled = false;
 
-			void Promise.all(initialFiles.map((file) => loadPreviewFromStoredFile(file)))
+			void Promise.all(files.map((file) => loadPreviewFromStoredFile(file)))
 				.then((loaded) => {
 					if (cancelled) return;
 					previewsRef.current = loaded;
@@ -182,7 +184,7 @@ const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(
 				.catch((error: unknown) => {
 					logErrorDetails(error, 'Load file previews');
 					if (cancelled) return;
-					const fallback = initialFiles.map((file) => ({
+					const fallback = files.map((file) => ({
 						name: file.name,
 						kind: 'other' as const,
 						content: file.url,
@@ -296,4 +298,4 @@ const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(
 FileUpload.displayName = 'FileUpload';
 
 export { FileUpload };
-export type { FileUploadHandle, StoredFile };
+export type { FileUploadHandle };

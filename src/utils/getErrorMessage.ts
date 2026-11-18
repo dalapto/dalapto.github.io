@@ -1,7 +1,7 @@
 import {
 	formatSupabaseError,
 	isSupabaseLikeError,
-} from '../supabase/supabase-utils';
+} from '../supabase/supabase-errors';
 
 function logErrorDetails(error: unknown, context?: string) {
 	const label = context ? `[${context}]` : '[Error]';

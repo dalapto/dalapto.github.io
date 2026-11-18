@@ -22,6 +22,14 @@ export const tokens = {
 		underline: '#646cff',
 		panelRust: 'rgba(130, 60, 55, 0.95)',
 		panelTeal: 'rgba(62, 171, 164, 0.95)',
+		disabledBg: '#424242',
+		/** ~4.5:1 on panel, ~3.1:1 on disabledBg — passes WCAG AA for UI */
+		disabledColor: '#9e9e9e',
+		success: '#4caf50',
+		warning: '#ffc107',
+		/** ~6.4:1 on primary — WCAG AA */
+		info: '#64b5f6',
+		/** ~5.0:1 on primary — WCAG AA for labels and helper text on dark panels */
 		error: '#ff6b6b',
 	},
 

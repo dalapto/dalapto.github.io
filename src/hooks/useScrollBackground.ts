@@ -29,7 +29,11 @@ function useScrollBackground<T extends Element = Element>({
 		if (!el) return;
 		registerScrollElement(el, config, observerOpts);
 		return () => unregisterScrollElement(el);
-	// Config and observerOpts are treated as stable at mount — same pattern as useHoverBackground.
+	// Intentionally mount-only: `config` and `observerOpts` are read once when the
+	// element registers. Callers pass inline objects (new every render), so listing
+	// them would unregister/re-register the element on every render. Consequence:
+	// changing the config after mount has no effect — remount (e.g. via `key`) to
+	// apply a new one. (Review R1-F28: left as-is by choice.)
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 

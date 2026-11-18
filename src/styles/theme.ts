@@ -1,5 +1,4 @@
 import { createTheme } from '@mui/material/styles';
-import { colours } from '../constants/colours';
 import { tokens, type Colours } from './tokens';
 
 declare module '@mui/material/styles' {
@@ -17,7 +16,7 @@ export const theme = createTheme({
 	palette: {
 		primary: { main: tokens.colours.primary },
 		secondary: { main: tokens.colours.secondary },
-		error: { main: colours.error },
+		error: { main: tokens.colours.error },
 		background: { default: tokens.colours.background },
 		text: {
 			primary: tokens.colours.text,
@@ -29,7 +28,7 @@ export const theme = createTheme({
 			styleOverrides: {
 				root: {
 					'&.Mui-error': {
-						color: colours.error,
+						color: tokens.colours.error,
 					},
 				},
 			},
@@ -38,7 +37,7 @@ export const theme = createTheme({
 			styleOverrides: {
 				root: {
 					'&.Mui-error': {
-						color: colours.error,
+						color: tokens.colours.error,
 					},
 				},
 			},
@@ -47,13 +46,13 @@ export const theme = createTheme({
 			styleOverrides: {
 				root: {
 					'&.Mui-error .MuiOutlinedInput-notchedOutline': {
-						borderColor: colours.error,
+						borderColor: tokens.colours.error,
 					},
 					'&.Mui-error:hover .MuiOutlinedInput-notchedOutline': {
-						borderColor: colours.error,
+						borderColor: tokens.colours.error,
 					},
 					'&.Mui-focused.Mui-error .MuiOutlinedInput-notchedOutline': {
-						borderColor: colours.error,
+						borderColor: tokens.colours.error,
 					},
 				},
 			},

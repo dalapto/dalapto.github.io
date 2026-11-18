@@ -3,8 +3,8 @@ import {
 	type ClipboardRow,
 	type TabId,
 } from '../utils/clipboard-helpers';
+import type { StorageSaveItem } from '../types/upload.types';
 import {
-	type StorageSaveItem,
 	removeFromBucketBestEffort,
 	splitStorageFilenames,
 	supabase,
@@ -77,4 +77,14 @@ export async function saveClipboardStorage({
 	);
 
 	return filenamesCsv;
+}
+
+/** Downloads a saved clipboard image (bypasses CORS issues with the public URL). */
+export async function downloadClipboardImage(
+	storageFilename: string,
+): Promise<Blob | null> {
+	const { data, error } = await supabase.storage
+		.from('clipboard-images')
+		.download(storageFilename);
+	return error ? null : data;
 }

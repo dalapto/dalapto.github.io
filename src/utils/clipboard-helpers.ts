@@ -1,12 +1,13 @@
-import type { StoredFile } from '../components/controls/FileUpload/FileUpload';
-import type { StoredImage } from '../components/controls/ImageUpload/ImageUpload';
+import {
+	formatSupabaseError,
+	isSupabaseLikeError,
+} from '../supabase/supabase-errors';
 import {
 	displayNameFromStorageFilename,
-	formatSupabaseError,
 	getStoragePublicUrl,
-	isSupabaseLikeError,
 	splitStorageFilenames,
 } from '../supabase/supabase-utils';
+import type { StoredFile, StoredImage } from '../types/upload.types';
 
 export type TabId = 'text' | 'image' | 'file';
 

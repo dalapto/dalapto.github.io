@@ -1,9 +1,7 @@
 import DownloadIcon from '@mui/icons-material/Download';
 import React from 'react';
-import type {
-	FileUploadHandle,
-	StoredFile,
-} from '../../../components/controls/FileUpload/FileUpload';
+import type { FileUploadHandle } from '../../../components/controls/FileUpload/FileUpload';
+import type { StoredFile } from '../../../types/upload.types';
 import { FileUpload } from '../../../components/controls/FileUpload/FileUpload';
 import { useSupabase } from '../../../context/SupabaseContext';
 import { ToastSeverity, useToast } from '../../../context/ToastProvider';

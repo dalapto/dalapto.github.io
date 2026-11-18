@@ -13,7 +13,7 @@ import type { Image } from '../../../types/basic.types';
 import { ImageCycler } from '../../display/ImageCycler/ImageCycler';
 import { Lightbox } from '../../display/Lightbox/Lightbox';
 import './ImageUpload.css';
-import type { StorageSaveItem } from '../../../supabase/supabase-utils';
+import type { StorageSaveItem, StoredImage } from '../../../types/upload.types';
 import {
 	getImageFilesFromDataTransfer,
 	imageSourceToPngBlob,
@@ -27,14 +27,14 @@ type ImagePreviewItem = {
 	pendingFile?: File;
 };
 
-interface StoredImage {
-	url: string;
-	storageFilename: string;
-}
-
 interface ImageUploadProps {
 	initialImages?: StoredImage[];
 	onChange?: () => void;
+	/**
+	 * Fetches a stored image by its storage filename (used when copying a saved
+	 * image to the clipboard). Keeps this control independent of any backend.
+	 */
+	loadStoredImage?: (storageFilename: string) => Promise<Blob | null>;
 }
 
 interface ImageUploadHandle {
@@ -53,7 +53,7 @@ function isImageFile(file: File): boolean {
 }
 
 const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
-	({ initialImages = [], onChange }, ref) => {
+	({ initialImages = [], onChange, loadStoredImage }, ref) => {
 		const { showToast } = useToast();
 		const containerRef = useRef<HTMLDivElement>(null);
 		const fileInputRef = useRef<HTMLInputElement>(null);
@@ -122,7 +122,7 @@ const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
 			const lastAdded = currentItems[currentItems.length - 1];
 
 			try {
-				const pngBlob = await imageSourceToPngBlob(lastAdded);
+				const pngBlob = await imageSourceToPngBlob(lastAdded, loadStoredImage);
 				await writePngToClipboard(pngBlob);
 				if (currentItems.length > 1) {
 					showToast(
@@ -133,7 +133,7 @@ const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
 			} catch {
 				showToast('Could not copy image to clipboard.', ToastSeverity.WARNING);
 			}
-		}, [showToast]);
+		}, [showToast, loadStoredImage]);
 
 		useImperativeHandle(
 			ref,
@@ -165,22 +165,28 @@ const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
 			[addImageFiles, copyToClipboard, pasteFromClipboard],
 		);
 
+		// Reload on the list of stored filenames rather than the array identity,
+		// so a caller passing a fresh array each render doesn't wipe the previews.
+		// The latest array is read from a ref.
+		const initialImagesRef = useRef(initialImages);
+		initialImagesRef.current = initialImages;
 		const initialKey = initialImages
 			.map((image) => image.storageFilename)
 			.join(',');
 
 		useEffect(() => {
-			if (initialImages.length === 0) {
+			const images = initialImagesRef.current;
+			if (images.length === 0) {
 				return;
 			}
 
-			const next = initialImages.map((image) => ({
+			const next = images.map((image) => ({
 				src: image.url,
 				storageFilename: image.storageFilename,
 			}));
 			itemsRef.current = next;
 			setItems(next);
-		}, [initialKey, initialImages]);
+		}, [initialKey]);
 
 		useEffect(() => {
 			function onPaste(e: ClipboardEvent) {
@@ -349,4 +355,4 @@ const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
 ImageUpload.displayName = 'ImageUpload';
 
 export { ImageUpload };
-export type { ImageUploadHandle, StoredImage };
+export type { ImageUploadHandle };
