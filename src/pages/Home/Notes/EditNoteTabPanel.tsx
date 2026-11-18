@@ -1,49 +1,38 @@
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { Box } from '@mui/material';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { StandardAutocomplete } from '../../../components/controls/StandardAutocomplete/StandardAutocomplete';
-import { StandardTextArea } from '../../../components/controls/StandardTextArea/StandardTextArea';
-import { StandardTextField } from '../../../components/controls/StandardTextField/StandardTextField';
-import { ConfirmationModal } from '../../../components/layout/ConfirmationModal/ConfirmationModal';
 import { PageImageField } from '../../../components/controls/PageImageField/PageImageField';
-import {
-	ActionToolbar,
-	FormPanel,
-} from '../../../components/layout/FormPanel/FormPanel';
+import { StandardAutocomplete } from '../../../components/controls/StandardAutocomplete/StandardAutocomplete';
+import { ConfirmationModal } from '../../../components/layout/ConfirmationModal/ConfirmationModal';
+import { FormPanel } from '../../../components/layout/FormPanel/FormPanel';
 import { useAuthRequest } from '../../../context/AuthRequestContext';
 import { useBusy } from '../../../context/BusyContext';
 import { useGitHub } from '../../../context/GitHubContext';
-import { ToastSeverity } from '../../../context/ToastProvider';
+import {
+	type ToastContextValue,
+	ToastSeverity,
+} from '../../../context/ToastProvider';
 import { useUnsavedChanges } from '../../../context/UnsavedChangesContext';
-import { HiddenCheckbox } from './HiddenCheckbox';
-import { useTextClipboard } from '../../../hooks/useTextClipboard';
-import { usePageImageField } from '../../../hooks/usePageImageField';
 import { usePointerGistHidden } from '../../../hooks/usePointerGistHidden';
-import { uploadArticlePageImage } from '../../../services/github/articles.service';
-import {
-	deleteNote,
-	getNote,
-	updateNote,
-} from '../../../services/github/notes.service';
-import {
-	commitArticleToPointer,
-	fetchPointerGistEntryByFolderNameAuth,
-	isPointerGistFolder,
-} from '../../../services/github/pointer-gist.service';
-import type { HeaderActions } from '../../../types/basic.types';
+import { deleteNote, updateNote } from '../../../services/github/notes.service';
+import type { ActionConfig, HeaderActions } from '../../../types/basic.types';
 import type { Folder } from '../../../types/github.types';
 import { filterArticleTextFilenames } from '../../../utils/article-page-image';
-import { getErrorMessage, logErrorDetails } from '../../../utils/getErrorMessage';
+import { getErrorMessage } from '../../../utils/getErrorMessage';
 import {
-	clampOrderInput,
-	findArticleByFilename,
-	formatOrderInput,
-	parseOrderInput,
-} from '../../../utils/pointer-gist-articles';
-import { isStaticWritingFolderKey } from '../../../utils/writing-articles';
+	fetchNoteWithOrder,
+	findFolderByName,
+	findNoteFilename,
+	getArticleOptions,
+	noteDisplayName,
+	type NoteWithOrder,
+	sectionExists,
+	sectionFilename,
+} from './note-form-helpers';
+import { NoteTextEditor } from './NoteTextEditor';
+import { SectionFields } from './SectionFields';
+import { useArticleSave } from './useArticleSave';
 
 type NoteField =
 	| 'articleName'
@@ -62,19 +51,13 @@ const emptyTouched = {
 	text: false,
 };
 
-function noteDisplayName(filename: string): string {
-	return filename.replace(/\.txt$/i, '');
-}
-
-function findNoteFilename(
-	folder: Folder,
-	displayName: string,
-): string | undefined {
-	const target = `${displayName.trim()}.txt`;
-	return folder.noteFilenames.find(
-		(name) => name.toLowerCase() === target.toLowerCase(),
-	);
-}
+/** The section-form fields, reset whenever a note is (re)loaded or saved. */
+const untouchedNoteFields = {
+	newArticle: false,
+	order: false,
+	newSection: false,
+	text: false,
+};
 
 interface LoadedNote {
 	folderId: string;
@@ -88,11 +71,7 @@ interface LoadedNote {
 interface EditNoteTabPanelProps {
 	folders: Folder[];
 	onSaved: () => void | Promise<void>;
-	showToast: (
-		message: string,
-		severity: ToastSeverity,
-		error?: unknown,
-	) => void;
+	showToast: ToastContextValue['showToast'];
 }
 
 function EditNoteTabPanel({
@@ -102,36 +81,20 @@ function EditNoteTabPanel({
 }: EditNoteTabPanelProps) {
 	const { githubToken } = useGitHub();
 	const { requestAuth } = useAuthRequest();
+	const { busy, operation, setBusy } = useBusy();
+	// Which note is selected.
 	const [articleName, setArticleName] = useState('');
 	const [noteName, setNoteName] = useState('');
+	const [noteSelectKey, setNoteSelectKey] = useState(0);
+	// The loaded note and its editable fields.
+	const [loadedNote, setLoadedNote] = useState<LoadedNote | null>(null);
 	const [newArticle, setNewArticle] = useState('');
 	const [newSection, setNewSection] = useState('');
 	const [order, setOrder] = useState('');
 	const [committedOrder, setCommittedOrder] = useState('');
 	const [text, setText] = useState('');
-	const [loadedNote, setLoadedNote] = useState<LoadedNote | null>(null);
-	const { busy, operation, setBusy } = useBusy();
-	const [noteSelectKey, setNoteSelectKey] = useState(0);
-	const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 	const [touched, setTouched] = useState(emptyTouched);
-
-	const { copy, paste } = useTextClipboard(text, setText);
-	const pageImageArticleName = loadedNote ? newArticle : articleName;
-	const showPageImageControl =
-		pageImageArticleName.trim() !== '' &&
-		!isStaticWritingFolderKey(pageImageArticleName);
-	const {
-		previewUrl: pageImageUrl,
-		pendingFile: pendingPageImageFile,
-		removed: pageImageRemoved,
-		hasImageChanges: hasPageImageChanges,
-		handleFileSelect: handlePageImageSelect,
-		handleRemove: handlePageImageRemove,
-		resetAfterSave: resetPageImageAfterSave,
-		loading: pageImageLoading,
-	} = usePageImageField(showPageImageControl ? pageImageArticleName : '', (message) =>
-		showToast(message, ToastSeverity.ERROR),
-	);
+	const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
 	const {
 		isHidden,
@@ -146,22 +109,34 @@ function EditNoteTabPanel({
 		onError: (message) => showToast(message, ToastSeverity.WARNING),
 	});
 
+	// The page image belongs to the target article once a note is loaded.
+	const pageImageArticleName = loadedNote ? newArticle : articleName;
+	const {
+		pageImage,
+		showImageControl,
+		commitArticle,
+		markSaved,
+		saveImageOnly,
+		runBusyTask,
+	} = useArticleSave({
+		imageArticleName: pageImageArticleName,
+		isHidden,
+		visibilityUnknown,
+		markHiddenCommitted,
+		onSaved,
+		showToast,
+	});
+
 	const markTouched = useCallback((field: NoteField) => {
 		setTouched((prev) => (prev[field] ? prev : { ...prev, [field]: true }));
 	}, []);
 
-	const articleOptions = useMemo(() => {
-		const names = folders
-			.filter((item) => !isPointerGistFolder(item))
-			.map((item) => item.name.trim())
-			.filter(Boolean);
-		return [...new Set(names)];
-	}, [folders]);
+	const articleOptions = useMemo(() => getArticleOptions(folders), [folders]);
 	const selectedArticle = folders.find((item) => item.name === articleName);
 	const noteOptions = useMemo(() => {
 		if (!selectedArticle) return [];
 		return filterArticleTextFilenames(selectedArticle.noteFilenames).map(
-			(filename) => noteDisplayName(filename),
+			noteDisplayName,
 		);
 	}, [selectedArticle]);
 
@@ -174,32 +149,44 @@ function EditNoteTabPanel({
 		setText('');
 		setLoadedNote(null);
 		setNoteSelectKey((key) => key + 1);
-		setTouched((prev) => ({
-			...prev,
-			noteName: false,
-			newArticle: false,
-			order: false,
-			newSection: false,
-			text: false,
-		}));
+		setTouched((prev) => ({ ...prev, noteName: false, ...untouchedNoteFields }));
 	}, []);
 
+	/** Fills the form from a freshly read note. */
+	const applyLoadedNote = useCallback(
+		(folderId: string, article: string, loaded: NoteWithOrder) => {
+			setNewArticle(article);
+			setNewSection(loaded.section);
+			setOrder(loaded.order);
+			setCommittedOrder(loaded.order);
+			setText(loaded.content);
+			setLoadedNote({
+				folderId,
+				articleName: article,
+				filename: loaded.filename,
+				section: loaded.section,
+				text: loaded.content,
+				updatedAt: loaded.updatedAt,
+			});
+			setTouched((prev) => ({ ...prev, ...untouchedNoteFields }));
+		},
+		[],
+	);
+
 	const handleArticleChange = useCallback(
-		(newArticleValue: string) => {
+		(value: string) => {
 			if (!githubToken) {
 				requestAuth();
 				return;
 			}
-			setArticleName(newArticleValue);
+			setArticleName(value);
 			clearSelectedNote();
 		},
 		[clearSelectedNote, githubToken, requestAuth],
 	);
 
 	const handleArticleOpen = useCallback(() => {
-		if (!githubToken) {
-			requestAuth();
-		}
+		if (!githubToken) requestAuth();
 	}, [githubToken, requestAuth]);
 
 	// Key the load on stable values, not the `selectedArticle` object: after a
@@ -230,37 +217,10 @@ function EditNoteTabPanel({
 			operation: 'fetch',
 		});
 
-		getNote(githubToken, selectedArticleId, filename)
-			.then(async (note) => {
-				if (cancelled || !note) return;
-				const displaySection = noteDisplayName(note.filename);
-				let nextOrder = '';
-				try {
-					const entry = await fetchPointerGistEntryByFolderNameAuth(
-						githubToken,
-						articleName,
-					);
-					const article = entry
-						? findArticleByFilename(entry.articles, note.filename)
-						: undefined;
-					nextOrder = formatOrderInput(article?.order);
-				} catch (error) {
-					logErrorDetails(error, 'Load section order');
-					nextOrder = '';
-				}
-				setNewArticle(articleName);
-				setNewSection(displaySection);
-				setOrder(nextOrder);
-				setCommittedOrder(nextOrder);
-				setText(note.content);
-				setLoadedNote({
-					folderId: selectedArticleId,
-					articleName,
-					filename: note.filename,
-					section: displaySection,
-					text: note.content,
-					updatedAt: note.updatedAt,
-				});
+		fetchNoteWithOrder(githubToken, selectedArticleId, filename, articleName)
+			.then((loaded) => {
+				if (cancelled || !loaded) return;
+				applyLoadedNote(selectedArticleId, articleName, loaded);
 			})
 			.catch((error) => {
 				if (!cancelled) {
@@ -275,6 +235,7 @@ function EditNoteTabPanel({
 			cancelled = true;
 		};
 	}, [
+		applyLoadedNote,
 		articleName,
 		githubToken,
 		noteName,
@@ -284,79 +245,30 @@ function EditNoteTabPanel({
 		showToast,
 	]);
 
-	const imageTargetFolder = folders.find(
-		(item) =>
-			item.name.toLowerCase() === pageImageArticleName.trim().toLowerCase(),
-	);
+	const reloadSelectedNote = useCallback(async () => {
+		if (!githubToken || !selectedArticle || !noteName.trim()) return;
+		const filename = findNoteFilename(selectedArticle, noteName);
+		if (!filename) return;
 
-	/** Uploads the page-image file change (if any); the index is updated by the commit. */
-	const uploadPageImage = useCallback(
-		async (folderId: string, targetArticle: string) => {
-			if (!hasPageImageChanges || isStaticWritingFolderKey(targetArticle)) {
-				return undefined;
-			}
-			return uploadArticlePageImage(githubToken!, folderId, {
-				file: pendingPageImageFile ?? undefined,
-				remove: pageImageRemoved && !pendingPageImageFile,
-			});
-		},
-		[
-			githubToken,
-			hasPageImageChanges,
-			pageImageRemoved,
-			pendingPageImageFile,
-		],
-	);
-
-	const performSavePageImageOnly = useCallback(async () => {
-		// Never write `hidden` while it's unknown — that could unpublish the article.
-		if (visibilityUnknown) return;
-		if (!githubToken) {
-			requestAuth();
-			return;
-		}
-		if (!imageTargetFolder || !hasPageImageChanges) return;
-
-		const targetArticle = pageImageArticleName.trim();
-		setBusy(true, {
-			label: 'page image',
-			variant: 'progress',
-			operation: 'save',
-		});
-		try {
-			const imageChange = await uploadPageImage(
-				imageTargetFolder.id,
-				targetArticle,
-			);
-			await commitArticleToPointer(githubToken, {
-				gistId: imageTargetFolder.id,
-				folderName: targetArticle,
-				hidden: isHidden,
-				imageChange,
-			});
-			showToast('Page image saved.', ToastSeverity.SUCCESS);
-			markHiddenCommitted(isHidden);
-			resetPageImageAfterSave();
-			await onSaved();
-		} catch (error) {
-			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
-		} finally {
-			setBusy(false);
-		}
+		await runBusyTask(
+			{ label: noteName.trim(), variant: 'spinner', operation: 'fetch' },
+			async () => {
+				const loaded = await fetchNoteWithOrder(
+					githubToken,
+					selectedArticle.id,
+					filename,
+					articleName,
+				);
+				if (loaded) applyLoadedNote(selectedArticle.id, articleName, loaded);
+			},
+		);
 	}, [
+		applyLoadedNote,
+		articleName,
 		githubToken,
-		hasPageImageChanges,
-		imageTargetFolder,
-		isHidden,
-		markHiddenCommitted,
-		onSaved,
-		pageImageArticleName,
-		requestAuth,
-		resetPageImageAfterSave,
-		setBusy,
-		showToast,
-		uploadPageImage,
-		visibilityUnknown,
+		noteName,
+		runBusyTask,
+		selectedArticle,
 	]);
 
 	const performSave = useCallback(async () => {
@@ -366,239 +278,123 @@ function EditNoteTabPanel({
 
 		const trimmedArticle = newArticle.trim();
 		const trimmedSection = newSection.trim();
-		const newFilename = `${trimmedSection}.txt`;
+		const newFilename = sectionFilename(newSection);
 
-		setBusy(true, {
-			label: trimmedSection,
-			variant: 'progress',
-			operation: 'save',
-		});
-		try {
-			const isArticleMove = trimmedArticle !== loadedNote.articleName;
-			const saved = await updateNote(githubToken, {
-				folderId: loadedNote.folderId,
-				filename: loadedNote.filename,
-				content: text,
-				newFilename:
-					newFilename !== loadedNote.filename ? newFilename : undefined,
-				newFolder: isArticleMove ? trimmedArticle : undefined,
-			});
-			const imageChange = await uploadPageImage(saved.folderId, trimmedArticle);
-			const parsedOrder = parseOrderInput(order);
-			const isRename =
-				!isArticleMove &&
-				newFilename.toLowerCase() !== loadedNote.filename.toLowerCase();
-			// One index write for the whole save (move/rename/order/hidden/image).
-			await commitArticleToPointer(githubToken, {
-				gistId: saved.folderId,
-				folderName: trimmedArticle,
-				hidden: isHidden,
-				orderUpdates:
-					parsedOrder === undefined
-						? []
-						: [{ name: newFilename, order: parsedOrder }],
-				rename: isRename
-					? { from: loadedNote.filename, to: newFilename }
-					: undefined,
-				imageChange,
-			});
-			showToast(
-				`Updated ${loadedNote.section} successfully.`,
-				ToastSeverity.SUCCESS,
-			);
-			resetPageImageAfterSave();
-			await onSaved();
-			setArticleName(trimmedArticle);
-			setNoteName(trimmedSection);
-			setNewArticle(trimmedArticle);
-			setNewSection(trimmedSection);
-			setLoadedNote({
-				folderId: saved.folderId,
-				articleName: trimmedArticle,
-				filename: newFilename,
-				section: trimmedSection,
-				text,
-				updatedAt: saved.updatedAt,
-			});
-			markHiddenCommitted(isHidden);
-			setCommittedOrder(order);
-			setTouched((prev) => ({
-				...prev,
-				newArticle: false,
-				order: false,
-				newSection: false,
-				text: false,
-			}));
-		} catch (error) {
-			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
-		} finally {
-			setBusy(false);
-		}
+		await runBusyTask(
+			{ label: trimmedSection, variant: 'progress', operation: 'save' },
+			async () => {
+				const isArticleMove = trimmedArticle !== loadedNote.articleName;
+				const saved = await updateNote(githubToken, {
+					folderId: loadedNote.folderId,
+					filename: loadedNote.filename,
+					content: text,
+					newFilename:
+						newFilename !== loadedNote.filename ? newFilename : undefined,
+					newFolder: isArticleMove ? trimmedArticle : undefined,
+				});
+				const isRename =
+					!isArticleMove &&
+					newFilename.toLowerCase() !== loadedNote.filename.toLowerCase();
+				// One index write for the whole save (move/rename/order/hidden/image).
+				await commitArticle(githubToken, {
+					gistId: saved.folderId,
+					articleName: trimmedArticle,
+					filename: newFilename,
+					order,
+					rename: isRename
+						? { from: loadedNote.filename, to: newFilename }
+						: undefined,
+				});
+				showToast(
+					`Updated ${loadedNote.section} successfully.`,
+					ToastSeverity.SUCCESS,
+				);
+				markSaved();
+				await onSaved();
+				setArticleName(trimmedArticle);
+				setNoteName(trimmedSection);
+				setNewArticle(trimmedArticle);
+				setNewSection(trimmedSection);
+				setLoadedNote({
+					folderId: saved.folderId,
+					articleName: trimmedArticle,
+					filename: newFilename,
+					section: trimmedSection,
+					text,
+					updatedAt: saved.updatedAt,
+				});
+				setCommittedOrder(order);
+				setTouched((prev) => ({ ...prev, ...untouchedNoteFields }));
+			},
+		);
 	}, [
+		commitArticle,
 		githubToken,
-		isHidden,
 		loadedNote,
-		markHiddenCommitted,
+		markSaved,
 		newArticle,
 		newSection,
 		onSaved,
 		order,
-		resetPageImageAfterSave,
+		runBusyTask,
 		selectedArticle,
-		setBusy,
 		showToast,
 		text,
-		uploadPageImage,
 		visibilityUnknown,
 	]);
 
-	function handleSave() {
-		if (!githubToken) {
-			requestAuth();
-			return;
-		}
-		if (canSavePageImageOnly && !canSaveNote) {
-			void performSavePageImageOnly();
-			return;
-		}
-		void performSave();
-	}
-
 	const performDelete = useCallback(async () => {
 		if (!githubToken || !selectedArticle || !loadedNote) return;
-		setBusy(true, {
-			label: loadedNote.section,
-			variant: 'progress',
-			operation: 'delete',
-		});
-		try {
-			const { indexWarning } = await deleteNote(
-				githubToken,
-				selectedArticle.id,
-				loadedNote.filename,
-			);
-			if (indexWarning) {
-				showToast(
-					`Deleted ${loadedNote.section}, but ${indexWarning}`,
-					ToastSeverity.WARNING,
+
+		await runBusyTask(
+			{ label: loadedNote.section, variant: 'progress', operation: 'delete' },
+			async () => {
+				const { indexWarning } = await deleteNote(
+					githubToken,
+					selectedArticle.id,
+					loadedNote.filename,
 				);
-			} else {
-				showToast(
-					`Deleted ${loadedNote.section} successfully.`,
-					ToastSeverity.SUCCESS,
-				);
-			}
-			clearSelectedNote();
-			await onSaved();
-		} catch (error) {
-			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
-		} finally {
-			setBusy(false);
-		}
+				if (indexWarning) {
+					showToast(
+						`Deleted ${loadedNote.section}, but ${indexWarning}`,
+						ToastSeverity.WARNING,
+					);
+				} else {
+					showToast(
+						`Deleted ${loadedNote.section} successfully.`,
+						ToastSeverity.SUCCESS,
+					);
+				}
+				clearSelectedNote();
+				await onSaved();
+			},
+		);
 	}, [
+		clearSelectedNote,
 		githubToken,
 		loadedNote,
 		onSaved,
-		clearSelectedNote,
+		runBusyTask,
 		selectedArticle,
-		setBusy,
 		showToast,
 	]);
 
-	function handleDeleteConfirm() {
-		setConfirmDeleteOpen(false);
-		void performDelete();
-	}
-
-	const reloadSelectedNote = useCallback(async () => {
-		if (!githubToken || !selectedArticle || !noteName.trim()) return;
-
-		const filename = findNoteFilename(selectedArticle, noteName);
-		if (!filename) return;
-
-		setBusy(true, {
-			label: noteName.trim(),
-			variant: 'spinner',
-			operation: 'fetch',
-		});
-		try {
-			const note = await getNote(githubToken, selectedArticle.id, filename);
-			if (!note) return;
-
-			const displaySection = noteDisplayName(note.filename);
-			let nextOrder = '';
-			try {
-				const entry = await fetchPointerGistEntryByFolderNameAuth(
-					githubToken,
-					articleName,
-				);
-				const article = entry
-					? findArticleByFilename(entry.articles, note.filename)
-					: undefined;
-				nextOrder = formatOrderInput(article?.order);
-			} catch (error) {
-				logErrorDetails(error, 'Load section order');
-				nextOrder = '';
-			}
-			setNewArticle(articleName);
-			setNewSection(displaySection);
-			setOrder(nextOrder);
-			setCommittedOrder(nextOrder);
-			setText(note.content);
-			setLoadedNote({
-				folderId: selectedArticle.id,
-				articleName,
-				filename: note.filename,
-				section: displaySection,
-				text: note.content,
-				updatedAt: note.updatedAt,
-			});
-			setTouched((prev) => ({
-				...prev,
-				newArticle: false,
-				order: false,
-				newSection: false,
-				text: false,
-			}));
-		} catch (error) {
-			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
-		} finally {
-			setBusy(false);
-		}
-	}, [articleName, githubToken, noteName, selectedArticle, setBusy, showToast]);
-
-	function handleClearText() {
-		setText('');
-	}
-
+	// --- Derived state: validation and what can be saved ---
 	const trimmedNewArticle = newArticle.trim();
 	const trimmedNewSection = newSection.trim();
-	const newFilename = trimmedNewSection ? `${trimmedNewSection}.txt` : '';
-
-	const targetArticle = folders.find(
-		(item) => item.name.toLowerCase() === trimmedNewArticle.toLowerCase(),
-	);
-
-	const isNewArticle =
-		trimmedNewArticle !== '' &&
-		!folders.some(
-			(item) => item.name.toLowerCase() === trimmedNewArticle.toLowerCase(),
-		);
+	const newFilename = sectionFilename(newSection);
+	const targetArticle = findFolderByName(folders, trimmedNewArticle);
+	const isNewArticle = trimmedNewArticle !== '' && !targetArticle;
+	const imageTargetFolder = findFolderByName(folders, pageImageArticleName);
 
 	const isSameNoteInTarget =
 		loadedNote !== null &&
 		targetArticle?.id === loadedNote.folderId &&
 		newFilename.toLowerCase() === loadedNote.filename.toLowerCase();
-
 	const isDuplicateNote =
 		loadedNote !== null &&
-		newFilename !== '' &&
 		!isSameNoteInTarget &&
-		(targetArticle
-			? filterArticleTextFilenames(targetArticle.noteFilenames).some(
-				(name) => name.toLowerCase() === newFilename.toLowerCase(),
-			)
-			: false);
+		sectionExists(targetArticle, newFilename);
 
 	const hasUnsavedChanges =
 		loadedNote !== null &&
@@ -607,10 +403,13 @@ function EditNoteTabPanel({
 			text !== loadedNote.text ||
 			order !== committedOrder ||
 			isHidden !== committedIsHidden ||
-			hasPageImageChanges);
+			pageImage.hasImageChanges);
 
 	// Also covers a page-image change made without a loaded note.
-	useUnsavedChanges(hasUnsavedChanges || hasPageImageChanges, 'Notes (Edit)');
+	useUnsavedChanges(
+		hasUnsavedChanges || pageImage.hasImageChanges,
+		'Notes (Edit)',
+	);
 
 	const canSaveNote =
 		loadedNote !== null &&
@@ -621,11 +420,28 @@ function EditNoteTabPanel({
 		!isDuplicateNote &&
 		!visibilityUnknown;
 	const canSavePageImageOnly =
-		showPageImageControl &&
-		hasPageImageChanges &&
+		showImageControl &&
+		pageImage.hasImageChanges &&
 		!!imageTargetFolder &&
 		!loadedNote &&
 		!visibilityUnknown;
+
+	function handleSave() {
+		if (!githubToken) {
+			requestAuth();
+			return;
+		}
+		if (canSavePageImageOnly && !canSaveNote && imageTargetFolder) {
+			void saveImageOnly(imageTargetFolder);
+			return;
+		}
+		void performSave();
+	}
+
+	function handleDeleteConfirm() {
+		setConfirmDeleteOpen(false);
+		void performDelete();
+	}
 
 	const articleNameRequiredError = touched.articleName && !articleName.trim();
 	const noteNameRequiredError = touched.noteName && !noteName.trim();
@@ -633,72 +449,38 @@ function EditNoteTabPanel({
 	const newSectionRequiredError = touched.newSection && !trimmedNewSection;
 	const textRequiredError = touched.text && !text.trim();
 
-	const articleNameHelperText = articleNameRequiredError
-		? 'Article is required.'
-		: undefined;
-
 	const noteNameHelperText = noteNameRequiredError
 		? 'Section is required.'
 		: selectedArticle && noteOptions.length === 0
 			? 'This article has no sections.'
 			: undefined;
 
-	const newArticleError = newArticleRequiredError;
 	const newArticleHelperText = newArticleRequiredError
 		? 'Article is required.'
 		: isNewArticle
 			? 'New article will be created.'
 			: undefined;
 
-	const newSectionError = isDuplicateNote || newSectionRequiredError;
 	const newSectionHelperText = isDuplicateNote
 		? 'A note with this section already exists in the target article.'
 		: newSectionRequiredError
 			? 'Section is required.'
 			: undefined;
 
-	const textHelperText = textRequiredError
-		? 'Note text is required.'
-		: undefined;
-
-	const textToolbarActions: HeaderActions = {
-		start: [
-			{
-				id: 'refresh',
-				label: 'Refresh',
-				variant: 'outlined',
-				icon: <RefreshIcon />,
-				onClick: () => void reloadSelectedNote(),
-				disabled:
-					busy || !githubToken || !selectedArticle || !noteName.trim(),
-			},
-		],
-		end: [
-			{
-				id: 'copy',
-				label: 'Copy',
-				variant: 'outlined',
-				icon: <ContentCopyIcon />,
-				onClick: () => void copy(),
-				disabled: !text.trim(),
-			},
-			{
-				id: 'paste',
-				label: 'Paste',
-				variant: 'contained',
-				icon: <ContentPasteIcon />,
-				onClick: () => void paste(),
-				mobileIconOnly: false,
-			},
-		],
+	const refreshAction: ActionConfig = {
+		id: 'refresh',
+		label: 'Refresh',
+		variant: 'outlined',
+		icon: <RefreshIcon />,
+		onClick: () => void reloadSelectedNote(),
+		disabled: busy || !githubToken || !selectedArticle || !noteName.trim(),
 	};
 
 	const footerActions: HeaderActions = {
 		start: [
 			{
 				id: 'delete',
-				label:
-					busy && operation === 'delete' ? 'Deleting…' : 'Delete',
+				label: busy && operation === 'delete' ? 'Deleting…' : 'Delete',
 				variant: 'outlined',
 				color: 'danger',
 				icon: <DeleteIcon />,
@@ -712,7 +494,7 @@ function EditNoteTabPanel({
 				id: 'clear',
 				label: 'Clear',
 				variant: 'outlined',
-				onClick: handleClearText,
+				onClick: () => setText(''),
 				hidden: !loadedNote || !text.trim(),
 			},
 			{
@@ -721,9 +503,7 @@ function EditNoteTabPanel({
 				variant: 'contained',
 				onClick: handleSave,
 				disabled:
-					busy ||
-					(!canSaveNote && !canSavePageImageOnly) ||
-					isDuplicateNote,
+					busy || (!canSaveNote && !canSavePageImageOnly) || isDuplicateNote,
 			},
 		],
 	};
@@ -764,16 +544,18 @@ function EditNoteTabPanel({
 							options={articleOptions}
 							dropdownOnly
 							error={articleNameRequiredError}
-							helperText={articleNameHelperText}
+							helperText={
+								articleNameRequiredError ? 'Article is required.' : undefined
+							}
 							sx={{ flex: { sm: 1 }, minWidth: 0, width: '100%' }}
 							required
 						/>
-						{showPageImageControl && (
+						{showImageControl && (
 							<PageImageField
-								imageUrl={pageImageUrl}
-								onFileSelect={handlePageImageSelect}
-								onRemove={handlePageImageRemove}
-								disabled={pageImageLoading || (busy && operation === 'save')}
+								imageUrl={pageImage.previewUrl}
+								onFileSelect={pageImage.handleFileSelect}
+								onRemove={pageImage.handleRemove}
+								disabled={pageImage.loading || (busy && operation === 'save')}
 							/>
 						)}
 					</Box>
@@ -811,78 +593,37 @@ function EditNoteTabPanel({
 								onChange={setNewArticle}
 								onBlur={() => markTouched('newArticle')}
 								options={articleOptions}
-								error={newArticleError}
+								error={newArticleRequiredError}
 								helperText={newArticleHelperText}
 								sx={{ minWidth: 0, width: { xs: '100%', sm: '50%' } }}
 								required
 							/>
-							<Box
-								sx={{
-									display: 'flex',
-									flexDirection: { xs: 'column', sm: 'row' },
-									gap: 1.5,
-									minWidth: 0,
-									width: { xs: '100%', sm: '50%' },
-									alignItems: { xs: 'stretch', sm: 'flex-start' },
-								}}
-							>
-								<StandardTextField
-									id='edit-note-order'
-									label='Order'
-									value={order}
-									onChange={(e) => setOrder(clampOrderInput(e.target.value))}
-									onBlur={() => markTouched('order')}
-									inputProps={{
-										inputMode: 'numeric',
-										pattern: '[0-9]*',
-										maxLength: 3,
-									}}
-									sx={{
-										flexShrink: 0,
-										width: { xs: '100%', sm: '4.5rem' },
-										minWidth: 0,
-									}}
-									size='small'
-								/>
-								<StandardTextField
-									id='edit-note-section'
-									label='Section'
-									value={newSection}
-									onChange={(e) => setNewSection(e.target.value)}
-									onBlur={() => markTouched('newSection')}
-									sx={{ flex: { sm: 1 }, minWidth: 0, width: '100%' }}
-									size='small'
-									required
-									error={newSectionError}
-									helperText={newSectionHelperText}
-								/>
-								<Box
-									sx={{
-										position: 'relative',
-										flexShrink: 0,
-										alignSelf: 'flex-start',
-									}}
-								>
-									<HiddenCheckbox
-										checked={isHidden}
-										onChange={setIsHidden}
-										status={hiddenStatus}
-										onRetry={retryHiddenLoad}
-									/>
-								</Box>
-							</Box>
+							<SectionFields
+								idPrefix='edit-note'
+								order={order}
+								onOrderChange={setOrder}
+								onOrderBlur={() => markTouched('order')}
+								section={newSection}
+								onSectionChange={setNewSection}
+								onSectionBlur={() => markTouched('newSection')}
+								sectionError={isDuplicateNote || newSectionRequiredError}
+								sectionHelperText={newSectionHelperText}
+								isHidden={isHidden}
+								onHiddenChange={setIsHidden}
+								hiddenStatus={hiddenStatus}
+								onHiddenRetry={retryHiddenLoad}
+							/>
 						</Box>
-						<ActionToolbar actions={textToolbarActions} sx={{ mt: 4 }} />
-						<StandardTextArea
+						<NoteTextEditor
 							id='edit-note-text'
-							name='edit-note-text'
 							placeholder='Edit your note…'
-							value={text}
-							onChange={setText}
+							text={text}
+							onTextChange={setText}
 							onBlur={() => markTouched('text')}
 							error={textRequiredError}
-							helperText={textHelperText}
-							required
+							helperText={textRequiredError ? 'Note text is required.' : undefined}
+							startActions={[refreshAction]}
+							toolbarSx={{ mt: 4 }}
 						/>
 						<p style={{ margin: 0, fontSize: '0.8125rem', opacity: 0.6 }}>
 							Last updated: {new Date(loadedNote.updatedAt).toLocaleString()}

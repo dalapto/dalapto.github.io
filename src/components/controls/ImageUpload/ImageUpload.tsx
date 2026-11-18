@@ -9,6 +9,10 @@ import {
 	useState,
 } from 'react';
 import { ToastSeverity, useToast } from '../../../context/ToastProvider';
+import {
+	useStorageItemList,
+	useStoredListEffect,
+} from '../../../hooks/useStorageItemList';
 import type { Image } from '../../../types/basic.types';
 import { ImageCycler } from '../../display/ImageCycler/ImageCycler';
 import { Lightbox } from '../../display/Lightbox/Lightbox';
@@ -57,8 +61,16 @@ const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
 		const { showToast } = useToast();
 		const containerRef = useRef<HTMLDivElement>(null);
 		const fileInputRef = useRef<HTMLInputElement>(null);
-		const itemsRef = useRef<ImagePreviewItem[]>([]);
-		const [items, setItems] = useState<ImagePreviewItem[]>([]);
+		const {
+			items,
+			itemsRef,
+			setAll: setItems,
+			append,
+			removeAt,
+			getSaveItems,
+			commitSavedFilenames,
+			reset,
+		} = useStorageItemList<ImagePreviewItem>();
 		const [lightboxOpen, setLightboxOpen] = useState(false);
 		const [lightboxIndex, setLightboxIndex] = useState(0);
 		const [isDragOver, setIsDragOver] = useState(false);
@@ -83,18 +95,13 @@ const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
 				validFiles.forEach((file) => {
 					const reader = new FileReader();
 					reader.onload = (ev) => {
-						const nextItem: ImagePreviewItem = {
-							src: ev.target?.result as string,
-							pendingFile: file,
-						};
-						itemsRef.current = [...itemsRef.current, nextItem];
-						setItems([...itemsRef.current]);
+						append({ src: ev.target?.result as string, pendingFile: file });
 						onChange?.();
 					};
 					reader.readAsDataURL(file);
 				});
 			},
-			[onChange, showToast],
+			[append, onChange, showToast],
 		);
 
 		const pasteFromClipboard = useCallback(async () => {
@@ -133,7 +140,7 @@ const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
 			} catch {
 				showToast('Could not copy image to clipboard.', ToastSeverity.WARNING);
 			}
-		}, [showToast, loadStoredImage]);
+		}, [itemsRef, showToast, loadStoredImage]);
 
 		useImperativeHandle(
 			ref,
@@ -143,50 +150,30 @@ const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
 				copyToClipboard,
 				pasteFromClipboard,
 				getPreviews: () => itemsRef.current.map((item) => item.src),
-				getSaveItems: () =>
-					itemsRef.current.map((item) => ({
-						storageFilename: item.storageFilename,
-						pendingFile: item.pendingFile,
-					})),
-				commitSavedFilenames: (filenames: string[]) => {
-					const next = itemsRef.current.map((item, index) => ({
-						...item,
-						storageFilename: filenames[index] ?? item.storageFilename,
-						pendingFile: undefined,
-					}));
-					itemsRef.current = next;
-					setItems(next);
-				},
-				reset: () => {
-					itemsRef.current = [];
-					setItems([]);
-				},
+				getSaveItems,
+				commitSavedFilenames,
+				reset,
 			}),
-			[addImageFiles, copyToClipboard, pasteFromClipboard],
+			[
+				addImageFiles,
+				commitSavedFilenames,
+				copyToClipboard,
+				getSaveItems,
+				itemsRef,
+				pasteFromClipboard,
+				reset,
+			],
 		);
 
-		// Reload on the list of stored filenames rather than the array identity,
-		// so a caller passing a fresh array each render doesn't wipe the previews.
-		// The latest array is read from a ref.
-		const initialImagesRef = useRef(initialImages);
-		initialImagesRef.current = initialImages;
-		const initialKey = initialImages
-			.map((image) => image.storageFilename)
-			.join(',');
-
-		useEffect(() => {
-			const images = initialImagesRef.current;
-			if (images.length === 0) {
-				return;
-			}
-
-			const next = images.map((image) => ({
-				src: image.url,
-				storageFilename: image.storageFilename,
-			}));
-			itemsRef.current = next;
-			setItems(next);
-		}, [initialKey]);
+		// Show the stored images whenever the saved list changes.
+		useStoredListEffect(initialImages, (images) => {
+			setItems(
+				images.map((image) => ({
+					src: image.url,
+					storageFilename: image.storageFilename,
+				})),
+			);
+		});
 
 		useEffect(() => {
 			function onPaste(e: ClipboardEvent) {
@@ -224,9 +211,7 @@ const ImageUpload = forwardRef<ImageUploadHandle, ImageUploadProps>(
 		};
 
 		const removePreview = (index: number) => {
-			const next = itemsRef.current.filter((_, i) => i !== index);
-			itemsRef.current = next;
-			setItems(next);
+			removeAt(index);
 			onChange?.();
 		};
 

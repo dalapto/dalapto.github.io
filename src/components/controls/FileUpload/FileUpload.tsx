@@ -1,14 +1,12 @@
 import CloseIcon from '@mui/icons-material/Close';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
-import {
-	forwardRef,
-	useEffect,
-	useImperativeHandle,
-	useRef,
-	useState,
-} from 'react';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
 import './FileUpload.css';
 import { PdfPreview } from './PdfPreview';
+import {
+	useStorageItemList,
+	useStoredListEffect,
+} from '../../../hooks/useStorageItemList';
 import type { StorageSaveItem, StoredFile } from '../../../types/upload.types';
 import { logErrorDetails } from '../../../utils/getErrorMessage';
 
@@ -125,79 +123,59 @@ async function loadPreviewFromStoredFile(
 const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(
 	({ initialFiles = [], onChange }, ref) => {
 		const fileInputRef = useRef<HTMLInputElement>(null);
-		const previewsRef = useRef<FilePreview[]>([]);
-		const [previews, setPreviews] = useState<FilePreview[]>([]);
+		const {
+			items: previews,
+			itemsRef: previewsRef,
+			setAll: setPreviews,
+			append,
+			removeAt,
+			getSaveItems,
+			commitSavedFilenames,
+			reset,
+		} = useStorageItemList<FilePreview>();
 
-		useImperativeHandle(ref, () => ({
-			trigger: () => fileInputRef.current?.click(),
-			download: async () => {
-				for (const preview of previewsRef.current) {
-					await downloadPreview(preview);
-				}
-			},
-			getPreviews: () => previewsRef.current,
-			getSaveItems: () =>
-				previewsRef.current.map((preview) => ({
-					storageFilename: preview.storageFilename,
-					pendingFile: preview.pendingFile,
-				})),
-			commitSavedFilenames: (filenames: string[]) => {
-				const next = previewsRef.current.map((preview, index) => ({
-					...preview,
-					storageFilename: filenames[index] ?? preview.storageFilename,
-					pendingFile: undefined,
-				}));
-				previewsRef.current = next;
-				setPreviews(next);
-			},
-			reset: () => {
-				previewsRef.current = [];
-				setPreviews([]);
-			},
-		}),
-		// Everything above reads refs or stable setters, so the handle never changes.
-		[]);
+		useImperativeHandle(
+			ref,
+			() => ({
+				trigger: () => fileInputRef.current?.click(),
+				download: async () => {
+					for (const preview of previewsRef.current) {
+						await downloadPreview(preview);
+					}
+				},
+				getPreviews: () => previewsRef.current,
+				getSaveItems,
+				commitSavedFilenames,
+				reset,
+			}),
+			[commitSavedFilenames, getSaveItems, previewsRef, reset],
+		);
 
-		// `initialFiles` defaults to a new [] each render, so reload on the list of
-		// stored filenames rather than the array identity, reading the latest
-		// array from a ref.
-		const initialFilesRef = useRef(initialFiles);
-		initialFilesRef.current = initialFiles;
-		const initialKey = initialFiles
-			.map((file) => file.storageFilename)
-			.join(',');
-
-		useEffect(() => {
-			const files = initialFilesRef.current;
-			if (files.length === 0) {
-				return;
-			}
-
+		// Load previews for the stored files whenever the saved list changes.
+		useStoredListEffect(initialFiles, (files) => {
 			let cancelled = false;
 
 			void Promise.all(files.map((file) => loadPreviewFromStoredFile(file)))
 				.then((loaded) => {
-					if (cancelled) return;
-					previewsRef.current = loaded;
-					setPreviews(loaded);
+					if (!cancelled) setPreviews(loaded);
 				})
 				.catch((error: unknown) => {
 					logErrorDetails(error, 'Load file previews');
 					if (cancelled) return;
-					const fallback = files.map((file) => ({
-						name: file.name,
-						kind: 'other' as const,
-						content: file.url,
-						storageFilename: file.storageFilename,
-					}));
-					previewsRef.current = fallback;
-					setPreviews(fallback);
+					setPreviews(
+						files.map((file) => ({
+							name: file.name,
+							kind: 'other' as const,
+							content: file.url,
+							storageFilename: file.storageFilename,
+						})),
+					);
 				});
 
 			return () => {
 				cancelled = true;
 			};
-		}, [initialKey]);
+		});
 
 		const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 			const files = Array.from(e.target.files ?? []);
@@ -206,14 +184,12 @@ const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(
 				const kind = getKind(file);
 				const reader = new FileReader();
 				reader.onload = (ev) => {
-					const nextPreview: FilePreview = {
+					append({
 						name: file.name,
 						kind,
 						content: ev.target?.result as string,
 						pendingFile: file,
-					};
-					previewsRef.current = [...previewsRef.current, nextPreview];
-					setPreviews([...previewsRef.current]);
+					});
 					onChange?.();
 				};
 				if (kind === 'text') {
@@ -227,9 +203,7 @@ const FileUpload = forwardRef<FileUploadHandle, FileUploadProps>(
 		};
 
 		const removePreview = (index: number) => {
-			const nextPreviews = previewsRef.current.filter((_, i) => i !== index);
-			previewsRef.current = nextPreviews;
-			setPreviews(nextPreviews);
+			removeAt(index);
 			onChange?.();
 		};
 

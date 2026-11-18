@@ -1,39 +1,29 @@
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import { Box } from '@mui/material';
 import { useCallback, useMemo, useState } from 'react';
 import { PageImageField } from '../../../components/controls/PageImageField/PageImageField';
 import { StandardAutocomplete } from '../../../components/controls/StandardAutocomplete/StandardAutocomplete';
-import { StandardTextArea } from '../../../components/controls/StandardTextArea/StandardTextArea';
-import { StandardTextField } from '../../../components/controls/StandardTextField/StandardTextField';
-import {
-	ActionToolbar,
-	FormPanel,
-} from '../../../components/layout/FormPanel/FormPanel';
+import { FormPanel } from '../../../components/layout/FormPanel/FormPanel';
 import { useAuthRequest } from '../../../context/AuthRequestContext';
 import { useBusy } from '../../../context/BusyContext';
 import { useGitHub } from '../../../context/GitHubContext';
-import { ToastSeverity } from '../../../context/ToastProvider';
-import { useUnsavedChanges } from '../../../context/UnsavedChangesContext';
-import { useTextClipboard } from '../../../hooks/useTextClipboard';
-import { usePageImageField } from '../../../hooks/usePageImageField';
-import { usePointerGistHidden } from '../../../hooks/usePointerGistHidden';
-import { uploadArticlePageImage } from '../../../services/github/articles.service';
-import { saveNote } from '../../../services/github/notes.service';
 import {
-	commitArticleToPointer,
-	isPointerGistFolder,
-} from '../../../services/github/pointer-gist.service';
+	type ToastContextValue,
+	ToastSeverity,
+} from '../../../context/ToastProvider';
+import { useUnsavedChanges } from '../../../context/UnsavedChangesContext';
+import { usePointerGistHidden } from '../../../hooks/usePointerGistHidden';
+import { saveNote } from '../../../services/github/notes.service';
 import type { ActionConfig } from '../../../types/basic.types';
 import type { Folder } from '../../../types/github.types';
-import { filterArticleTextFilenames } from '../../../utils/article-page-image';
-import { getErrorMessage } from '../../../utils/getErrorMessage';
 import {
-	clampOrderInput,
-	parseOrderInput,
-} from '../../../utils/pointer-gist-articles';
-import { isStaticWritingFolderKey } from '../../../utils/writing-articles';
-import { HiddenCheckbox } from './HiddenCheckbox';
+	findFolderByName,
+	getArticleOptions,
+	sectionExists,
+	sectionFilename,
+} from './note-form-helpers';
+import { NoteTextEditor } from './NoteTextEditor';
+import { SectionFields } from './SectionFields';
+import { useArticleSave } from './useArticleSave';
 
 type NoteField = 'order' | 'section' | 'article' | 'text';
 
@@ -42,11 +32,7 @@ const emptyTouched = { order: false, section: false, article: false, text: false
 interface CreateNoteTabPanelProps {
 	folders: Folder[];
 	onSaved: () => void | Promise<void>;
-	showToast: (
-		message: string,
-		severity: ToastSeverity,
-		error?: unknown,
-	) => void;
+	showToast: ToastContextValue['showToast'];
 }
 
 function CreateNoteTabPanel({
@@ -56,34 +42,18 @@ function CreateNoteTabPanel({
 }: CreateNoteTabPanelProps) {
 	const { githubToken } = useGitHub();
 	const { requestAuth } = useAuthRequest();
+	const { busy, operation } = useBusy();
 	const [section, setSection] = useState('');
 	const [order, setOrder] = useState('');
 	const [text, setText] = useState('');
 	const [article, setArticle] = useState('');
-	const { busy, operation, setBusy } = useBusy();
 	const [touched, setTouched] = useState(emptyTouched);
 
-	const { copy, paste } = useTextClipboard(text, setText);
-	const showPageImageControl =
-		article.trim() !== '' && !isStaticWritingFolderKey(article);
-	const {
-		previewUrl: pageImageUrl,
-		pendingFile: pendingPageImageFile,
-		removed: pageImageRemoved,
-		hasImageChanges: hasPageImageChanges,
-		handleFileSelect: handlePageImageSelect,
-		handleRemove: handlePageImageRemove,
-		resetAfterSave: resetPageImageAfterSave,
-		loading: pageImageLoading,
-	} = usePageImageField(showPageImageControl ? article : '', (message) =>
-		showToast(message, ToastSeverity.ERROR),
-	);
-
-	const isNewArticle =
-		article.trim() !== '' &&
-		!folders.some(
-			(item) => item.name.toLowerCase() === article.trim().toLowerCase(),
-		);
+	const articleOptions = useMemo(() => getArticleOptions(folders), [folders]);
+	const selectedArticle = findFolderByName(folders, article);
+	const isNewArticle = article.trim() !== '' && !selectedArticle;
+	const noteFilename = sectionFilename(section);
+	const isDuplicateNote = sectionExists(selectedArticle, noteFilename);
 
 	const {
 		isHidden,
@@ -97,39 +67,28 @@ function CreateNoteTabPanel({
 		onError: (message) => showToast(message, ToastSeverity.WARNING),
 	});
 
+	const {
+		pageImage,
+		showImageControl,
+		commitArticle,
+		markSaved,
+		saveImageOnly,
+		runBusyTask,
+	} = useArticleSave({
+		imageArticleName: article,
+		isHidden,
+		visibilityUnknown,
+		onSaved,
+		showToast,
+	});
+
 	const markTouched = useCallback((field: NoteField) => {
 		setTouched((prev) => (prev[field] ? prev : { ...prev, [field]: true }));
 	}, []);
 
-	const articleOptions = useMemo(() => {
-		const names = folders
-			.filter((item) => !isPointerGistFolder(item))
-			.map((item) => item.name.trim())
-			.filter(Boolean);
-		return [...new Set(names)];
-	}, [folders]);
-
-	const handleArticleChange = useCallback((value: string) => {
-		setArticle(value);
-	}, []);
-
 	const handleArticleOpen = useCallback(() => {
-		if (!githubToken) {
-			requestAuth();
-		}
+		if (!githubToken) requestAuth();
 	}, [githubToken, requestAuth]);
-
-	const noteFilename = section.trim() ? `${section.trim()}.txt` : '';
-	const selectedArticle = folders.find(
-		(item) => item.name.toLowerCase() === article.trim().toLowerCase(),
-	);
-	const isDuplicateNote =
-		noteFilename !== '' &&
-		(selectedArticle
-			? filterArticleTextFilenames(selectedArticle.noteFilenames).some(
-				(name) => name.toLowerCase() === noteFilename.toLowerCase(),
-			)
-			: false);
 
 	const canSaveNote =
 		!!section.trim() &&
@@ -138,76 +97,14 @@ function CreateNoteTabPanel({
 		!isDuplicateNote &&
 		!visibilityUnknown;
 	const canSaveImageOnly =
-		showPageImageControl &&
+		showImageControl &&
 		!!selectedArticle &&
-		hasPageImageChanges &&
-		!isNewArticle &&
+		pageImage.hasImageChanges &&
 		!visibilityUnknown;
 
 	const hasUnsavedChanges =
-		!!section.trim() || !!text.trim() || hasPageImageChanges;
+		!!section.trim() || !!text.trim() || pageImage.hasImageChanges;
 	useUnsavedChanges(hasUnsavedChanges, 'Notes (Create)');
-
-	/** Uploads the page-image file change (if any); the index is updated by the commit. */
-	const uploadPageImage = useCallback(
-		async (folderId: string, articleName: string) => {
-			if (!hasPageImageChanges || isStaticWritingFolderKey(articleName)) {
-				return undefined;
-			}
-			return uploadArticlePageImage(githubToken!, folderId, {
-				file: pendingPageImageFile ?? undefined,
-				remove: pageImageRemoved && !pendingPageImageFile,
-			});
-		},
-		[
-			githubToken,
-			hasPageImageChanges,
-			pageImageRemoved,
-			pendingPageImageFile,
-		],
-	);
-
-	const performSaveImageOnly = useCallback(async () => {
-		if (!githubToken) {
-			requestAuth();
-			return;
-		}
-		if (!selectedArticle || !canSaveImageOnly) return;
-
-		const articleName = selectedArticle.name;
-		setBusy(true, {
-			label: 'page image',
-			variant: 'progress',
-			operation: 'save',
-		});
-		try {
-			const imageChange = await uploadPageImage(selectedArticle.id, articleName);
-			await commitArticleToPointer(githubToken, {
-				gistId: selectedArticle.id,
-				folderName: articleName,
-				hidden: isHidden,
-				imageChange,
-			});
-			showToast('Page image saved.', ToastSeverity.SUCCESS);
-			resetPageImageAfterSave();
-			onSaved();
-		} catch (error) {
-			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
-		} finally {
-			setBusy(false);
-		}
-	}, [
-		canSaveImageOnly,
-		githubToken,
-		isHidden,
-		onSaved,
-		requestAuth,
-		resetPageImageAfterSave,
-		selectedArticle,
-		setBusy,
-		showToast,
-		uploadPageImage,
-	]);
 
 	const performSave = useCallback(async () => {
 		// Never write `hidden` while it's unknown — that could unpublish the article.
@@ -218,121 +115,80 @@ function CreateNoteTabPanel({
 		}
 
 		const articleName = article.trim();
-		const filename = `${section.trim()}.txt`;
+		const trimmedSection = section.trim();
+		const filename = sectionFilename(section);
 
-		setBusy(true, {
-			label: section.trim(),
-			variant: 'progress',
-			operation: 'save',
-		});
-		try {
-			const saved = await saveNote(githubToken, {
-				folder: articleName,
-				filename,
-				content: text,
-			});
-			const imageChange = await uploadPageImage(saved.folderId, articleName);
-			const parsedOrder = parseOrderInput(order);
-			await commitArticleToPointer(githubToken, {
-				gistId: saved.folderId,
-				folderName: articleName,
-				hidden: isHidden,
-				orderUpdates:
-					parsedOrder === undefined
-						? []
-						: [{ name: filename, order: parsedOrder }],
-				imageChange,
-			});
-			showToast(`Created ${section.trim()} successfully.`, ToastSeverity.SUCCESS);
-			setSection('');
-			setOrder('');
-			setText('');
-			setArticle('');
-			setIsHidden(true);
-			setTouched(emptyTouched);
-			resetPageImageAfterSave();
-			onSaved();
-		} catch (error) {
-			showToast(getErrorMessage(error), ToastSeverity.ERROR, error);
-		} finally {
-			setBusy(false);
-		}
+		await runBusyTask(
+			{ label: trimmedSection, variant: 'progress', operation: 'save' },
+			async () => {
+				const saved = await saveNote(githubToken, {
+					folder: articleName,
+					filename,
+					content: text,
+				});
+				await commitArticle(githubToken, {
+					gistId: saved.folderId,
+					articleName,
+					filename,
+					order,
+				});
+				showToast(`Created ${trimmedSection} successfully.`, ToastSeverity.SUCCESS);
+				setSection('');
+				setOrder('');
+				setText('');
+				setArticle('');
+				setIsHidden(true);
+				setTouched(emptyTouched);
+				markSaved();
+				await onSaved();
+			},
+		);
 	}, [
 		article,
+		commitArticle,
 		githubToken,
-		isHidden,
+		markSaved,
 		onSaved,
 		order,
 		requestAuth,
-		resetPageImageAfterSave,
+		runBusyTask,
 		section,
-		setBusy,
 		setIsHidden,
 		showToast,
 		text,
-		uploadPageImage,
 		visibilityUnknown,
 	]);
 
 	function handleSave() {
-		if (canSaveImageOnly && !canSaveNote) {
-			void performSaveImageOnly();
+		if (canSaveImageOnly && !canSaveNote && selectedArticle) {
+			void saveImageOnly(selectedArticle);
 			return;
 		}
 		void performSave();
-	}
-
-	function handleClearText() {
-		setText('');
 	}
 
 	const sectionRequiredError = touched.section && !section.trim();
 	const articleRequiredError = touched.article && !article.trim();
 	const textRequiredError = touched.text && !text.trim();
 
-	const sectionError = isDuplicateNote || sectionRequiredError;
 	const sectionHelperText = isDuplicateNote
 		? 'This note already exists in this article.'
 		: sectionRequiredError
 			? 'Section is required.'
 			: undefined;
 
-	const articleError = articleRequiredError;
 	const articleHelperText = articleRequiredError
 		? 'Article is required.'
 		: isNewArticle
 			? 'New article will be created.'
 			: undefined;
 
-	const textHelperText = textRequiredError
-		? 'Note text is required.'
-		: undefined;
-
-	const textToolbarActions: ActionConfig[] = [
-		{
-			id: 'copy',
-			label: 'Copy',
-			variant: 'outlined',
-			icon: <ContentCopyIcon />,
-			onClick: () => void copy(),
-			disabled: !text.trim(),
-		},
-		{
-			id: 'paste',
-			label: 'Paste',
-			variant: 'contained',
-			icon: <ContentPasteIcon />,
-			onClick: () => void paste(),
-			mobileIconOnly: false,
-		},
-	];
-
 	const footerActions: ActionConfig[] = [
 		{
 			id: 'clear',
 			label: 'Clear',
 			variant: 'outlined',
-			onClick: handleClearText,
+			onClick: () => setText(''),
 			hidden: !text.trim(),
 		},
 		{
@@ -341,8 +197,7 @@ function CreateNoteTabPanel({
 			variant: 'contained',
 			onClick: handleSave,
 			disabled:
-				(busy && operation === 'save') ||
-				(!canSaveNote && !canSaveImageOnly),
+				(busy && operation === 'save') || (!canSaveNote && !canSaveImageOnly),
 		},
 	];
 
@@ -361,93 +216,48 @@ function CreateNoteTabPanel({
 					id='note-article'
 					label='Article'
 					value={article}
-					onChange={handleArticleChange}
+					onChange={setArticle}
 					onOpen={handleArticleOpen}
 					onBlur={() => markTouched('article')}
 					options={articleOptions}
-					error={articleError}
+					error={articleRequiredError}
 					helperText={articleHelperText}
 					sx={{ minWidth: 0, width: { xs: '100%', sm: '50%' } }}
 					required
 				/>
-				{showPageImageControl && (
+				{showImageControl && (
 					<PageImageField
-						imageUrl={pageImageUrl}
-						onFileSelect={handlePageImageSelect}
-						onRemove={handlePageImageRemove}
-						disabled={pageImageLoading || (busy && operation === 'save')}
+						imageUrl={pageImage.previewUrl}
+						onFileSelect={pageImage.handleFileSelect}
+						onRemove={pageImage.handleRemove}
+						disabled={pageImage.loading || (busy && operation === 'save')}
 					/>
 				)}
-				<Box
-					sx={{
-						display: 'flex',
-						flexDirection: { xs: 'column', sm: 'row' },
-						gap: 1.5,
-						minWidth: 0,
-						width: { xs: '100%', sm: '50%' },
-						alignItems: { xs: 'stretch', sm: 'flex-start' },
-					}}
-				>
-					<StandardTextField
-						id='note-order'
-						label='Order'
-						value={order}
-						onChange={(e) => setOrder(clampOrderInput(e.target.value))}
-						onBlur={() => markTouched('order')}
-						inputProps={{
-							inputMode: 'numeric',
-							pattern: '[0-9]*',
-							maxLength: 3,
-						}}
-						sx={{
-							flexShrink: 0,
-							width: { xs: '100%', sm: '4.5rem' },
-							minWidth: 0,
-						}}
-						size='small'
-					/>
-					<StandardTextField
-						id='note-section'
-						label='Section'
-						value={section}
-						onChange={(e) => setSection(e.target.value)}
-						onBlur={() => markTouched('section')}
-						sx={{ flex: { sm: 1 }, minWidth: 0, width: '100%' }}
-						size='small'
-						required
-						error={sectionError}
-						helperText={sectionHelperText}
-					/>
-					<Box
-						sx={{
-							position: 'relative',
-							flexShrink: 0,
-							alignSelf: 'flex-start',
-						}}
-					>
-						<HiddenCheckbox
-							checked={isHidden}
-							onChange={setIsHidden}
-							status={hiddenStatus}
-							onRetry={retryHiddenLoad}
-						/>
-					</Box>
-				</Box>
+				<SectionFields
+					idPrefix='note'
+					order={order}
+					onOrderChange={setOrder}
+					onOrderBlur={() => markTouched('order')}
+					section={section}
+					onSectionChange={setSection}
+					onSectionBlur={() => markTouched('section')}
+					sectionError={isDuplicateNote || sectionRequiredError}
+					sectionHelperText={sectionHelperText}
+					isHidden={isHidden}
+					onHiddenChange={setIsHidden}
+					hiddenStatus={hiddenStatus}
+					onHiddenRetry={retryHiddenLoad}
+				/>
 			</Box>
-			<ActionToolbar
-				actions={{ end: textToolbarActions }}
-				sx={{ justifyContent: 'flex-end', mt: 1 }}
-			/>
-			<StandardTextArea
+			<NoteTextEditor
 				id='note-text'
-				name='note-text'
 				placeholder='What do you want to write down?'
-				value={text}
-				onChange={setText}
+				text={text}
+				onTextChange={setText}
 				onBlur={() => markTouched('text')}
 				error={textRequiredError}
-				helperText={textHelperText}
-				required
+				helperText={textRequiredError ? 'Note text is required.' : undefined}
+				toolbarSx={{ justifyContent: 'flex-end', mt: 1 }}
 			/>
 		</FormPanel>
 	);
