@@ -11,7 +11,7 @@ import { useGitHub } from '../../../context/GitHubContext';
 import { useWritingPages } from '../../../context/WritingPagesContext';
 import { busyTitle, useBusy } from '../../../context/BusyContext';
 import { ToastSeverity, useToast } from '../../../context/ToastProvider';
-import { listFolders } from '../../../services/github.service';
+import { listFolders } from '../../../services/github/notes.service';
 import type { JsonTab } from '../../../types/basic.types';
 import type { Folder } from '../../../types/github.types';
 import { getErrorMessage } from '../../../utils/getErrorMessage';

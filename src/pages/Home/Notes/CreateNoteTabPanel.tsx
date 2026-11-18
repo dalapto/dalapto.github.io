@@ -1,10 +1,9 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import { Box } from '@mui/material';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { PageImageField } from '../../../components/controls/PageImageField/PageImageField';
 import { StandardAutocomplete } from '../../../components/controls/StandardAutocomplete/StandardAutocomplete';
-import { StandardCheckbox } from '../../../components/controls/StandardCheckbox/StandardCheckbox';
 import { StandardTextArea } from '../../../components/controls/StandardTextArea/StandardTextArea';
 import { StandardTextField } from '../../../components/controls/StandardTextField/StandardTextField';
 import {
@@ -18,14 +17,16 @@ import { ToastSeverity } from '../../../context/ToastProvider';
 import { useUnsavedChanges } from '../../../context/UnsavedChangesContext';
 import { useTextClipboard } from '../../../hooks/useTextClipboard';
 import { usePageImageField } from '../../../hooks/usePageImageField';
+import { usePointerGistHidden } from '../../../hooks/usePointerGistHidden';
 import {
-	fetchPointerGistEntryByFolderName,
+	syncArticlePageImage,
+} from '../../../services/github/articles.service';
+import { saveNote } from '../../../services/github/notes.service';
+import {
 	isPointerGistFolder,
 	reconcilePointerGist,
 	registerPointerGistEntry,
-	saveNote,
-	syncArticlePageImage,
-} from '../../../services/github.service';
+} from '../../../services/github/pointer-gist.service';
 import type { ActionConfig } from '../../../types/basic.types';
 import type { Folder } from '../../../types/github.types';
 import { filterArticleTextFilenames } from '../../../utils/article-page-image';
@@ -35,6 +36,7 @@ import {
 	parseOrderInput,
 } from '../../../utils/pointer-gist-articles';
 import { isStaticWritingFolderKey } from '../../../utils/writing-articles';
+import { HiddenCheckbox } from './HiddenCheckbox';
 
 type NoteField = 'order' | 'section' | 'article' | 'text';
 
@@ -59,7 +61,6 @@ function CreateNoteTabPanel({
 	const { requestAuth } = useAuthRequest();
 	const [section, setSection] = useState('');
 	const [order, setOrder] = useState('');
-	const [isHidden, setIsHidden] = useState(true);
 	const [text, setText] = useState('');
 	const [article, setArticle] = useState('');
 	const { busy, operation, setBusy } = useBusy();
@@ -87,27 +88,17 @@ function CreateNoteTabPanel({
 			(item) => item.name.toLowerCase() === article.trim().toLowerCase(),
 		);
 
-	useEffect(() => {
-		if (!article.trim()) {
-			setIsHidden(true);
-			return;
-		}
-		if (isNewArticle) return;
-
-		let cancelled = false;
-		fetchPointerGistEntryByFolderName(article)
-			.then((entry) => {
-				if (cancelled || !entry) return;
-				setIsHidden(entry.hidden);
-			})
-			.catch(() => {
-				if (!cancelled) setIsHidden(true);
-			});
-
-		return () => {
-			cancelled = true;
-		};
-	}, [article, isNewArticle]);
+	const {
+		isHidden,
+		setIsHidden,
+		status: hiddenStatus,
+		visibilityUnknown,
+		retry: retryHiddenLoad,
+	} = usePointerGistHidden(article, {
+		token: githubToken,
+		skip: isNewArticle,
+		onError: (message) => showToast(message, ToastSeverity.WARNING),
+	});
 
 	const markTouched = useCallback((field: NoteField) => {
 		setTouched((prev) => (prev[field] ? prev : { ...prev, [field]: true }));
@@ -147,12 +138,14 @@ function CreateNoteTabPanel({
 		!!section.trim() &&
 		!!text.trim() &&
 		!!article.trim() &&
-		!isDuplicateNote;
+		!isDuplicateNote &&
+		!visibilityUnknown;
 	const canSaveImageOnly =
 		showPageImageControl &&
 		!!selectedArticle &&
 		hasPageImageChanges &&
-		!isNewArticle;
+		!isNewArticle &&
+		!visibilityUnknown;
 
 	const hasUnsavedChanges =
 		!!section.trim() || !!text.trim() || hasPageImageChanges;
@@ -218,6 +211,8 @@ function CreateNoteTabPanel({
 	]);
 
 	const performSave = useCallback(async () => {
+		// Never write `hidden` while it's unknown — that could unpublish the article.
+		if (visibilityUnknown) return;
 		if (!githubToken) {
 			requestAuth();
 			return;
@@ -279,9 +274,11 @@ function CreateNoteTabPanel({
 		resetPageImageAfterSave,
 		section,
 		setBusy,
+		setIsHidden,
 		showToast,
 		syncPageImage,
 		text,
+		visibilityUnknown,
 	]);
 
 	function handleSave() {
@@ -435,10 +432,11 @@ function CreateNoteTabPanel({
 							alignSelf: 'flex-start',
 						}}
 					>
-						<StandardCheckbox
-							label='Hidden'
+						<HiddenCheckbox
 							checked={isHidden}
 							onChange={setIsHidden}
+							status={hiddenStatus}
+							onRetry={retryHiddenLoad}
 						/>
 					</Box>
 				</Box>

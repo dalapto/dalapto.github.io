@@ -10,10 +10,12 @@ import React, {
 import { NavRoute } from '../routes';
 import {
 	createArticlePageImageObjectUrl,
+} from '../services/github/articles.service';
+import {
 	fetchPointerGistEntries,
 	findPointerGistEntryByFolderName,
 	type PointerGistEntry,
-} from '../services/github.service';
+} from '../services/github/pointer-gist.service';
 import {
 	getStaticWritingPageImageUrl,
 	isPublicWritingFolder,

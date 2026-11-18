@@ -3,9 +3,11 @@ import { useBusy } from '../context/BusyContext';
 import { useGitHub } from '../context/GitHubContext';
 import {
 	createArticlePageImageObjectUrl,
+} from '../services/github/articles.service';
+import {
 	fetchPointerGistEntryByFolderName,
 	fetchPointerGistEntryByFolderNameAuth,
-} from '../services/github.service';
+} from '../services/github/pointer-gist.service';
 import {
 	ARTICLE_PAGE_IMAGE_FILENAME,
 	validateArticlePageImageFile,

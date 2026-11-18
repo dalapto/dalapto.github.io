@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useBusy } from '../context/BusyContext';
+import { fetchPublicGistFiles } from '../services/github/articles.service';
 import {
 	fetchPointerGistEntries,
-	fetchPublicGistFiles,
 	findPointerGistEntryByFolderName,
-} from '../services/github.service';
+} from '../services/github/pointer-gist.service';
 import { sortArticlesByOrder } from '../utils/pointer-gist-articles';
 
 interface PointerGistFile {

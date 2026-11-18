@@ -160,21 +160,22 @@ function AppInner() {
 function App() {
 	return (
 		<BackgroundProvider>
-			<SupabaseProvider>
-				<GitHubProvider>
-					<AuthRequestProvider>
-						<BusyProvider initialBusy>
-							<ToastProvider>
+			{/* Above the auth providers so they can show toasts (e.g. GitHub unreachable). */}
+			<ToastProvider>
+				<SupabaseProvider>
+					<GitHubProvider>
+						<AuthRequestProvider>
+							<BusyProvider initialBusy>
 								<WritingPagesProvider>
 									<UnsavedChangesProvider>
 										<AppInner />
 									</UnsavedChangesProvider>
 								</WritingPagesProvider>
-							</ToastProvider>
-						</BusyProvider>
-					</AuthRequestProvider>
-				</GitHubProvider>
-			</SupabaseProvider>
+							</BusyProvider>
+						</AuthRequestProvider>
+					</GitHubProvider>
+				</SupabaseProvider>
+			</ToastProvider>
 		</BackgroundProvider>
 	);
 }

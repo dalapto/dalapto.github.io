@@ -12,6 +12,7 @@ interface StandardCheckboxProps {
 	label: string;
 	checked: boolean;
 	onChange: (checked: boolean) => void;
+	disabled?: boolean;
 	className?: string;
 	sx?: SxProps<Theme>;
 }
@@ -21,17 +22,20 @@ function StandardCheckbox({
 	label,
 	checked,
 	onChange,
+	disabled = false,
 	className,
 	sx,
 }: StandardCheckboxProps) {
 	return (
 		<FormControlLabel
 			label={label}
+			disabled={disabled}
 			className={['standard-checkbox', className].filter(Boolean).join(' ')}
 			control={
 				<Checkbox
 					id={id}
 					checked={checked}
+					disabled={disabled}
 					onChange={(e) => onChange(e.target.checked)}
 					sx={{
 						color: colours.textSecondary,

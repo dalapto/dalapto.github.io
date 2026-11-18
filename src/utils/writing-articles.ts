@@ -1,5 +1,5 @@
 import { ImgPaths } from '../constants/img-paths';
-import type { PointerGistEntry } from '../services/github.service';
+import type { PointerGistEntry } from '../services/github/pointer-gist.service';
 
 export const WRITING_ARTICLE_PARAM = 'article';
 export const WRITING_HUB_ROUTE = '/writing';
